@@ -9,6 +9,27 @@ const SUPABASE_CONFIG = {
     KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZ290amRucmJyYndmY2thYXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1NzAwMTcsImV4cCI6MjA4NDE0NjAxN30.c0Y9MLW6HQBBJhN04MGHamOE6flLKqyPWRbyQBmNI_8'
 };
 
+let supabaseClient = null;
+
+// Initialiser Supabase
+async function initSupabase() {
+    if (supabaseClient) return supabaseClient;
+
+    try {
+        // Charger la bibliothèque Supabase
+        if (typeof supabase === 'undefined') {
+            throw new Error('Supabase library not loaded');
+        }
+
+        supabaseClient = supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.KEY);
+        console.log('✅ Supabase client initialisé');
+        return supabaseClient;
+    } catch (error) {
+        console.error('❌ Erreur initialisation Supabase:', error);
+        throw error;
+    }
+}
+
 // Charger Supabase dynamiquement - Compatible avec npm install local
 async function loadSupabaseLibrary() {
     // Vérifier si Supabase est déjà chargé
@@ -20,11 +41,20 @@ async function loadSupabaseLibrary() {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
-        script.onload = () => resolve();
+        script.onload = () => {
+            console.log('✅ Supabase library chargée');
+            resolve();
+        };
         script.onerror = () => {
             script.src = 'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js';
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error('Impossible de charger Supabase'));
+            script.onload = () => {
+                console.log('✅ Supabase library chargée (fallback unpkg)');
+                resolve();
+            };
+            script.onerror = () => {
+                console.error('❌ Impossible de charger Supabase');
+                reject(new Error('Impossible de charger Supabase'));
+            };
             document.head.appendChild(script);
         };
         document.head.appendChild(script);
@@ -39,22 +69,19 @@ async function enableSupabaseStorage() {
     }
 
     try {
-        console.log('⏳ Initialisation Supabase exclusive...');
+        console.log('⏳ Chargement et initialisation Supabase...');
 
-        // Utiliser la fonction d'initialisation de storage-adapter.js
-        if (typeof initializeSupabaseStorage === 'function') {
-            await initializeSupabaseStorage();
-            console.log('✅ Supabase Storage initialisé (stockage unique)');
-            return true;
-        } else {
-            throw new Error('initializeSupabaseStorage non disponible');
-        }
+        // D'abord charger la lib
+        await loadSupabaseLibrary();
+
+        // Puis initialiser le client
+        await initSupabase();
+
+        console.log('✅ Supabase Storage initialisé (stockage unique)');
+        return true;
     } catch (error) {
         console.error('❌ Erreur lors de l\'activation de Supabase:', error);
         throw error;
     }
 }
-
-// À appeler depuis la console une fois configuré :
-// enableSupabaseStorage()
 

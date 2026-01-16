@@ -1,17 +1,28 @@
 // Gestionnaire de synchronisation avec Supabase
 class DataSyncManager {
     constructor() {
-        this.supabase = window.supabaseClient;
+        this.supabase = null;
+    }
+
+    // Obtenir le client Supabase
+    async getSupabaseClient() {
+        if (this.supabase) return this.supabase;
+
+        // Attendre que Supabase soit initialisé
+        if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+            this.supabase = supabaseClient;
+            return this.supabase;
+        }
+
+        throw new Error('Supabase client non disponible. Appelez enableSupabaseStorage() d\'abord');
     }
 
     // Charger les niveaux acceptés depuis Supabase
     async loadLevels() {
         try {
-            if (!this.supabase) {
-                throw new Error('Supabase client non disponible');
-            }
+            const client = await this.getSupabaseClient();
 
-            const { data, error } = await this.supabase
+            const { data, error } = await client
                 .from('submissions')
                 .select('*')
                 .eq('status', 'accepted')
@@ -30,11 +41,9 @@ class DataSyncManager {
     // Charger les records acceptés depuis Supabase
     async loadRecords() {
         try {
-            if (!this.supabase) {
-                throw new Error('Supabase client non disponible');
-            }
+            const client = await this.getSupabaseClient();
 
-            const { data, error } = await this.supabase
+            const { data, error } = await client
                 .from('submissions')
                 .select('*')
                 .eq('status', 'accepted')

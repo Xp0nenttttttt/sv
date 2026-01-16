@@ -121,77 +121,82 @@ class SupabaseStorageAdapter extends StorageAdapter {
             console.warn('⚠️ Table storage_data introuvable:', err.message);
             // Throw pour que le caller puisse fallback
             throw err;
-            .select('data')
-                .eq('storage_key', key)
-                .order('updated_at', { ascending: false })
-                .limit(1);
-
-            if (error) {
-                console.error(`[Supabase] getData error:`, error);
-                throw error;
-            }
-
-            const result = Array.isArray(data) && data.length ? data[0].data : null;
-            console.log(`[Supabase] getData result:`, result);
-            return result;
         }
+    }
+
+    async getData(key) {
+        console.log(`[Supabase] getData("${key}")`);
+        await this.initialize();
+        const { data, error } = await this.client
+            .from(this.tableName)
+            .select('data')
+            .eq('storage_key', key)
+            .order('updated_at', { ascending: false })
+            .limit(1);
+
+        if (error) {
+            console.error(`[Supabase] getData error:`, error);
+            throw error;
+        }
+
+        const result = Array.isArray(data) && data.length ? data[0].data : null;
+        console.log(`[Supabase] getData result:`, result);
+        return result;
+    }
 
     async setData(key, data) {
-            console.log(`[Supabase] setData("${key}") with ${JSON.stringify(data).substring(0, 100)}...`);
-            await this.initialize();
-            const { error: upsertError } = await this.client
-                .from(this.tableName)
-                .upsert(
-                    {
-                        storage_key: key,
-                        data: data,
-                        updated_at: new Date().toISOString()
-                    },
-                    { onConflict: 'storage_key' }
-                );
+        console.log(`[Supabase] setData("${key}") with ${JSON.stringify(data).substring(0, 100)}...`);
+        await this.initialize();
+        const { error: upsertError } = await this.client
+            .from(this.tableName)
+            .upsert(
+                {
+                    storage_key: key,
+                    data: data,
+                    updated_at: new Date().toISOString()
+                },
+                { onConflict: 'storage_key' }
+            );
 
-            if (upsertError) {
-                console.error(`[Supabase] setData error:`, upsertError);
-                throw upsertError;
-            }
-
-            console.log(`[Supabase] setData success`);
-            return true;
+        if (upsertError) {
+            console.error(`[Supabase] setData error:`, upsertError);
+            throw upsertError;
         }
 
+        console.log(`[Supabase] setData success`);
+        return true;
+    }
     async removeData(key) {
-            console.log(`[Supabase] removeData("${key}")`);
-            await this.initialize();
-            const { error: deleteError } = await this.client
-                .from(this.tableName)
-                .delete()
-                .eq('storage_key', key);
+        console.log(`[Supabase] removeData("${key}")`);
+        await this.initialize();
+        const { error: deleteError } = await this.client
+            .from(this.tableName)
+            .delete()
+            .eq('storage_key', key);
 
-            if (deleteError) {
-                console.error(`[Supabase] removeData error:`, deleteError);
-                throw deleteError;
-            }
-
-            console.log(`[Supabase] removeData success`);
-            return true;
+        if (deleteError) {
+            console.error(`[Supabase] removeData error:`, deleteError);
+            throw deleteError;
         }
 
+        console.log(`[Supabase] removeData success`);
+        return true;
+    }
     async getAllKeys() {
-            console.log(`[Supabase] getAllKeys()`);
-            await this.initialize();
-            const { data, error } = await this.client
-                .from(this.tableName)
-                .select('storage_key');
+        console.log(`[Supabase] getAllKeys()`);
+        await this.initialize();
+        const { data, error } = await this.client
+            .from(this.tableName)
+            .select('storage_key');
 
-            if (error) {
-                console.error(`[Supabase] getAllKeys error:`, error);
-                throw error;
-            }
-
-            const keys = Array.isArray(data) ? data.map(row => row.storage_key) : [];
-            console.log(`[Supabase] getAllKeys result:`, keys);
-            return keys;
+        if (error) {
+            console.error(`[Supabase] getAllKeys error:`, error);
+            throw error;
         }
+
+        const keys = Array.isArray(data) ? data.map(row => row.storage_key) : [];
+        console.log(`[Supabase] getAllKeys result:`, keys);
+        return keys;
     }
 }
 
