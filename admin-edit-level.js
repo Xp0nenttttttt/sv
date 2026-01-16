@@ -125,13 +125,23 @@ class LevelEditor {
             submittedAt: new Date().toISOString()
         };
 
+        console.log('🔹 Ajout record:', newRecord);
+
         // Ajouter via RecordSubmissionManager pour que ce soit synchronisé partout
         const manager = new RecordSubmissionManager();
         const submissions = await manager.getSubmissions();
+        console.log(`📦 Submissions avant ajout: ${submissions.length}`, submissions);
+
         submissions.push(newRecord);
+        console.log(`📦 Submissions après ajout: ${submissions.length}`, submissions);
 
         if (universalStorage) {
+            console.log('💾 Sauvegarde dans Supabase...');
             await universalStorage.setData('svChallengeRecordSubmissions', submissions);
+            console.log('✅ Sauvegardé dans Supabase');
+        } else {
+            console.error('❌ universalStorage non initialisé!');
+            return;
         }
 
         // Recharger les records locaux pour l'affichage immédiat
@@ -139,8 +149,8 @@ class LevelEditor {
             .filter(r => r.levelId === this.level.id && r.status === 'accepted')
             .sort((a, b) => b.percentage - a.percentage);
 
+        console.log(`🎯 Records affichés localement: ${this.records.length}`, this.records);
         this.renderRecords();
-        console.log('✅ Record ajouté et synchronisé');
     }
 
     async deleteRecord(recordId) {

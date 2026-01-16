@@ -39,7 +39,21 @@ class RecordSubmissionManager {
 
         if (universalStorage && typeof universalStorage.getData === 'function') {
             try {
-                return (await universalStorage.getData(this.storageKey)) || [];
+                const data = await universalStorage.getData(this.storageKey);
+                console.log(`[RecordSubmissionManager] getData returned:`, data, `type: ${typeof data}`);
+
+                // Assurer que c'est toujours un array
+                if (Array.isArray(data)) {
+                    return data;
+                } else if (data && typeof data === 'object') {
+                    // Si c'est un objet, le convertir en array
+                    console.warn('⚠️ Data est un objet, pas un array - conversion:', data);
+                    return Object.values(data);
+                } else if (!data) {
+                    return [];
+                }
+
+                return data || [];
             } catch (err) {
                 console.warn('⚠️ Erreur Supabase, retour vide:', err.message);
                 return [];
