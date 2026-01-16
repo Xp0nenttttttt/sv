@@ -14,15 +14,26 @@
     <script src="storage-adapter.js"></script>
     <script src="supabase-config.js"></script>
     <script>
-        // Initialiser le stockage immédiatement (avant les autres scripts)
+        // Initialiser Supabase PUIS le stockage (en séquence)
         console.log('🔄 Initialisation du stockage (leaderboard)...');
-        initializeSupabaseStorage()
-            .then(() => {
+
+        async function initializeLeaderboard() {
+            try {
+                // D'abord activer Supabase (charge la lib et initialise le client)
+                await enableSupabaseStorage();
+                console.log('✅ Supabase activé et client initialisé');
+
+                // Puis initialiser le stockage avec le client global
+                await initializeSupabaseStorage();
                 console.log('✅ Stockage prêt (leaderboard)');
-            })
-            .catch(err => {
+            } catch (err) {
                 console.error('❌ Erreur initialisation stockage:', err.message);
-            });
+                throw err;
+            }
+        }
+
+        // Lancer l'initialisation
+        initializeLeaderboard();
     </script>
 </head>
 
