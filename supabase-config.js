@@ -3,10 +3,10 @@
 
 const SUPABASE_CONFIG = {
     // Remplacez par votre Project URL depuis Supabase Settings > API
-    URL: 'https://vgbrwtkcdjbmjhirlqyf.supabase.co',
+    URL: 'https://bpgotjdnrbrbwfckaayz.supabase.co',
 
     // Remplacez par votre Anon Key depuis Supabase Settings > API
-    KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnYnJ3dGtjZGpibWpoaXJscXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1NTkzOTgsImV4cCI6MjA4NDEzNTM5OH0.1QUWS46g1rfF0O_-GgNVXIkOK2BPIq0KGSsYRb58rJg'
+    KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZ290amRucmJyYndmY2thYXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1NzAwMTcsImV4cCI6MjA4NDE0NjAxN30.c0Y9MLW6HQBBJhN04MGHamOE6flLKqyPWRbyQBmNI_8'
 };
 
 // Charger Supabase dynamiquement - Compatible avec npm install local
