@@ -170,8 +170,6 @@ class LeaderboardManager {
             }
 
             // Trouver le niveau
-            const allSubmissions = this.submissionManager.getSubmissions()
-                .filter(s => s.status === 'accepted');
             const level = allSubmissions.find(s => s.id === record.levelId);
 
             if (level) {
