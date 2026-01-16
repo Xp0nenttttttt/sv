@@ -14,7 +14,34 @@ function calculatePoints(rank) {
 
 // Charger les niveaux avec les soumissions acceptées
 async function loadAllLevels() {
-    // Si le gestionnaire est disponible, l'utiliser pour récupérer les soumissions acceptées
+    // Utiliser DataSyncManager pour charger depuis JSON (ou fallback localStorage)
+    if (typeof dataSyncManager !== 'undefined') {
+        const acceptedSubmissions = await dataSyncManager.loadLevels();
+
+        const submittedLevels = acceptedSubmissions.map((submission) => {
+            const rank = submission.approvedRank || (levels.length + 100);
+            return {
+                id: submission.id,
+                rank: rank,
+                name: submission.levelName,
+                creator: submission.creatorName,
+                difficulty: submission.approvedDifficulty || 'Moyen',
+                length: submission.length,
+                points: calculatePoints(rank),
+                author: submission.authorName,
+                image: submission.imageBase64 || submission.imageUrl,
+                submittedBy: submission.authorName,
+                isSubmitted: true,
+                proposedTop: submission.proposedTop,
+                tags: submission.tags || [],
+                badge: submission.badge || null
+            };
+        });
+
+        return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
+    }
+
+    // Fallback classique si DataSyncManager n'est pas chargé
     if (typeof SubmissionManager !== 'undefined') {
         const manager = new SubmissionManager();
         const acceptedSubmissions = manager.getAcceptedSubmissions();

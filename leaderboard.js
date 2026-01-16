@@ -29,19 +29,19 @@ function applyFilters() {
     renderCombinedLeaderboard();
 }
 
-function loadLeaderboards() {
+async function loadLeaderboards() {
     // Charger les stats globales
-    const stats = leaderboardManager.getGlobalStats();
+    const stats = await leaderboardManager.getGlobalStats();
     document.getElementById('statsLevels').textContent = stats.totalLevels;
     document.getElementById('statsRecords').textContent = stats.totalRecords;
     document.getElementById('statsPlayers').textContent = stats.totalPlayers;
 
     // Charger le classement global
-    renderCombinedLeaderboard();
+    await renderCombinedLeaderboard();
 }
 
-function renderCombinedLeaderboard() {
-    let combined = leaderboardManager.getCombinedLeaderboard();
+async function renderCombinedLeaderboard() {
+    let combined = await leaderboardManager.getCombinedLeaderboard();
 
     // Appliquer les filtres
     const countryFilter = document.getElementById('countryFilter').value;

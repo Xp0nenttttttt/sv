@@ -6,9 +6,9 @@ class LeaderboardManager {
     }
 
     // Obtenir le classement combiné (joueurs + vérificateurs)
-    getCombinedLeaderboard() {
-        const players = this.getPlayersLeaderboard();
-        const verifiers = this.getVerifiersLeaderboard();
+    async getCombinedLeaderboard() {
+        const players = await this.getPlayersLeaderboard();
+        const verifiers = await this.getVerifiersLeaderboard();
 
         // Créer un map pour fusionner les données
         const combined = {};
@@ -69,9 +69,16 @@ class LeaderboardManager {
     }
 
     // Obtenir le classement des vérificateurs
-    getVerifiersLeaderboard() {
-        const allSubmissions = this.submissionManager.getSubmissions()
-            .filter(s => s.status === 'accepted');
+    async getVerifiersLeaderboard() {
+        let allSubmissions;
+
+        // Utiliser DataSyncManager si disponible
+        if (typeof dataSyncManager !== 'undefined') {
+            allSubmissions = await dataSyncManager.loadLevels();
+        } else {
+            allSubmissions = this.submissionManager.getSubmissions()
+                .filter(s => s.status === 'accepted');
+        }
 
         const verifiers = {};
 
@@ -111,9 +118,20 @@ class LeaderboardManager {
     }
 
     // Obtenir le classement des joueurs
-    getPlayersLeaderboard() {
-        const acceptedRecords = this.recordSubmissionManager.getSubmissions()
-            .filter(s => s.status === 'accepted');
+    async getPlayersLeaderboard() {
+        let acceptedRecords;
+        let allSubmissions;
+
+        // Utiliser DataSyncManager si disponible
+        if (typeof dataSyncManager !== 'undefined') {
+            acceptedRecords = await dataSyncManager.loadRecords();
+            allSubmissions = await dataSyncManager.loadLevels();
+        } else {
+            acceptedRecords = this.recordSubmissionManager.getSubmissions()
+                .filter(s => s.status === 'accepted');
+            allSubmissions = this.submissionManager.getSubmissions()
+                .filter(s => s.status === 'accepted');
+        }
 
         const players = {};
 
@@ -172,22 +190,31 @@ class LeaderboardManager {
     }
 
     // Obtenir les statistiques globales
-    getGlobalStats() {
-        const allSubmissions = this.submissionManager.getSubmissions();
-        const acceptedRecords = this.recordSubmissionManager.getSubmissions()
-            .filter(s => s.status === 'accepted');
+    async getGlobalStats() {
+        let allSubmissions;
+        let acceptedRecords;
+
+        // Utiliser DataSyncManager si disponible
+        if (typeof dataSyncManager !== 'undefined') {
+            allSubmissions = await dataSyncManager.loadLevels();
+            acceptedRecords = await dataSyncManager.loadRecords();
+        } else {
+            allSubmissions = this.submissionManager.getSubmissions();
+            acceptedRecords = this.recordSubmissionManager.getSubmissions()
+                .filter(s => s.status === 'accepted');
+        }
 
         // Compter joueurs et vérificateurs ensemble
         const playersSet = new Set(acceptedRecords.map(r => r.player));
-        const verifiersSet = new Set(allSubmissions.filter(s => s.status === 'accepted').map(s => s.authorName));
+        const verifiersSet = new Set(allSubmissions.map(s => s.authorName));
         const allParticipants = new Set([...playersSet, ...verifiersSet]);
 
         return {
-            totalLevels: allSubmissions.filter(s => s.status === 'accepted').length,
+            totalLevels: allSubmissions.length,
             totalRecords: acceptedRecords.length,
             totalPlayers: allParticipants.size,
-            pendingLevels: allSubmissions.filter(s => s.status === 'pending').length,
-            pendingRecords: this.recordSubmissionManager.getSubmissions().filter(s => s.status === 'pending').length
+            pendingLevels: 0,
+            pendingRecords: 0
         };
     }
 }

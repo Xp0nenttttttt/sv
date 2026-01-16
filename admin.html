@@ -41,6 +41,8 @@
                         <a href="admin-records.html" class="btn-primary">🏅 Gérer les records</a>
                         <a href="admin-accounts.html" class="btn-primary">👤 Gérer les comptes</a>
                         <a href="admin-storage.html" class="btn-primary">💾 Gestion du stockage</a>
+                        <button class="btn-primary" onclick="dataSyncManager.exportForGitHub()"
+                            style="background: #28a745;">📤 Exporter pour GitHub</button>
                         <button class="btn-logout" onclick="logoutAdmin()">Se déconnecter</button>
                     </div>
                 </div>
@@ -76,6 +78,7 @@
     </footer>
 
     <script src="submission.js"></script>
+    <script src="data-sync.js"></script>
     <script src="admin.js"></script>
 
     <!-- Supabase (optionnel, pour usage futur) -->
