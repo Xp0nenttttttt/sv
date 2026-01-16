@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Supabase Direct</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .log {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .error {
+            border-left-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .success {
+            border-left-color: #51cf66;
+            color: #51cf66;
+        }
+
+        .info {
+            border-left-color: #4dabf7;
+            color: #4dabf7;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🧪 Test Supabase Direct</h1>
+    <div id="output"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script>
+        const output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = message;
+            output.appendChild(div);
+            console.log(message);
+        }
+
+        async function test() {
+            log('🔄 Début des tests Supabase...');
+
+            try {
+                // 1. Vérifier si Supabase est chargé
+                log('1️⃣ Vérification de la bibliothèque Supabase...');
+                if (typeof supabase === 'undefined') {
+                    log('❌ Supabase non chargé', 'error');
+                    return;
+                }
+                log('✅ Supabase chargé', 'success');
+
+                // 2. Créer le client
+                log('2️⃣ Création du client Supabase...');
+                const client = supabase.createClient(
+                    'https://bpgotjdnrbrbwfckaayz.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZ290amRucmJyYndmY2thYXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1NzAwMTcsImV4cCI6MjA4NDE0NjAxN30.c0Y9MLW6HQBBJhN04MGHamOE6flLKxPWRbyQBmNI_8'
+                );
+                log('✅ Client créé', 'success');
+
+                // 3. Tester la table storage_data
+                log('3️⃣ Test de connexion à storage_data...');
+                const { data: testData, error: testError } = await client
+                    .from('storage_data')
+                    .select('*')
+                    .limit(1);
+
+                if (testError) {
+                    log(`❌ Erreur Supabase: ${testError.message}`, 'error');
+                    log(`Détails: ${JSON.stringify(testError)}`, 'error');
+                } else {
+                    log(`✅ Connexion réussie! ${testData.length} enregistrements trouvés`, 'success');
+                }
+
+                // 4. Tester une insertion
+                log('4️⃣ Test d\'insertion...');
+                const testPayload = {
+                    storage_key: `test_${Date.now()}`,
+                    data: { test: true, timestamp: new Date().toISOString() }
+                };
+                log(`Tentative d'insertion: ${JSON.stringify(testPayload)}`);
+
+                const { data: insertData, error: insertError } = await client
+                    .from('storage_data')
+                    .upsert(testPayload)
+                    .select();
+
+                if (insertError) {
+                    log(`❌ Erreur insertion: ${insertError.message}`, 'error');
+                } else {
+                    log(`✅ Insertion réussie!`, 'success');
+                    log(`Données renvoyées: ${JSON.stringify(insertData)}`);
+                }
+
+                // 5. Tester une lecture
+                log('5️⃣ Test de lecture...');
+                const { data: readData, error: readError } = await client
+                    .from('storage_data')
+                    .select('*')
+                    .eq('storage_key', testPayload.storage_key)
+                    .limit(1);
+
+                if (readError) {
+                    log(`❌ Erreur lecture: ${readError.message}`, 'error');
+                } else {
+                    log(`✅ Lecture réussie! ${readData.length} enregistrements trouvés`, 'success');
+                    if (readData.length > 0) {
+                        log(`Données lues: ${JSON.stringify(readData[0].data)}`);
+                    }
+                }
+
+                log('✅ TOUS LES TESTS RÉUSSIS!', 'success');
+
+            } catch (err) {
+                log(`❌ Erreur: ${err.message}`, 'error');
+                log(`Stack: ${err.stack}`, 'error');
+            }
+        }
+
+        // Lancer les tests quand la page se charge
+        window.addEventListener('load', test);
+    </script>
+</body>
+
+</html>

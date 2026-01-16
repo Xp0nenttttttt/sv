@@ -127,65 +127,91 @@ class SupabaseStorageAdapter extends StorageAdapter {
         // Table créée via SQL Editor dans Supabase
         // Vérifier que la table existe en tentant une requête simple
         try {
-            await this.client.from(this.tableName).select('id').limit(1);
-            console.log('✅ Table storage_data connectée');
+            console.log('🔍 Vérification table storage_data...');
+            const { data, error } = await this.client.from(this.tableName).select('id').limit(1);
+
+            if (error) {
+                console.warn('⚠️ Erreur accès table:', error.code, error.message);
+                // Throw pour que le caller sache que Supabase ne fonctionne pas
+                throw new Error(`Erreur table ${this.tableName}: ${error.message}`);
+            } else {
+                console.log('✅ Table storage_data connectée');
+            }
         } catch (err) {
-            console.error('❌ Table storage_data introuvable. Exécutez le SQL de création.');
-        }
-    }
-
-    async getData(key) {
-        await this.initialize();
-        const { data, error } = await this.client
-            .from(this.tableName)
+            console.warn('⚠️ Table storage_data introuvable:', err.message);
+            // Throw pour que le caller puisse fallback
+            throw err;
             .select('data')
-            .eq('storage_key', key)
-            .order('updated_at', { ascending: false })
-            .limit(1);
+                .eq('storage_key', key)
+                .order('updated_at', { ascending: false })
+                .limit(1);
 
-        if (error) {
-            throw error;
+            if (error) {
+                console.error(`[Supabase] getData error:`, error);
+                throw error;
+            }
+
+            const result = Array.isArray(data) && data.length ? data[0].data : null;
+            console.log(`[Supabase] getData result:`, result);
+            return result;
         }
-
-        return Array.isArray(data) && data.length ? data[0].data : null;
-    }
 
     async setData(key, data) {
-        await this.initialize();
-        const { error: upsertError } = await this.client
-            .from(this.tableName)
-            .upsert(
-                {
-                    storage_key: key,
-                    data: data,
-                    updated_at: new Date().toISOString()
-                },
-                { onConflict: 'storage_key' }
-            );
+            console.log(`[Supabase] setData("${key}") with ${JSON.stringify(data).substring(0, 100)}...`);
+            await this.initialize();
+            const { error: upsertError } = await this.client
+                .from(this.tableName)
+                .upsert(
+                    {
+                        storage_key: key,
+                        data: data,
+                        updated_at: new Date().toISOString()
+                    },
+                    { onConflict: 'storage_key' }
+                );
 
-        if (upsertError) throw upsertError;
-        return true;
-    }
+            if (upsertError) {
+                console.error(`[Supabase] setData error:`, upsertError);
+                throw upsertError;
+            }
+
+            console.log(`[Supabase] setData success`);
+            return true;
+        }
 
     async removeData(key) {
-        await this.initialize();
-        const { error } = await this.client
-            .from(this.tableName)
-            .delete()
-            .eq('storage_key', key);
+            console.log(`[Supabase] removeData("${key}")`);
+            await this.initialize();
+            const { error: deleteError } = await this.client
+                .from(this.tableName)
+                .delete()
+                .eq('storage_key', key);
 
-        if (error) throw error;
-        return true;
-    }
+            if (deleteError) {
+                console.error(`[Supabase] removeData error:`, deleteError);
+                throw deleteError;
+            }
+
+            console.log(`[Supabase] removeData success`);
+            return true;
+        }
 
     async getAllKeys() {
-        await this.initialize();
-        const { data, error } = await this.client
-            .from(this.tableName)
-            .select('storage_key');
+            console.log(`[Supabase] getAllKeys()`);
+            await this.initialize();
+            const { data, error } = await this.client
+                .from(this.tableName)
+                .select('storage_key');
 
-        if (error) throw error;
-        return data.map(row => row.storage_key);
+            if (error) {
+                console.error(`[Supabase] getAllKeys error:`, error);
+                throw error;
+            }
+
+            const keys = Array.isArray(data) ? data.map(row => row.storage_key) : [];
+            console.log(`[Supabase] getAllKeys result:`, keys);
+            return keys;
+        }
     }
 }
 
@@ -315,30 +341,41 @@ async function initializeSupabaseStorage() {
         console.log('🔄 Initialisation du stockage...');
 
         // Charger la bibliothèque Supabase
+        console.log('📦 Chargement bibliothèque Supabase...');
         await new Promise((resolve, reject) => {
             if (typeof supabase !== 'undefined' && supabase.createClient) {
+                console.log('✅ Supabase déjà chargé');
                 resolve();
             } else {
                 const script = document.createElement('script');
                 script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
-                script.onload = () => resolve();
-                script.onerror = () => reject(new Error('Impossible de charger Supabase'));
+                script.onload = () => {
+                    console.log('✅ Supabase chargé du CDN');
+                    resolve();
+                };
+                script.onerror = () => {
+                    console.error('❌ Impossible de charger Supabase');
+                    reject(new Error('Impossible de charger Supabase'));
+                };
                 document.head.appendChild(script);
             }
         });
 
         // Créer l'adaptateur Supabase
+        console.log('🔧 Création adaptateur Supabase...');
         const supabaseAdapter = new SupabaseStorageAdapter(
             'https://bpgotjdnrbrbwfckaayz.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZ290amRucmJyYndmY2thYXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1NzAwMTcsImV4cCI6MjA4NDE0NjAxN30.c0Y9MLW6HQBBJhN04MGHamOE6flLKxPWRbyQBmNI_8'
         );
 
         // Initialiser et tester la connexion
+        console.log('🌐 Initialisation client Supabase...');
         try {
             await supabaseAdapter.initialize();
             console.log('✅ Supabase connecté');
 
             // Créer un adaptateur hybride Supabase + localStorage
+            console.log('⚙️ Création adaptateur hybride...');
             const localStorageAdapter = new LocalStorageAdapter();
             const hybridAdapter = new HybridStorageAdapter(supabaseAdapter, localStorageAdapter);
             universalStorage = new UniversalStorageManager(hybridAdapter);
