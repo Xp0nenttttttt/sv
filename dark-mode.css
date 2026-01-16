@@ -1,0 +1,305 @@
+/* MODE SOMBRE - Variables et Thèmes */
+
+:root {
+    /* Couleurs claires (défaut) */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: rgba(0, 0, 0, 0.8);
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-tertiary: #999999;
+    --border-color: #dddddd;
+    --input-bg: #ffffff;
+    --input-text: #333333;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --gradient-start: #667eea;
+    --gradient-end: #764ba2;
+    --header-bg: rgba(0, 0, 0, 0.8);
+    --container-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* MODE SOMBRE */
+body.dark-mode {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: rgba(255, 255, 255, 0.1);
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #808080;
+    --border-color: #404040;
+    --input-bg: #2d2d2d;
+    --input-text: #e0e0e0;
+    --shadow: rgba(0, 0, 0, 0.7);
+    --gradient-start: #5a67d8;
+    --gradient-end: #6b4ca3;
+    --header-bg: rgba(0, 0, 0, 0.95);
+    --container-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: var(--text-primary);
+}
+
+body.dark-mode .container {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+body.dark-mode header {
+    background: var(--header-bg);
+    border-bottom-color: var(--gradient-start);
+}
+
+body.dark-mode main {
+    color: var(--text-primary);
+}
+
+/* Input et Select en dark mode */
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea,
+body.dark-mode .filter-group input,
+body.dark-mode .filter-group select {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .form-group input:focus,
+body.dark-mode .form-group select:focus,
+body.dark-mode .form-group textarea:focus,
+body.dark-mode .filter-group input:focus,
+body.dark-mode .filter-group select:focus {
+    border-color: var(--gradient-start);
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+}
+
+body.dark-mode .submission-form {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+body.dark-mode .submission-wrapper h2 {
+    color: var(--text-primary);
+}
+
+body.dark-mode .form-group label,
+body.dark-mode .filter-group label {
+    color: var(--text-primary);
+}
+
+body.dark-mode .form-group small {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .stat-number {
+    color: var(--gradient-start);
+}
+
+body.dark-mode .stat-label {
+    color: var(--text-tertiary);
+}
+
+body.dark-mode .filters {
+    border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .filter-group input::placeholder,
+body.dark-mode .form-group input::placeholder,
+body.dark-mode .form-group textarea::placeholder {
+    color: var(--text-tertiary);
+}
+
+/* Select options en dark mode */
+body.dark-mode .form-group select option,
+body.dark-mode .filter-group select option {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Dark mode pour les cartes et éléments */
+body.dark-mode .level-card,
+body.dark-mode .submission-item,
+body.dark-mode .submission-card,
+body.dark-mode .leaderboard-entry {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .level-card h3,
+body.dark-mode .submission-item .submission-title {
+    color: var(--text-primary);
+}
+
+body.dark-mode .level-card p,
+body.dark-mode .submission-item .submission-meta {
+    color: var(--text-secondary);
+}
+
+/* Messages */
+body.dark-mode .success-message {
+    background: rgba(40, 167, 69, 0.2);
+    border-color: #28a745;
+    color: #6ee7a8;
+}
+
+body.dark-mode .error-message {
+    background: rgba(220, 53, 69, 0.2);
+    border-color: #dc3545;
+    color: #ff7b8a;
+}
+
+/* Tags et badges */
+body.dark-mode .tag-label {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .tag-label:hover {
+    background: var(--gradient-start);
+    color: white;
+}
+
+body.dark-mode .tag-label input:checked~.tag-text {
+    color: white;
+}
+
+/* Leaderboard en dark mode */
+body.dark-mode .global-stats {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode .stat-item {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .leaderboard-section {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode .section-header h2 {
+    color: var(--text-primary);
+}
+
+body.dark-mode .section-subtitle {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .leaderboard-list {
+    background: var(--bg-primary);
+}
+
+body.dark-mode .leaderboard-entry {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .leaderboard-entry:hover {
+    background: var(--bg-tertiary);
+}
+
+body.dark-mode .leaderboard-rank {
+    color: var(--gradient-start);
+}
+
+body.dark-mode .leaderboard-name {
+    color: var(--text-primary);
+}
+
+body.dark-mode .leaderboard-score {
+    color: var(--text-secondary);
+}
+
+/* Boutons */
+body.dark-mode .btn-logout,
+body.dark-mode .btn-reset,
+body.dark-mode .btn-delete,
+body.dark-mode .btn-reject {
+    background: rgba(220, 53, 69, 0.3);
+    color: #ff7b8a;
+    border-color: #dc3545;
+}
+
+body.dark-mode .btn-accept {
+    background: rgba(40, 167, 69, 0.3);
+    color: #6ee7a8;
+    border-color: #28a745;
+}
+
+/* Toggle Dark Mode */
+.dark-mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.2em;
+    z-index: 1000;
+    transition: all 0.3s;
+    color: white;
+}
+
+.dark-mode-toggle:hover {
+    transform: scale(1.1);
+    background: var(--gradient-start);
+    border-color: var(--gradient-start);
+}
+
+/* Admin panel dark mode */
+body.dark-mode .login-wrapper {
+    background: var(--bg-primary);
+}
+
+body.dark-mode .login-form input {
+    background: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .login-form button {
+    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+}
+
+body.dark-mode .admin-header {
+    color: var(--text-primary);
+    border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .stats-admin {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode .stat-box {
+    background: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+body.dark-mode .stat-number {
+    color: var(--gradient-start);
+}
+
+body.dark-mode .submission-meta {
+    border-color: var(--border-color);
+}
+
+body.dark-mode .submission-meta-item {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .submission-meta-label {
+    color: var(--text-primary);
+}
+
+body.dark-mode .difficulty-select {
+    background: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--border-color);
+}
