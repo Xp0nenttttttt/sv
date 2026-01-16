@@ -35,18 +35,9 @@ class DataSyncManager {
                 }
             }
 
-            // Fallback: charger depuis la table submissions si elle existe
-            const client = await this.getSupabaseClient();
-            const { data, error } = await client
-                .from('submissions')
-                .select('*')
-                .eq('status', 'accepted')
-                .eq('type', 'level');
-
-            if (error) throw error;
-
-            console.log(`✅ ${data.length} niveaux chargés depuis Supabase submissions`);
-            return data || [];
+            // Pas de fallback - les données sont dans storage_data
+            console.log('⚠️ Aucun niveau trouvé dans storage_data');
+            return [];
         } catch (err) {
             console.error('❌ Impossible de charger les niveaux depuis Supabase:', err);
             throw err;
@@ -71,19 +62,9 @@ class DataSyncManager {
                 }
             }
 
-            // Fallback: charger depuis la table submissions si elle existe
-            const client = await this.getSupabaseClient();
-
-            const { data, error } = await client
-                .from('submissions')
-                .select('*')
-                .eq('status', 'accepted')
-                .eq('type', 'record');
-
-            if (error) throw error;
-
-            console.log(`✅ ${data.length} records chargés depuis Supabase submissions`);
-            return data || [];
+            // Pas de fallback - les données sont dans storage_data
+            console.log('⚠️ Aucun record trouvé dans storage_data');
+            return [];
         } catch (err) {
             console.error('❌ Impossible de charger les records depuis Supabase:', err);
             throw err;
