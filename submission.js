@@ -30,7 +30,7 @@ class SubmissionManager {
         if (universalStorage) {
             await universalStorage.setData(this.storageKey, submissions);
         } else {
-            throw new Error('Supabase non initialisé');
+            console.error('❌ Supabase non initialisé - soumission non sauvegardée');
         }
 
         return newSubmission;
@@ -38,10 +38,24 @@ class SubmissionManager {
 
     // Récupérer toutes les soumissions
     async getSubmissions() {
-        if (universalStorage && typeof universalStorage.getData === 'function') {
-            return (await universalStorage.getData(this.storageKey)) || [];
+        // Attendre l'initialisation de Supabase
+        let attempts = 0;
+        while (!universalStorage && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
         }
-        throw new Error('Supabase non initialisé');
+
+        if (universalStorage && typeof universalStorage.getData === 'function') {
+            try {
+                return (await universalStorage.getData(this.storageKey)) || [];
+            } catch (err) {
+                console.warn('⚠️ Erreur Supabase, retour vide:', err.message);
+                return [];
+            }
+        }
+
+        console.warn('⚠️ Supabase non initialisé après attente');
+        return [];
     }
 
     // Mettre à jour le statut d'une soumission
