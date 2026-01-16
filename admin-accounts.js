@@ -47,15 +47,19 @@ class AccountManager {
         this.submissionManager = new SubmissionManager();
         this.leaderboardManager = new LeaderboardManager();
         this.accounts = [];
-        this.loadAccounts();
+        // Lancer loadAccounts async
+        this.loadAccounts().catch(err => {
+            console.error('Erreur chargement comptes:', err);
+        });
     }
 
-    loadAccounts() {
+    async loadAccounts() {
         const accountsMap = {};
 
         // Charger tous les joueurs
-        const allRecords = this.recordManager.getSubmissions().filter(s => s.status === 'accepted');
-        allRecords.forEach(record => {
+        const allRecords = await this.recordManager.getSubmissions();
+        const acceptedRecords = allRecords.filter(s => s.status === 'accepted');
+        acceptedRecords.forEach(record => {
             const key = record.player.toLowerCase();
             if (!accountsMap[key]) {
                 accountsMap[key] = new Account({
@@ -67,7 +71,7 @@ class AccountManager {
                 });
             }
 
-            const level = this.leaderboardManager.submissionManager.getSubmissions()
+            const level = await this.leaderboardManager.submissionManager.getSubmissions()
                 .filter(s => s.status === 'accepted')
                 .find(s => s.id === record.levelId);
 
@@ -80,8 +84,9 @@ class AccountManager {
         });
 
         // Charger tous les vérificateurs
-        const allSubmissions = this.submissionManager.getSubmissions().filter(s => s.status === 'accepted');
-        allSubmissions.forEach(submission => {
+        const allSubmissions = await this.submissionManager.getSubmissions();
+        const acceptedSubmissions = allSubmissions.filter(s => s.status === 'accepted');
+        acceptedSubmissions.forEach(submission => {
             const key = submission.authorName.toLowerCase();
             if (!accountsMap[key]) {
                 accountsMap[key] = new Account({
@@ -116,10 +121,10 @@ class AccountManager {
         this.accounts = Object.values(accountsMap).sort((a, b) => b.getTotalPoints() - a.getTotalPoints());
     }
 
-    updateAccount(originalName, newData) {
+    async updateAccount(originalName, newData) {
         const originalKey = originalName.toLowerCase();
-        const allRecords = this.recordManager.getSubmissions();
-        const allSubmissions = this.submissionManager.getSubmissions();
+        const allRecords = await this.recordManager.getSubmissions();
+        const allSubmissions = await this.submissionManager.getSubmissions();
 
         // Mettre à jour les joueurs
         allRecords.forEach(record => {
@@ -139,30 +144,34 @@ class AccountManager {
             }
         });
 
-        localStorage.setItem(this.recordManager.storageKey, JSON.stringify(allRecords));
-        localStorage.setItem(this.submissionManager.storageKey, JSON.stringify(allSubmissions));
-        this.loadAccounts();
+        if (universalStorage) {
+            await universalStorage.setData(this.recordManager.storageKey, allRecords);
+            await universalStorage.setData(this.submissionManager.storageKey, allSubmissions);
+        }
+        await this.loadAccounts();
     }
 
-    deleteAccount(accountName) {
+    async deleteAccount(accountName) {
         const accountKey = accountName.toLowerCase();
-        const allRecords = this.recordManager.getSubmissions();
-        const allSubmissions = this.submissionManager.getSubmissions();
+        const allRecords = await this.recordManager.getSubmissions();
+        const allSubmissions = await this.submissionManager.getSubmissions();
 
         const filteredRecords = allRecords.filter(record => record.player.toLowerCase() !== accountKey);
         const filteredSubmissions = allSubmissions.filter(submission => submission.authorName.toLowerCase() !== accountKey);
 
-        localStorage.setItem(this.recordManager.storageKey, JSON.stringify(filteredRecords));
-        localStorage.setItem(this.submissionManager.storageKey, JSON.stringify(filteredSubmissions));
-        this.loadAccounts();
+        if (universalStorage) {
+            await universalStorage.setData(this.recordManager.storageKey, filteredRecords);
+            await universalStorage.setData(this.submissionManager.storageKey, filteredSubmissions);
+        }
+        await this.loadAccounts();
     }
 
-    mergeAccounts(primaryAccountName, secondaryAccountName) {
+    async mergeAccounts(primaryAccountName, secondaryAccountName) {
         const primaryKey = primaryAccountName.toLowerCase();
         const secondaryKey = secondaryAccountName.toLowerCase();
 
-        const allRecords = this.recordManager.getSubmissions();
-        const allSubmissions = this.submissionManager.getSubmissions();
+        const allRecords = await this.recordManager.getSubmissions();
+        const allSubmissions = await this.submissionManager.getSubmissions();
 
         // Fusionner tous les records du compte secondaire au compte primaire
         allRecords.forEach(record => {
@@ -178,9 +187,11 @@ class AccountManager {
             }
         });
 
-        localStorage.setItem(this.recordManager.storageKey, JSON.stringify(allRecords));
-        localStorage.setItem(this.submissionManager.storageKey, JSON.stringify(allSubmissions));
-        this.loadAccounts();
+        if (universalStorage) {
+            await universalStorage.setData(this.recordManager.storageKey, allRecords);
+            await universalStorage.setData(this.submissionManager.storageKey, allSubmissions);
+        }
+        await this.loadAccounts();
     }
 
     searchAccounts(term) {
@@ -337,7 +348,7 @@ function editAccountName(accountName) {
 }
 
 // === MODIFICATION DE L'EMPLACEMENT ===
-function editAccountLocation(accountName) {
+async function editAccountLocation(accountName) {
     const account = accountManager.accounts.find(a => a.name === accountName);
     if (!account) return;
 
@@ -347,7 +358,7 @@ function editAccountLocation(accountName) {
     const newRegion = prompt('Région:', account.region || '');
     if (newRegion === null) return; // Annulé
 
-    accountManager.updateAccount(accountName, {
+    await accountManager.updateAccount(accountName, {
         name: accountName,
         country: newCountry.trim() || '',
         region: newRegion.trim() || ''
@@ -358,22 +369,22 @@ function editAccountLocation(accountName) {
 }
 
 // === SUPPRESSION DE COMPTE ===
-function deleteAccount(accountName) {
+async function deleteAccount(accountName) {
     const account = accountManager.accounts.find(a => a.name === accountName);
     if (!account) return;
 
     const activities = account.getActivitiesHTML();
-    if (!confirm(`❓ Êtes-vous sûr de vouloir supprimer le compte "${accountName}" ?\n\n${activities}\n\nCette action supprimera tous ses records et/ou niveaux vérifiés.`)) {
+    if (!confirm(`❓ Êetes-vous sûr de vouloir supprimer le compte "${accountName}" ?\n\n${activities}\n\nCette action supprimera tous ses records et/ou niveaux vérifiés.`)) {
         return;
     }
 
-    accountManager.deleteAccount(accountName);
+    await accountManager.deleteAccount(accountName);
     renderAccountsList();
     alert(`✅ Compte "${accountName}" supprimé`);
 }
 
 // === FUSION DE COMPTES ===
-function mergeAccount(primaryAccountName) {
+async function mergeAccount(primaryAccountName) {
     const primaryAccount = accountManager.accounts.find(a => a.name === primaryAccountName);
     if (!primaryAccount) return;
 
@@ -420,7 +431,7 @@ function mergeAccount(primaryAccountName) {
         return;
     }
 
-    accountManager.mergeAccounts(primaryAccountName, secondaryAccountName);
+    await accountManager.mergeAccounts(primaryAccountName, secondaryAccountName);
     renderAccountsList();
     alert(`✅ Comptes fusionnés ! "${secondaryAccountName}" a été fusionné dans "${primaryAccountName}"`);
 }
