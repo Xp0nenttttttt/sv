@@ -49,51 +49,31 @@ class LocalStorageAdapter extends StorageAdapter {
     }
 }
 
-// === ADAPTATEUR HYBRIDE (Supabase + localStorage fallback) ===
+// === ADAPTATEUR SUPABASE UNIQUEMENT (PAS de fallback localStorage) ===
 class HybridStorageAdapter extends StorageAdapter {
     constructor(supabaseAdapter, localStorageAdapter) {
         super();
         this.supabaseAdapter = supabaseAdapter;
-        this.localStorageAdapter = localStorageAdapter;
     }
 
     async getData(key) {
-        try {
-            const data = await this.supabaseAdapter.getData(key);
-            if (data) return data;
-        } catch (err) {
-            console.warn('⚠️ Supabase getData failed, falling back to localStorage:', err.message);
-        }
-        // Fallback to localStorage
-        return await this.localStorageAdapter.getData(key);
+        // Uniquement Supabase - pas de fallback
+        return await this.supabaseAdapter.getData(key);
     }
 
     async setData(key, data) {
-        try {
-            await this.supabaseAdapter.setData(key, data);
-        } catch (err) {
-            console.warn('⚠️ Supabase setData failed, using localStorage only:', err.message);
-        }
-        // Always sync to localStorage as backup
-        return await this.localStorageAdapter.setData(key, data);
+        // Uniquement Supabase - pas de fallback
+        return await this.supabaseAdapter.setData(key, data);
     }
 
     async removeData(key) {
-        try {
-            await this.supabaseAdapter.removeData(key);
-        } catch (err) {
-            console.warn('⚠️ Supabase removeData failed, using localStorage only:', err.message);
-        }
-        return await this.localStorageAdapter.removeData(key);
+        // Uniquement Supabase - pas de fallback
+        return await this.supabaseAdapter.removeData(key);
     }
 
     async getAllKeys() {
-        try {
-            return await this.supabaseAdapter.getAllKeys();
-        } catch (err) {
-            console.warn('⚠️ Supabase getAllKeys failed, using localStorage:', err.message);
-            return await this.localStorageAdapter.getAllKeys();
-        }
+        // Uniquement Supabase - pas de fallback
+        return await this.supabaseAdapter.getAllKeys();
     }
 }
 

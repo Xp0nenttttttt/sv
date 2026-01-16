@@ -84,23 +84,17 @@ function logoutAdmin() {
     document.getElementById('loginError').classList.add('hidden');
 }
 
-// Synchroniser avec les JSON au démarrage
+// Charger les données depuis Supabase (PAS de fallback localStorage)
 async function syncFromJSON() {
     if (typeof dataSyncManager !== 'undefined') {
         try {
             const levels = await dataSyncManager.loadLevels();
             const records = await dataSyncManager.loadRecords();
 
-            // Sauvegarder dans localStorage pour l'admin
-            if (levels && levels.length > 0) {
-                localStorage.setItem('svChallengeSubmissions', JSON.stringify(levels));
-            }
-            if (records && records.length > 0) {
-                localStorage.setItem('svChallengeRecordSubmissions', JSON.stringify(records));
-            }
-            console.log('✅ Données synchronisées depuis JSON');
+            console.log('✅ Données chargées depuis Supabase');
         } catch (err) {
-            console.log('ℹ️ Pas de synchronisation JSON disponible');
+            console.error('❌ Erreur chargement Supabase (PAS de fallback localStorage):', err);
+            throw err;
         }
     }
 }
