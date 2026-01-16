@@ -1,50 +1,53 @@
-// Gestionnaire de synchronisation avec fichiers JSON statiques
+// Gestionnaire de synchronisation avec Supabase
 class DataSyncManager {
     constructor() {
-        this.dataFolder = 'data/';
-        this.levelsFile = 'levels.json';
-        this.recordsFile = 'records.json';
-        this.useLocalStorage = true; // Fallback sur localStorage si fetch échoue
+        this.supabase = window.supabaseClient;
     }
 
-    // Charger les niveaux acceptés depuis JSON ou localStorage
+    // Charger les niveaux acceptés depuis Supabase
     async loadLevels() {
         try {
-            const response = await fetch(this.dataFolder + this.levelsFile);
-            if (response.ok) {
-                const data = await response.json();
-                console.log('✅ Niveaux chargés depuis JSON statique');
-                return data;
+            if (!this.supabase) {
+                throw new Error('Supabase client non disponible');
             }
-        } catch (err) {
-            console.warn('⚠️ Impossible de charger depuis JSON, fallback localStorage', err);
-        }
 
-        // Fallback: localStorage
-        const manager = new SubmissionManager();
-        const accepted = manager.getAcceptedSubmissions();
-        console.log('📦 Niveaux chargés depuis localStorage');
-        return accepted;
+            const { data, error } = await this.supabase
+                .from('submissions')
+                .select('*')
+                .eq('status', 'accepted')
+                .eq('type', 'level');
+
+            if (error) throw error;
+
+            console.log('✅ Niveaux chargés depuis Supabase');
+            return data || [];
+        } catch (err) {
+            console.error('❌ Impossible de charger les niveaux depuis Supabase:', err);
+            throw err;
+        }
     }
 
-    // Charger les records acceptés depuis JSON ou localStorage
+    // Charger les records acceptés depuis Supabase
     async loadRecords() {
         try {
-            const response = await fetch(this.dataFolder + this.recordsFile);
-            if (response.ok) {
-                const data = await response.json();
-                console.log('✅ Records chargés depuis JSON statique');
-                return data;
+            if (!this.supabase) {
+                throw new Error('Supabase client non disponible');
             }
-        } catch (err) {
-            console.warn('⚠️ Impossible de charger depuis JSON, fallback localStorage', err);
-        }
 
-        // Fallback: localStorage
-        const manager = new RecordSubmissionManager();
-        const accepted = manager.getSubmissions().filter(s => s.status === 'accepted');
-        console.log('📦 Records chargés depuis localStorage');
-        return accepted;
+            const { data, error } = await this.supabase
+                .from('submissions')
+                .select('*')
+                .eq('status', 'accepted')
+                .eq('type', 'record');
+
+            if (error) throw error;
+
+            console.log('✅ Records chargés depuis Supabase');
+            return data || [];
+        } catch (err) {
+            console.error('❌ Impossible de charger les records depuis Supabase:', err);
+            throw err;
+        }
     }
 
     // Exporter les données pour commit GitHub
