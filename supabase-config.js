@@ -16,25 +16,13 @@ async function loadSupabaseLibrary() {
         return;
     }
 
-    // Essayer de charger depuis le bundle local d'abord
-    try {
-        if (window.supabaseClient) {
-            console.log('✅ Supabase client local disponible');
-            return;
-        }
-    } catch (e) {
-        console.log('ℹ️ Client local non disponible, tentative CDN...');
-    }
-
-    // Fallback: charger depuis CDN unpkg si le local ne marche pas
+    // Charger la version UMD (non-ESM) pour compatibilité file:// et vieux navigateurs
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-        script.type = 'module';
+        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
         script.onload = () => resolve();
         script.onerror = () => {
-            // Dernier fallback: essayer unpkg
-            script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+            script.src = 'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js';
             script.onload = () => resolve();
             script.onerror = () => reject(new Error('Impossible de charger Supabase'));
             document.head.appendChild(script);
