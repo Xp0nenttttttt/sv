@@ -19,6 +19,8 @@ class LevelDetailsManager {
     // Charger les données du niveau
     async loadLevelData() {
         const levelId = this.getLevelIdFromUrl();
+        console.log(`🔍 Chargement niveau ID: ${levelId}`);
+
         if (!levelId) {
             this.showError('Aucun niveau spécifié');
             return;
@@ -26,7 +28,10 @@ class LevelDetailsManager {
 
         // Charger tous les niveaux (base + soumissions)
         const allLevels = await this.getAllLevels();
+        console.log(`📋 Total niveaux chargés: ${allLevels.length}`, allLevels);
+
         this.level = allLevels.find(l => l.id === levelId);
+        console.log(`🎮 Niveau trouvé:`, this.level);
 
         if (!this.level) {
             this.showError('Niveau introuvable');
