@@ -5,8 +5,8 @@ class RecordSubmissionManager {
     }
 
     // Soumettre un nouveau record
-    submitRecord(levelId, recordData) {
-        const submissions = this.getSubmissions();
+    async submitRecord(levelId, recordData) {
+        const submissions = await this.getSubmissions();
         const newSubmission = {
             id: Date.now(),
             levelId: levelId,
@@ -20,23 +20,20 @@ class RecordSubmissionManager {
             submittedAt: new Date().toISOString()
         };
         submissions.push(newSubmission);
-        if (typeof universalStorage !== 'undefined') {
-            universalStorage.setData(this.storageKey, submissions);
+        if (universalStorage) {
+            await universalStorage.setData(this.storageKey, submissions);
         } else {
-            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            throw new Error('Supabase non initialisé');
         }
         return newSubmission;
     }
 
     // Récupérer toutes les soumissions
-    getSubmissions() {
-        if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
-            // Mode synchrone pour compatibilité - getData retourne depuis le cache
-            const data = universalStorage.cache[this.storageKey];
-            return data || [];
+    async getSubmissions() {
+        if (universalStorage && typeof universalStorage.getData === 'function') {
+            return (await universalStorage.getData(this.storageKey)) || [];
         }
-        const data = localStorage.getItem(this.storageKey);
-        return data ? JSON.parse(data) : [];
+        throw new Error('Supabase non initialisé');
     }
 
     // Récupérer les soumissions pour un niveau spécifique
@@ -45,69 +42,52 @@ class RecordSubmissionManager {
     }
 
     // Accepter une soumission de record
-    acceptSubmission(submissionId) {
-        const submissions = this.getSubmissions();
+    // Accepter une soumission de record
+    async acceptSubmission(submissionId) {
+        const submissions = await this.getSubmissions();
         const submission = submissions.find(s => s.id === submissionId);
         if (submission) {
             submission.status = 'accepted';
             submission.acceptedAt = new Date().toISOString();
-            if (typeof universalStorage !== 'undefined') {
-                universalStorage.setData(this.storageKey, submissions);
+            if (universalStorage) {
+                await universalStorage.setData(this.storageKey, submissions);
             } else {
-                localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+                throw new Error('Supabase non initialisé');
             }
-
-            // Ajouter le record au niveau
-            const recordsKey = `level_records_${submission.levelId}`;
-            const recordsData = localStorage.getItem(recordsKey);
-            const records = recordsData ? JSON.parse(recordsData) : [];
-
-            const newRecord = {
-                id: Date.now(),
-                player: submission.player,
-                percentage: submission.percentage,
-                videoLink: submission.videoLink,
-                device: submission.device,
-                submittedAt: submission.acceptedAt
-            };
-
-            records.push(newRecord);
-            records.sort((a, b) => b.percentage - a.percentage);
-            localStorage.setItem(recordsKey, JSON.stringify(records));
         }
         return submission;
     }
 
     // Rejeter une soumission
-    rejectSubmission(submissionId) {
-        const submissions = this.getSubmissions();
+    async rejectSubmission(submissionId) {
+        const submissions = await this.getSubmissions();
         const submission = submissions.find(s => s.id === submissionId);
         if (submission) {
             submission.status = 'rejected';
             submission.rejectedAt = new Date().toISOString();
-            if (typeof universalStorage !== 'undefined') {
-                universalStorage.setData(this.storageKey, submissions);
+            if (universalStorage) {
+                await universalStorage.setData(this.storageKey, submissions);
             } else {
-                localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+                throw new Error('Supabase non initialisé');
             }
         }
         return submission;
     }
 
     // Supprimer une soumission
-    deleteSubmission(submissionId) {
-        let submissions = this.getSubmissions();
+    async deleteSubmission(submissionId) {
+        let submissions = await this.getSubmissions();
         submissions = submissions.filter(s => s.id !== submissionId);
-        if (typeof universalStorage !== 'undefined') {
-            universalStorage.setData(this.storageKey, submissions);
+        if (universalStorage) {
+            await universalStorage.setData(this.storageKey, submissions);
         } else {
-            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            throw new Error('Supabase non initialisé');
         }
     }
 
     // Obtenir les statistiques
-    getStats() {
-        const submissions = this.getSubmissions();
+    async getStats() {
+        const submissions = await this.getSubmissions();
         return {
             pending: submissions.filter(s => s.status === 'pending').length,
             accepted: submissions.filter(s => s.status === 'accepted').length,

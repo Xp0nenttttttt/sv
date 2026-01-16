@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nettoyage localStorage</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dark-mode.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Nettoyage du stockage local</h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" style="max-width: 600px; margin: 50px auto;">
+            <h2>🗑️ Supprimer localStorage</h2>
+            <p style="color: #666; margin-bottom: 30px;">
+                Toutes vos données sont maintenant dans Supabase. Vous pouvez nettoyer le stockage local de votre
+                navigateur.
+            </p>
+
+            <button onclick="clearLocalStorage()" class="btn-submit" style="margin-bottom: 20px;">
+                🗑️ Supprimer tout le localStorage
+            </button>
+
+            <button onclick="clearGameDataOnly()" class="btn-accept" style="margin-bottom: 20px;">
+                🎮 Supprimer uniquement les données de jeu
+            </button>
+
+            <button onclick="checkStatus()" class="btn-reset">
+                ✅ Vérifier l'état du stockage
+            </button>
+
+            <pre id="log" style="
+                background: #f5f5f5;
+                padding: 15px;
+                border-radius: 5px;
+                margin-top: 30px;
+                font-size: 0.9em;
+                color: #333;
+                overflow-x: auto;
+            "></pre>
+        </div>
+    </main>
+
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="dark-mode.js"></script>
+
+    <script>
+        const log = document.getElementById('log');
+
+        function addLog(msg) {
+            log.textContent += msg + '\n';
+            console.log(msg);
+        }
+
+        function clearLocalStorage() {
+            if (confirm('⚠️ Cela supprimera TOUT le localStorage. Êtes-vous sûr ?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                addLog('✅ localStorage complètement vidé\n');
+                addLog('✅ sessionStorage complètement vidé\n');
+                addLog('\n🎉 Nettoyage terminé ! Vous utilisez maintenant Supabase exclusivement.');
+            }
+        }
+
+        function clearGameDataOnly() {
+            if (confirm('Supprimer les données de jeu du localStorage ?')) {
+                const keysToRemove = [
+                    'svChallengeSubmissions',
+                    'svChallengeRecordSubmissions',
+                    'svChallengeLevels',
+                    'svChallengeRecords'
+                ];
+
+                let removed = 0;
+                keysToRemove.forEach(key => {
+                    if (localStorage.getItem(key)) {
+                        localStorage.removeItem(key);
+                        removed++;
+                        addLog(`✅ Supprimé: ${key}`);
+                    }
+                });
+
+                addLog(`\n🎉 ${removed} entrées supprimées du localStorage`);
+                addLog('Données de jeu maintenant stockées dans Supabase uniquement.');
+            }
+        }
+
+        function checkStatus() {
+            log.textContent = '';
+            addLog('📊 État du stockage:\n');
+
+            const keys = Object.keys(localStorage);
+            addLog(`Clés stockées: ${keys.length}\n`);
+
+            keys.forEach(key => {
+                const size = (localStorage.getItem(key).length / 1024).toFixed(2);
+                addLog(`  • ${key}: ${size} KB`);
+            });
+
+            if (keys.length === 0) {
+                addLog('\n✅ localStorage complètement vide!');
+                addLog('Tous les données utilisent Supabase.');
+            } else {
+                addLog('\n⚠️ Du contenu reste dans localStorage.');
+                addLog('Cliquez sur "Supprimer" pour nettoyer.');
+            }
+        }
+
+        // Vérifier automatiquement au chargement
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                addLog('🔍 Vérification initiale...\n');
+                checkStatus();
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

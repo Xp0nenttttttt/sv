@@ -8,76 +8,77 @@ class SubmissionManager {
     }
 
     // Ajouter une soumission
-    addSubmission(data) {
-        const submissions = this.getSubmissions();
+    async addSubmission(data) {
+        const submissions = await this.getSubmissions();
         const newSubmission = {
             id: Date.now(),
             ...data,
             tags: data.tags || [],
             status: 'pending',
             submittedAt: new Date().toISOString(),
-            approvedRank: null, // Sera défini par l'admin à l'acceptation
-            imageUrl: 'image/svkawai.png' // NE PAS stocker les images Base64, utiliser l'image par défaut
+            approvedRank: null,
+            imageUrl: 'image/svkawai.png'
         };
 
-        // Supprimer les données volumineuses qui ne doivent pas être stockées
+        // Supprimer les données volumineuses
         delete newSubmission.imageData;
         delete newSubmission.videoFile;
 
         submissions.push(newSubmission);
-        if (typeof universalStorage !== 'undefined') {
-            universalStorage.setData(this.storageKey, submissions);
+
+        // Sauvegarder dans Supabase uniquement
+        if (universalStorage) {
+            await universalStorage.setData(this.storageKey, submissions);
         } else {
-            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            throw new Error('Supabase non initialisé');
         }
+
         return newSubmission;
     }
 
     // Récupérer toutes les soumissions
-    getSubmissions() {
-        if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
-            // Mode synchrone pour compatibilité - getData retourne depuis le cache
-            const data = universalStorage.cache[this.storageKey];
-            return data || [];
+    async getSubmissions() {
+        if (universalStorage && typeof universalStorage.getData === 'function') {
+            return (await universalStorage.getData(this.storageKey)) || [];
         }
-        const data = localStorage.getItem(this.storageKey);
-        return data ? JSON.parse(data) : [];
+        throw new Error('Supabase non initialisé');
     }
 
-    // Mettre à jour le statut d'une soumission avec rang et difficulté optionnels
-    updateSubmissionStatus(id, status, approvedRank = null, difficulty = null) {
-        const submissions = this.getSubmissions();
+    // Mettre à jour le statut d'une soumission
+    async updateSubmissionStatus(id, status, approvedRank = null, difficulty = null) {
+        const submissions = await this.getSubmissions();
         const submission = submissions.find(s => s.id === id);
         if (submission) {
             submission.status = status;
             if (status === 'accepted') {
                 submission.acceptedAt = new Date().toISOString();
                 submission.approvedRank = approvedRank;
-                submission.approvedDifficulty = difficulty; // La difficulté choisie par l'admin
+                submission.approvedDifficulty = difficulty;
             }
-            if (typeof universalStorage !== 'undefined') {
-                universalStorage.setData(this.storageKey, submissions);
+            if (universalStorage) {
+                await universalStorage.setData(this.storageKey, submissions);
             } else {
-                localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+                throw new Error('Supabase non initialisé');
             }
         }
         return submission;
     }
 
     // Supprimer une soumission
-    deleteSubmission(id) {
-        let submissions = this.getSubmissions();
+    async deleteSubmission(id) {
+        let submissions = await this.getSubmissions();
         submissions = submissions.filter(s => s.id !== id);
-        if (typeof universalStorage !== 'undefined') {
-            universalStorage.setData(this.storageKey, submissions);
+        if (universalStorage) {
+            await universalStorage.setData(this.storageKey, submissions);
         } else {
-            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            throw new Error('Supabase non initialisé');
         }
     }
 
     // Obtenir les soumissions acceptées
-    getAcceptedSubmissions() {
-        return this.getSubmissions().filter(s => s.status === 'accepted');
+    async getAcceptedSubmissions() {
+        const subs = await this.getSubmissions();
+        return subs.filter(s => s.status === 'accepted');
     }
 
     // Convertir une soumission en niveau

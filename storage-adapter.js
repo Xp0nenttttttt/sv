@@ -256,7 +256,44 @@ class UniversalStorageManager {
 }
 
 // === INSTANCE GLOBALE ===
-let universalStorage = new UniversalStorageManager();
+// Créer directement avec Supabase (pas de fallback localStorage)
+let universalStorage = null;
+
+// Initialiser Supabase au démarrage
+async function initializeSupabaseStorage() {
+    if (universalStorage) return; // Déjà initialisé
+
+    try {
+        // Charger la bibliothèque Supabase
+        await new Promise((resolve, reject) => {
+            if (typeof supabase !== 'undefined' && supabase.createClient) {
+                resolve();
+            } else {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Impossible de charger Supabase'));
+                document.head.appendChild(script);
+            }
+        });
+
+        // Créer l'adaptateur Supabase
+        const supabaseAdapter = new SupabaseStorageAdapter(
+            'https://bpgotjdnrbrbwfckaayz.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZ290amRucmJyYndmY2thYXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1NzAwMTcsImV4cCI6MjA4NDE0NjAxN30.c0Y9MLW6HQBBJhN04MGHamOE6flLKqyPWRbyQBmNI_8'
+        );
+
+        // Initialiser et tester la connexion
+        await supabaseAdapter.initialize();
+
+        universalStorage = new UniversalStorageManager(supabaseAdapter);
+        console.log('✅ Supabase Storage initialisé (stockage unique)');
+        return true;
+    } catch (error) {
+        console.error('❌ Erreur initialisation Supabase:', error);
+        throw error;
+    }
+}
 
 // === DOCUMENTATION D'UTILISATION FUTURE ===
 /*

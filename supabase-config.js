@@ -34,26 +34,24 @@ async function loadSupabaseLibrary() {
 // Fonction pour activer Supabase au chargement
 async function enableSupabaseStorage() {
     if (!SUPABASE_CONFIG.URL || SUPABASE_CONFIG.URL === 'https://votre-projet.supabase.co') {
-        console.warn('⚠️ Supabase non configuré. Utilisez toujours localStorage.');
-        return false;
+        console.warn('⚠️ Supabase non configuré.');
+        throw new Error('Supabase non configuré');
     }
 
     try {
-        console.log('⏳ Chargement de Supabase...');
-        await loadSupabaseLibrary();
-        console.log('✅ Bibliothèque Supabase chargée');
+        console.log('⏳ Initialisation Supabase exclusive...');
 
-        const supabaseAdapter = new SupabaseStorageAdapter(
-            SUPABASE_CONFIG.URL,
-            SUPABASE_CONFIG.KEY
-        );
-        universalStorage.switchAdapter(supabaseAdapter);
-        console.log('✅ Supabase Storage activé');
-        return true;
+        // Utiliser la fonction d'initialisation de storage-adapter.js
+        if (typeof initializeSupabaseStorage === 'function') {
+            await initializeSupabaseStorage();
+            console.log('✅ Supabase Storage initialisé (stockage unique)');
+            return true;
+        } else {
+            throw new Error('initializeSupabaseStorage non disponible');
+        }
     } catch (error) {
         console.error('❌ Erreur lors de l\'activation de Supabase:', error);
-        console.log('ℹ️ Utilisation de localStorage en secours');
-        return false;
+        throw error;
     }
 }
 
