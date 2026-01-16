@@ -12,8 +12,69 @@ function calculatePoints(rank) {
     return 10; // Au-delà du top 100
 }
 
+// Récupérer les niveaux directement depuis Supabase (table public.levels)
+async function fetchLevelsFromSupabase() {
+    if (typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.URL || !SUPABASE_CONFIG.KEY) {
+        return [];
+    }
+
+    const endpoint = `${SUPABASE_CONFIG.URL}/rest/v1/levels` +
+        '?select=id,level_name,creator_name,approved_rank,approved_difficulty,length,tags,status,image_url,image_base64,imageUrl,imageBase64,proposed_top,badge,description,submitted_at,accepted_at,author_name';
+
+    try {
+        const res = await fetch(endpoint, {
+            headers: {
+                apikey: SUPABASE_CONFIG.KEY,
+                Authorization: `Bearer ${SUPABASE_CONFIG.KEY}`
+            }
+        });
+
+        if (!res.ok) {
+            console.warn('⚠️ Supabase levels fetch failed:', res.status, await res.text());
+            return [];
+        }
+
+        const rows = await res.json();
+        const acceptedRows = Array.isArray(rows) ? rows.filter(r => r.status === 'accepted') : [];
+        return acceptedRows.map(mapSupabaseRowToLevel).sort((a, b) => a.rank - b.rank);
+    } catch (err) {
+        console.warn('⚠️ Supabase levels fetch error:', err.message);
+        return [];
+    }
+}
+
+// Mapper une ligne Supabase vers le format utilisé par le front
+function mapSupabaseRowToLevel(row) {
+    const rank = row.approved_rank ?? 999;
+    return {
+        id: String(row.id),
+        rank: rank,
+        name: row.level_name || 'Niveau',
+        creator: row.creator_name || 'Inconnu',
+        difficulty: row.approved_difficulty || 'Moyen',
+        length: row.length || 'Short',
+        points: calculatePoints(rank),
+        author: row.author_name || row.creator_name || '',
+        image: row.image_url || row.imageUrl || row.image_base64 || row.imageBase64,
+        submittedBy: row.author_name || row.creator_name || '',
+        isSubmitted: true,
+        proposedTop: row.proposed_top || row.proposedTop,
+        tags: row.tags || [],
+        badge: row.badge || null,
+        description: row.description || '',
+        submittedAt: row.submitted_at || row.submittedAt,
+        acceptedAt: row.accepted_at || row.acceptedAt
+    };
+}
+
 // Charger les niveaux avec priorité Supabase -> JSON -> localStorage
 async function loadAllLevels() {
+    // 0) Supabase direct (source officielle)
+    const supabaseLevels = await fetchLevelsFromSupabase();
+    if (supabaseLevels.length > 0) {
+        return supabaseLevels;
+    }
+
     // 1) Supabase via universalStorage (cache ou fetch)
     if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
         const acceptedSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];

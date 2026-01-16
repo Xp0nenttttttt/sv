@@ -13,7 +13,8 @@ class LevelDetailsManager {
     // Récupérer l'ID du niveau depuis l'URL
     getLevelIdFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
-        return parseInt(urlParams.get('id'));
+        const raw = urlParams.get('id');
+        return raw ? String(raw) : '';
     }
 
     // Charger les données du niveau
@@ -70,8 +71,67 @@ class LevelDetailsManager {
         return 10; // Au-delà du top 100
     }
 
+    // Charger les niveaux depuis Supabase (source officielle)
+    async fetchLevelsFromSupabase() {
+        if (typeof SUPABASE_CONFIG === 'undefined' || !SUPABASE_CONFIG.URL || !SUPABASE_CONFIG.KEY) {
+            return [];
+        }
+
+        const endpoint = `${SUPABASE_CONFIG.URL}/rest/v1/levels` +
+            '?select=id,level_name,creator_name,approved_rank,approved_difficulty,length,tags,status,image_url,image_base64,imageUrl,imageBase64,proposed_top,badge,description,submitted_at,accepted_at,author_name';
+
+        try {
+            const res = await fetch(endpoint, {
+                headers: {
+                    apikey: SUPABASE_CONFIG.KEY,
+                    Authorization: `Bearer ${SUPABASE_CONFIG.KEY}`
+                }
+            });
+
+            if (!res.ok) {
+                console.warn('⚠️ Supabase levels fetch failed (details):', res.status, await res.text());
+                return [];
+            }
+
+            const rows = await res.json();
+            const acceptedRows = Array.isArray(rows) ? rows.filter(r => r.status === 'accepted') : [];
+            return acceptedRows.map(r => this.mapSupabaseRowToLevel(r)).sort((a, b) => a.rank - b.rank);
+        } catch (err) {
+            console.warn('⚠️ Supabase levels fetch error (details):', err.message);
+            return [];
+        }
+    }
+
+    // Mapper une ligne Supabase vers le format attendu
+    mapSupabaseRowToLevel(row) {
+        const rank = row.approved_rank ?? 999;
+        return {
+            id: String(row.id),
+            rank: rank,
+            name: row.level_name || 'Niveau',
+            creator: row.creator_name || 'Inconnu',
+            difficulty: row.approved_difficulty || 'Moyen',
+            length: row.length || 'Short',
+            points: this.calculatePoints(rank),
+            author: row.author_name || row.creator_name || '',
+            image: row.image_url || row.imageUrl || row.image_base64 || row.imageBase64,
+            description: row.description || '',
+            proposedTop: row.proposed_top || row.proposedTop,
+            submittedAt: row.submitted_at || row.submittedAt,
+            acceptedAt: row.accepted_at || row.acceptedAt,
+            tags: row.tags || [],
+            badge: row.badge || null
+        };
+    }
+
     // Récupérer tous les niveaux
     async getAllLevels() {
+        // 0) Supabase direct
+        const supabaseLevels = await this.fetchLevelsFromSupabase();
+        if (supabaseLevels.length > 0) {
+            return supabaseLevels;
+        }
+
         let allSubmissions = [];
 
         // D'abord essayer Supabase/universalStorage
@@ -100,7 +160,7 @@ class LevelDetailsManager {
             .map(s => {
                 const rank = s.approvedRank || 999;
                 return {
-                    id: s.id,
+                    id: String(s.id),
                     rank: rank,
                     name: s.levelName,
                     creator: s.creatorName,
@@ -148,7 +208,7 @@ class LevelDetailsManager {
 
         // Filtrer les records acceptés pour ce niveau
         const filtered = (allRecords || []).filter(r => {
-            const match = r.status === 'accepted' && r.levelId === this.level.id;
+            const match = r.status === 'accepted' && String(r.levelId) === String(this.level.id);
             console.log(`  Record: ID=${r.id}, levelId=${r.levelId}, status=${r.status}, match=${match}`);
             return match;
         });
