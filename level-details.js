@@ -61,8 +61,29 @@ class LevelDetailsManager {
 
     // Récupérer tous les niveaux
     async getAllLevels() {
-        const manager = new SubmissionManager();
-        const allSubmissions = await manager.getSubmissions();
+        let allSubmissions = [];
+
+        // D'abord essayer Supabase/universalStorage
+        if (typeof universalStorage !== 'undefined' && universalStorage) {
+            try {
+                allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+            } catch (err) {
+                console.warn('⚠️ Erreur universalStorage:', err.message);
+            }
+        }
+
+        // Fallback: SubmissionManager
+        if (!allSubmissions || allSubmissions.length === 0) {
+            const manager = new SubmissionManager();
+            allSubmissions = await manager.getSubmissions() || [];
+        }
+
+        // S'assurer que c'est un array
+        if (!Array.isArray(allSubmissions)) {
+            console.warn('⚠️ allSubmissions n\'est pas un array:', allSubmissions);
+            allSubmissions = [];
+        }
+
         const acceptedSubmissions = allSubmissions
             .filter(s => s.status === 'accepted')
             .map(s => {
