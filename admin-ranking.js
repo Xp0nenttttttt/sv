@@ -169,7 +169,6 @@ function renderRankingList() {
             console.error('Erreur chargement niveaux:', err);
         });
 }
-}
 
 function createRankingCard(level) {
     const card = document.createElement('div');
