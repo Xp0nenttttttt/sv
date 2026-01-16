@@ -7,6 +7,9 @@
     <title>Classements - SV CHALLENGE LIST</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="leaderboard.css">
+    <!-- Stockage (localStorage par défaut, Supabase optionnel) -->
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
     <!-- Charger Supabase en local (npm install) -->
     <script type="module" src="supabase-client.js"></script>
 </head>
@@ -90,17 +93,19 @@
     <script src="leaderboard.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await enableSupabaseStorage();
-                console.log('✅ Supabase activé (leaderboard)');
-
-                // Recharger les leaderboards après activation Supabase
-                if (typeof loadLeaderboards === 'function') {
-                    loadLeaderboards();
-                    console.log('✅ Leaderboards chargés depuis Supabase');
+            // Activer Supabase si la config est disponible, sinon continuer en localStorage
+            if (typeof enableSupabaseStorage === 'function') {
+                try {
+                    await enableSupabaseStorage();
+                    console.log('✅ Supabase activé (leaderboard)');
+                } catch (err) {
+                    console.error('❌ Activation Supabase échouée, fallback localStorage', err);
                 }
-            } catch (err) {
-                console.error('❌ Activation Supabase échouée, fallback localStorage', err);
+            }
+
+            // Charger les classements
+            if (typeof loadLeaderboards === 'function') {
+                loadLeaderboards();
             }
         });
     </script>

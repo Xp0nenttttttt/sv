@@ -14,22 +14,12 @@ function calculatePoints(rank) {
 
 // Charger les niveaux avec les soumissions acceptées
 async function loadAllLevels() {
-    // Créer une classe SubmissionManager pour la gestion des données
-    if (typeof SubmissionManager === 'undefined') {
-        // Créer une version minimale du gestionnaire
-        const submissionManagerStandalone = {
-            storageKey: 'svChallengeSubmissions',
-            getAcceptedSubmissions: async function () {
-                const data = await universalStorage.getData(this.storageKey);
-                const submissions = data || [];
-                return submissions.filter(s => s.status === 'accepted');
-            }
-        };
+    // Si le gestionnaire est disponible, l'utiliser pour récupérer les soumissions acceptées
+    if (typeof SubmissionManager !== 'undefined') {
+        const manager = new SubmissionManager();
+        const acceptedSubmissions = manager.getAcceptedSubmissions();
 
-        const acceptedSubmissions = await submissionManagerStandalone.getAcceptedSubmissions();
-
-        // Convertir les soumissions acceptées en niveaux
-        let submittedLevels = acceptedSubmissions.map((submission) => {
+        const submittedLevels = acceptedSubmissions.map((submission) => {
             const rank = submission.approvedRank || (levels.length + 100);
             return {
                 id: submission.id,
@@ -38,9 +28,9 @@ async function loadAllLevels() {
                 creator: submission.creatorName,
                 difficulty: submission.approvedDifficulty || 'Moyen',
                 length: submission.length,
-                points: calculatePoints(rank), // Calculer les points selon le rang
+                points: calculatePoints(rank),
                 author: submission.authorName,
-                image: submission.imageBase64,
+                image: submission.imageBase64 || submission.imageUrl,
                 submittedBy: submission.authorName,
                 isSubmitted: true,
                 proposedTop: submission.proposedTop,
@@ -49,11 +39,42 @@ async function loadAllLevels() {
             };
         });
 
-        // Fusionner et trier par rang
-        const allLevelsTemp = [...levels, ...submittedLevels];
-        return allLevelsTemp.sort((a, b) => a.rank - b.rank);
+        return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
     }
-    return levels;
+
+    // Fallback: utiliser l'adaptateur universel si SubmissionManager n'est pas présent
+    const submissionManagerStandalone = {
+        storageKey: 'svChallengeSubmissions',
+        getAcceptedSubmissions: async function () {
+            const data = await universalStorage.getData(this.storageKey);
+            const submissions = data || [];
+            return submissions.filter(s => s.status === 'accepted');
+        }
+    };
+
+    const acceptedSubmissions = await submissionManagerStandalone.getAcceptedSubmissions();
+
+    const submittedLevels = acceptedSubmissions.map((submission) => {
+        const rank = submission.approvedRank || (levels.length + 100);
+        return {
+            id: submission.id,
+            rank: rank,
+            name: submission.levelName,
+            creator: submission.creatorName,
+            difficulty: submission.approvedDifficulty || 'Moyen',
+            length: submission.length,
+            points: calculatePoints(rank),
+            author: submission.authorName,
+            image: submission.imageBase64 || submission.imageUrl,
+            submittedBy: submission.authorName,
+            isSubmitted: true,
+            proposedTop: submission.proposedTop,
+            tags: submission.tags || [],
+            badge: submission.badge || null
+        };
+    });
+
+    return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
 }
 
 // Récupérer les éléments du DOM
