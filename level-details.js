@@ -4,7 +4,10 @@ class LevelDetailsManager {
         this.level = null;
         this.records = [];
         this.music = null;
-        this.loadLevelData();
+        // Appeler async sans await (lance la chaîne async)
+        this.loadLevelData().catch(err => {
+            console.error('Erreur chargement niveau:', err);
+        });
     }
 
     // Récupérer l'ID du niveau depuis l'URL
@@ -14,7 +17,7 @@ class LevelDetailsManager {
     }
 
     // Charger les données du niveau
-    loadLevelData() {
+    async loadLevelData() {
         const levelId = this.getLevelIdFromUrl();
         if (!levelId) {
             this.showError('Aucun niveau spécifié');
@@ -22,7 +25,7 @@ class LevelDetailsManager {
         }
 
         // Charger tous les niveaux (base + soumissions)
-        const allLevels = this.getAllLevels();
+        const allLevels = await this.getAllLevels();
         this.level = allLevels.find(l => l.id === levelId);
 
         if (!this.level) {
@@ -57,9 +60,9 @@ class LevelDetailsManager {
     }
 
     // Récupérer tous les niveaux
-    getAllLevels() {
+    async getAllLevels() {
         const manager = new SubmissionManager();
-        const allSubmissions = manager.getSubmissions();
+        const allSubmissions = await manager.getSubmissions();
         const acceptedSubmissions = allSubmissions
             .filter(s => s.status === 'accepted')
             .map(s => {
