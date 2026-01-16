@@ -39,7 +39,8 @@ class RankingManager {
 
             if (isSubmission && level.originalData) {
                 const manager = new SubmissionManager();
-                manager.updateSubmissionStatus(levelId, 'accepted', newRank, level.originalData.approvedDifficulty);
+                manager.updateSubmissionStatus(levelId, 'accepted', newRank, level.originalData.approvedDifficulty)
+                    .catch(err => console.error('Erreur updateSubmissionStatus:', err));
             }
 
             this.levels.sort((a, b) => a.rank - b.rank);
@@ -49,7 +50,8 @@ class RankingManager {
     deleteLevel(levelId, isSubmission = false) {
         if (isSubmission) {
             const manager = new SubmissionManager();
-            manager.updateSubmissionStatus(levelId, 'rejected', null, null);
+            manager.updateSubmissionStatus(levelId, 'rejected', null, null)
+                .catch(err => console.error('Erreur updateSubmissionStatus:', err));
         }
         this.levels = this.levels.filter(l => l.id !== levelId);
     }
@@ -61,7 +63,8 @@ class RankingManager {
 
             if (isSubmission && level.originalData) {
                 const manager = new SubmissionManager();
-                manager.updateSubmissionStatus(levelId, 'accepted', level.rank, newDifficulty);
+                manager.updateSubmissionStatus(levelId, 'accepted', level.rank, newDifficulty)
+                    .catch(err => console.error('Erreur updateSubmissionStatus:', err));
             }
         }
     }
@@ -73,14 +76,15 @@ class RankingManager {
 
             if (isSubmission && level.originalData) {
                 const manager = new SubmissionManager();
+                manager.getSubmissions().then(submissions => {
+                    const idx = submissions.findIndex(s => s.id === levelId);
+                    if (idx !== -1) {
+                        submissions[idx].badge = badgeType;
+                        manager.storageKey && universalStorage &&
+                            universalStorage.setData(manager.storageKey, submissions);
+                    }
+                });
                 level.originalData.badge = badgeType;
-                // Sauvegarder via localStorage
-                const submissions = manager.getSubmissions();
-                const idx = submissions.findIndex(s => s.id === levelId);
-                if (idx !== -1) {
-                    submissions[idx].badge = badgeType;
-                    localStorage.setItem(manager.storageKey, JSON.stringify(submissions));
-                }
             }
         }
     }
@@ -92,14 +96,15 @@ class RankingManager {
 
             if (isSubmission && level.originalData) {
                 const manager = new SubmissionManager();
+                manager.getSubmissions().then(submissions => {
+                    const idx = submissions.findIndex(s => s.id === levelId);
+                    if (idx !== -1) {
+                        submissions[idx].tags = tags;
+                        manager.storageKey && universalStorage &&
+                            universalStorage.setData(manager.storageKey, submissions);
+                    }
+                });
                 level.originalData.tags = tags;
-                // Sauvegarder via localStorage
-                const submissions = manager.getSubmissions();
-                const idx = submissions.findIndex(s => s.id === levelId);
-                if (idx !== -1) {
-                    submissions[idx].tags = tags;
-                    localStorage.setItem(manager.storageKey, JSON.stringify(submissions));
-                }
             }
         }
     }
