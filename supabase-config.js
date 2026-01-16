@@ -9,18 +9,36 @@ const SUPABASE_CONFIG = {
     KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnYnJ3dGtjZGpibWpoaXJscXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1NTkzOTgsImV4cCI6MjA4NDEzNTM5OH0.1QUWS46g1rfF0O_-GgNVXIkOK2BPIq0KGSsYRb58rJg'
 };
 
-// Charger Supabase dynamiquement (évite les problèmes de Tracking Prevention)
-function loadSupabaseLibrary() {
-    return new Promise((resolve, reject) => {
-        if (typeof supabase !== 'undefined') {
-            resolve();
+// Charger Supabase dynamiquement - Compatible avec npm install local
+async function loadSupabaseLibrary() {
+    // Vérifier si Supabase est déjà chargé
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+        return;
+    }
+
+    // Essayer de charger depuis le bundle local d'abord
+    try {
+        if (window.supabaseClient) {
+            console.log('✅ Supabase client local disponible');
             return;
         }
+    } catch (e) {
+        console.log('ℹ️ Client local non disponible, tentative CDN...');
+    }
 
+    // Fallback: charger depuis CDN unpkg si le local ne marche pas
+    return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+        script.type = 'module';
         script.onload = () => resolve();
-        script.onerror = () => reject(new Error('Impossible de charger Supabase'));
+        script.onerror = () => {
+            // Dernier fallback: essayer unpkg
+            script.src = 'https://unpkg.com/@supabase/supabase-js@2';
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Impossible de charger Supabase'));
+            document.head.appendChild(script);
+        };
         document.head.appendChild(script);
     });
 }
