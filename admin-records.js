@@ -41,12 +41,14 @@ function logoutRecordAdmin() {
 }
 
 function loadRecordSubmissions() {
-    const stats = recordSubmissionManager.getStats();
-    document.getElementById('pendingRecordCount').textContent = stats.pending;
-    document.getElementById('acceptedRecordCount').textContent = stats.accepted;
-    document.getElementById('rejectedRecordCount').textContent = stats.rejected;
-
-    displayRecordSubmissions(currentRecordTab);
+    recordSubmissionManager.getStats()
+        .then(stats => {
+            document.getElementById('pendingRecordCount').textContent = stats.pending;
+            document.getElementById('acceptedRecordCount').textContent = stats.accepted;
+            document.getElementById('rejectedRecordCount').textContent = stats.rejected;
+            displayRecordSubmissions(currentRecordTab);
+        })
+        .catch(err => console.error('Erreur chargement stats:', err));
 }
 
 function switchRecordTab(tab) {
@@ -61,9 +63,9 @@ function switchRecordTab(tab) {
     displayRecordSubmissions(tab);
 }
 
-function displayRecordSubmissions(status) {
+async function displayRecordSubmissions(status) {
     const container = document.getElementById('recordSubmissionsContainer');
-    const submissions = recordSubmissionManager.getSubmissions()
+    const submissions = (await recordSubmissionManager.getSubmissions())
         .filter(s => s.status === status)
         .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 

@@ -40,7 +40,7 @@ class SubmissionManager {
     async getSubmissions() {
         // Attendre l'initialisation de Supabase
         let attempts = 0;
-        while (!universalStorage && attempts < 50) {
+        while (!universalStorage && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
         }
