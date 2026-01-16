@@ -25,12 +25,21 @@ class SubmissionManager {
         delete newSubmission.videoFile;
 
         submissions.push(newSubmission);
-        localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        if (typeof universalStorage !== 'undefined') {
+            universalStorage.setData(this.storageKey, submissions);
+        } else {
+            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        }
         return newSubmission;
     }
 
     // Récupérer toutes les soumissions
     getSubmissions() {
+        if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+            // Mode synchrone pour compatibilité - getData retourne depuis le cache
+            const data = universalStorage.cache[this.storageKey];
+            return data || [];
+        }
         const data = localStorage.getItem(this.storageKey);
         return data ? JSON.parse(data) : [];
     }
@@ -46,7 +55,11 @@ class SubmissionManager {
                 submission.approvedRank = approvedRank;
                 submission.approvedDifficulty = difficulty; // La difficulté choisie par l'admin
             }
-            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            if (typeof universalStorage !== 'undefined') {
+                universalStorage.setData(this.storageKey, submissions);
+            } else {
+                localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            }
         }
         return submission;
     }
@@ -55,7 +68,11 @@ class SubmissionManager {
     deleteSubmission(id) {
         let submissions = this.getSubmissions();
         submissions = submissions.filter(s => s.id !== id);
-        localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        if (typeof universalStorage !== 'undefined') {
+            universalStorage.setData(this.storageKey, submissions);
+        } else {
+            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        }
     }
 
     // Obtenir les soumissions acceptées

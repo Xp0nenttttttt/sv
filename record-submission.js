@@ -20,12 +20,21 @@ class RecordSubmissionManager {
             submittedAt: new Date().toISOString()
         };
         submissions.push(newSubmission);
-        localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        if (typeof universalStorage !== 'undefined') {
+            universalStorage.setData(this.storageKey, submissions);
+        } else {
+            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        }
         return newSubmission;
     }
 
     // Récupérer toutes les soumissions
     getSubmissions() {
+        if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+            // Mode synchrone pour compatibilité - getData retourne depuis le cache
+            const data = universalStorage.cache[this.storageKey];
+            return data || [];
+        }
         const data = localStorage.getItem(this.storageKey);
         return data ? JSON.parse(data) : [];
     }
@@ -42,7 +51,11 @@ class RecordSubmissionManager {
         if (submission) {
             submission.status = 'accepted';
             submission.acceptedAt = new Date().toISOString();
-            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            if (typeof universalStorage !== 'undefined') {
+                universalStorage.setData(this.storageKey, submissions);
+            } else {
+                localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            }
 
             // Ajouter le record au niveau
             const recordsKey = `level_records_${submission.levelId}`;
@@ -72,7 +85,11 @@ class RecordSubmissionManager {
         if (submission) {
             submission.status = 'rejected';
             submission.rejectedAt = new Date().toISOString();
-            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            if (typeof universalStorage !== 'undefined') {
+                universalStorage.setData(this.storageKey, submissions);
+            } else {
+                localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+            }
         }
         return submission;
     }
@@ -81,7 +98,11 @@ class RecordSubmissionManager {
     deleteSubmission(submissionId) {
         let submissions = this.getSubmissions();
         submissions = submissions.filter(s => s.id !== submissionId);
-        localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        if (typeof universalStorage !== 'undefined') {
+            universalStorage.setData(this.storageKey, submissions);
+        } else {
+            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        }
     }
 
     // Obtenir les statistiques

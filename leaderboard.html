@@ -97,6 +97,12 @@
                 try {
                     await enableSupabaseStorage();
                     console.log('✅ Supabase activé (leaderboard)');
+
+                    // Charger les données depuis Supabase dans le cache
+                    if (typeof universalStorage !== 'undefined') {
+                        await universalStorage.getData('svChallengeSubmissions');
+                        await universalStorage.getData('svChallengeRecordSubmissions');
+                    }
                 } catch (err) {
                     console.error('❌ Activation Supabase échouée, fallback localStorage', err);
                 }
