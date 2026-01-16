@@ -252,6 +252,16 @@ body.dark-mode .btn-accept {
     border-color: var(--gradient-start);
 }
 
+/* Responsive toggle */
+@media (max-width: 480px) {
+    .dark-mode-toggle {
+        top: 10px;
+        right: 10px;
+        padding: 6px 10px;
+        font-size: 1em;
+    }
+}
+
 /* Admin panel dark mode */
 body.dark-mode .login-wrapper {
     background: var(--bg-primary);

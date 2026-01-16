@@ -1427,8 +1427,54 @@
     display: none;
 }
 
+.hidden {
+    display: none;
+}
+
 /* Responsive for edit page */
 @media (max-width: 768px) {
+    .submission-wrapper {
+        max-width: 100%;
+    }
+
+    .submission-form {
+        padding: 15px;
+        border-radius: 5px;
+    }
+
+    .submission-wrapper h2 {
+        font-size: 1.4em;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        font-size: 1em;
+    }
+
+    .btn-submit {
+        padding: 12px;
+        font-size: 1em;
+    }
+
+    .tags-container {
+        flex-direction: column;
+    }
+
+    .tag-label {
+        width: 100%;
+    }
+
     .edit-id-section {
         grid-template-columns: 1fr;
     }
@@ -1447,5 +1493,86 @@
 
     .account-stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .submission-item {
+        padding: 12px;
+    }
+
+    .submission-meta {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .submission-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .submission-actions button {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.9em;
+    }
+
+    .difficulty-select {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .submission-wrapper {
+        max-width: 100%;
+    }
+
+    .submission-form {
+        padding: 12px;
+    }
+
+    .submission-wrapper h2 {
+        font-size: 1.2em;
+    }
+
+    .form-group label {
+        font-size: 0.95em;
+    }
+
+    .form-group small {
+        font-size: 0.8em;
+    }
+
+    .btn-submit {
+        padding: 12px 8px;
+        font-size: 0.95em;
+        margin-top: 15px;
+    }
+
+    .tags-container {
+        flex-wrap: wrap;
+    }
+
+    .tag-label {
+        flex: 0 1 calc(50% - 5px);
+    }
+
+    .success-message,
+    .error-message {
+        padding: 12px;
+        margin-top: 15px;
+        font-size: 0.9em;
+    }
+
+    .login-form {
+        padding: 15px;
+    }
+
+    .login-form input {
+        padding: 10px;
+        font-size: 1em;
+    }
+
+    .login-form button {
+        padding: 12px;
+        font-size: 1em;
     }
 }

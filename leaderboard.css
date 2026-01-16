@@ -416,15 +416,34 @@
 @media (max-width: 768px) {
     .global-stats {
         grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .stat-item {
+        padding: 15px;
+        gap: 12px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .stat-icon {
+        font-size: 2em;
+    }
+
+    .stat-value {
+        font-size: 1.6em;
     }
 
     .leaderboard-item {
         grid-template-columns: 60px 1fr auto;
         gap: 15px;
+        padding: 15px;
     }
 
     .rank-badge {
         height: 60px;
+        width: 60px;
         font-size: 1.8em;
     }
 
@@ -435,14 +454,156 @@
 
     .leaderboard-tabs {
         flex-wrap: wrap;
+        gap: 8px;
     }
 
     .tab-btn {
         flex: 1;
-        min-width: 150px;
+        min-width: 120px;
+        padding: 10px 12px;
+        font-size: 0.9em;
     }
 
     .section-header h2 {
         font-size: 1.5em;
+    }
+
+    .section-header {
+        margin-bottom: 20px;
+    }
+
+    .leaderboard-filters {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .filter-group select,
+    .filter-group input {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .btn-reset {
+        width: 100%;
+    }
+
+    .points-value {
+        font-size: 1.2em;
+    }
+
+    .country-flag {
+        font-size: 1.2em;
+    }
+
+    .leaderboard-item-info {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .global-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-item {
+        padding: 12px;
+    }
+
+    .stat-icon {
+        font-size: 1.8em;
+    }
+
+    .stat-label {
+        font-size: 0.85em;
+    }
+
+    .stat-value {
+        font-size: 1.4em;
+    }
+
+    .leaderboard-item {
+        grid-template-columns: 50px 1fr;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .rank-badge {
+        height: 50px;
+        width: 50px;
+        font-size: 1.5em;
+    }
+
+    .points-value {
+        font-size: 1em;
+    }
+
+    .player-name,
+    .verifier-name {
+        font-size: 0.95em;
+    }
+
+    .player-info {
+        font-size: 0.85em;
+    }
+
+    .leaderboard-tabs {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .tab-btn {
+        width: 100%;
+        min-width: unset;
+        padding: 12px 10px;
+        font-size: 0.9em;
+    }
+
+    .section-header h2 {
+        font-size: 1.3em;
+        margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+        font-size: 0.9em;
+    }
+
+    .leaderboard-filters {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .filter-group label {
+        font-size: 0.85em;
+    }
+
+    .filter-group select,
+    .filter-group input {
+        padding: 8px 10px;
+        font-size: 0.9em;
+    }
+
+    .btn-reset {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    .no-data {
+        padding: 40px 15px;
+        font-size: 1em;
+    }
+
+    main {
+        max-width: 100%;
+        padding: 10px 5px;
+    }
+
+    .container {
+        padding: 12px;
+        border-radius: 5px;
     }
 }

@@ -479,21 +479,149 @@ footer {
         font-size: 1.8em;
     }
 
+    .header-links {
+        gap: 10px;
+    }
+
+    .header-links a {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    main {
+        padding: 15px 10px;
+    }
+
+    .container {
+        padding: 15px;
+        border-radius: 5px;
+    }
+
     .level-container {
         flex-direction: column;
     }
 
-    .level-image {
+    .level-card {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .image-wrapper {
         width: 100%;
-        height: auto;
-        max-width: 300px;
+        height: 200px;
+    }
+
+    .level-badge {
+        width: 130px;
+        height: 130px;
+        top: -10px;
+        right: -10px;
+    }
+
+    .level-info {
+        text-align: center;
+    }
+
+    .level-rank {
+        font-size: 1.4em;
+    }
+
+    .level-card.top-1 .level-rank {
+        font-size: 2em;
+    }
+
+    .level-details {
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+
+    .level-meta {
+        justify-content: center;
     }
 
     .filters {
         grid-template-columns: 1fr;
+        gap: 15px;
     }
 
     .top-1-container {
         flex-direction: column;
+        text-align: center;
+    }
+
+    .level-points {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .stats {
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-content h1 {
+        font-size: 1.4em;
+        margin-bottom: 15px;
+    }
+
+    .header-links {
+        gap: 8px;
+        flex-direction: column;
+    }
+
+    .header-links a {
+        width: 100%;
+        padding: 10px 15px;
+    }
+
+    main {
+        padding: 10px 5px;
+        max-width: 100%;
+    }
+
+    .container {
+        padding: 12px;
+    }
+
+    .level-card {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .image-wrapper {
+        height: 150px;
+    }
+
+    .level-rank {
+        font-size: 1.2em;
+    }
+
+    .level-info h3 {
+        font-size: 1.2em;
+    }
+
+    .level-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .level-meta span {
+        padding: 4px 8px;
+        font-size: 0.85em;
+    }
+
+    .level-details div {
+        font-size: 0.9em;
+    }
+
+    .level-badge {
+        width: 100px;
+        height: 100px;
+    }
+
+    footer {
+        padding: 15px 10px;
+        font-size: 0.9em;
     }
 }
