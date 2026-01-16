@@ -76,16 +76,14 @@ class SupabaseStorageAdapter extends StorageAdapter {
     }
 
     async ensureTableExists() {
-        // Cette méthode suppose que vous avez admin access
-        // En production, créer la table via SQL:
-        // CREATE TABLE IF NOT EXISTS storage_data (
-        //   id BIGSERIAL PRIMARY KEY,
-        //   storage_key TEXT UNIQUE NOT NULL,
-        //   data JSONB NOT NULL,
-        //   created_at TIMESTAMP DEFAULT NOW(),
-        //   updated_at TIMESTAMP DEFAULT NOW()
-        // );
-        console.log('Table storage_data doit être créée manuellement dans Supabase');
+        // Table créée via SQL Editor dans Supabase
+        // Vérifier que la table existe en tentant une requête simple
+        try {
+            await this.client.from(this.tableName).select('id').limit(1);
+            console.log('✅ Table storage_data connectée');
+        } catch (err) {
+            console.error('❌ Table storage_data introuvable. Exécutez le SQL de création.');
+        }
     }
 
     async getData(key) {
