@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Copie localStorage → Supabase</title>
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
+</head>
+
+<body>
+    <h1>Copie des données vers Supabase</h1>
+    <button onclick="copyToSupabase()">📤 Copier localStorage → Supabase</button>
+    <pre id="log"></pre>
+
+    <script>
+        async function copyToSupabase() {
+            const log = document.getElementById('log');
+            log.textContent = '⏳ Chargement Supabase...\n';
+
+            try {
+                await enableSupabaseStorage();
+                log.textContent += '✅ Supabase connecté\n\n';
+
+                // Lire depuis localStorage
+                const submissions = localStorage.getItem('svChallengeSubmissions');
+                const records = localStorage.getItem('svChallengeRecordSubmissions');
+
+                if (submissions) {
+                    log.textContent += '📤 Copie des submissions...\n';
+                    await universalStorage.setData('svChallengeSubmissions', JSON.parse(submissions));
+                    log.textContent += '✅ Submissions copiées\n';
+                } else {
+                    log.textContent += '⚠️ Pas de submissions dans localStorage\n';
+                }
+
+                if (records) {
+                    log.textContent += '📤 Copie des records...\n';
+                    await universalStorage.setData('svChallengeRecordSubmissions', JSON.parse(records));
+                    log.textContent += '✅ Records copiés\n';
+                } else {
+                    log.textContent += '⚠️ Pas de records dans localStorage\n';
+                }
+
+                log.textContent += '\n✅ Synchronisation terminée!\n';
+                log.textContent += '\nVous pouvez maintenant ouvrir le site sur un autre PC.\n';
+            } catch (error) {
+                log.textContent += '\n❌ Erreur: ' + error.message + '\n';
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+
+</html>
