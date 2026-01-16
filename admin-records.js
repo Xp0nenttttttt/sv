@@ -80,7 +80,7 @@ async function displayRecordSubmissions(status) {
 
     // Charger les noms des niveaux
     const manager = new SubmissionManager();
-    const allLevels = manager.getSubmissions().filter(s => s.status === 'accepted');
+    const allLevels = (await manager.getSubmissions()).filter(s => s.status === 'accepted');
 
     container.innerHTML = submissions.map(submission => {
         const level = allLevels.find(l => l.id === submission.levelId);
