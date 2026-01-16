@@ -30,34 +30,34 @@ class LevelEditor {
         }
 
         this.level = submission;
-        this.loadRecords();
-        this.loadMusic();
+        await this.loadRecords();
+        await this.loadMusic();
         this.render();
     }
 
-    loadRecords() {
+    async loadRecords() {
         const storageKey = `level_records_${this.level.id}`;
-        const data = universalStorage.getData(storageKey);
+        const data = await universalStorage.getData(storageKey);
         this.records = data ? JSON.parse(data) : [];
     }
 
-    saveRecords() {
+    async saveRecords() {
         const storageKey = `level_records_${this.level.id}`;
-        universalStorage.setData(storageKey, JSON.stringify(this.records));
+        await universalStorage.setData(storageKey, JSON.stringify(this.records));
     }
 
-    loadMusic() {
+    async loadMusic() {
         const storageKey = `level_music_${this.level.id}`;
-        const data = universalStorage.getData(storageKey);
+        const data = await universalStorage.getData(storageKey);
         this.music = data ? JSON.parse(data) : null;
     }
 
-    saveMusic() {
+    async saveMusic() {
         const storageKey = `level_music_${this.level.id}`;
         if (this.music) {
-            universalStorage.setData(storageKey, JSON.stringify(this.music));
+            await universalStorage.setData(storageKey, JSON.stringify(this.music));
         } else {
-            universalStorage.removeData(storageKey);
+            await universalStorage.removeData(storageKey);
         }
     }
 
@@ -78,17 +78,17 @@ class LevelEditor {
         const newRecordsKey = `level_records_${newId}`;
         const newMusicKey = `level_music_${newId}`;
 
-        const records = universalStorage.getData(oldRecordsKey);
-        const music = universalStorage.getData(oldMusicKey);
+        const records = await universalStorage.getData(oldRecordsKey);
+        const music = await universalStorage.getData(oldMusicKey);
 
         if (records) {
-            universalStorage.setData(newRecordsKey, records);
-            universalStorage.removeData(oldRecordsKey);
+            await universalStorage.setData(newRecordsKey, records);
+            await universalStorage.removeData(oldRecordsKey);
         }
 
         if (music) {
-            universalStorage.setData(newMusicKey, music);
-            universalStorage.removeData(oldMusicKey);
+            await universalStorage.setData(newMusicKey, music);
+            await universalStorage.removeData(oldMusicKey);
         }
 
         // Mettre à jour le niveau
@@ -106,7 +106,7 @@ class LevelEditor {
         return true;
     }
 
-    addRecord(recordData) {
+    async addRecord(recordData) {
         const newRecord = {
             id: Date.now(),
             player: recordData.player,
@@ -117,34 +117,34 @@ class LevelEditor {
         };
         this.records.push(newRecord);
         this.records.sort((a, b) => b.percentage - a.percentage);
-        this.saveRecords();
+        await this.saveRecords();
         this.renderRecords();
     }
 
-    deleteRecord(recordId) {
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce record ?')) {
+    async deleteRecord(recordId) {
+        if (confirm('Êetes-vous sûr de vouloir supprimer ce record ?')) {
             this.records = this.records.filter(r => r.id !== recordId);
-            this.saveRecords();
+            await this.saveRecords();
             this.renderRecords();
         }
     }
 
-    updateMusic(musicData) {
+    async updateMusic(musicData) {
         this.music = {
             name: musicData.name,
             artist: musicData.artist,
             link: musicData.link || '',
             newgroundsId: musicData.newgroundsId || ''
         };
-        this.saveMusic();
+        await this.saveMusic();
         this.renderMusic();
         alert('✅ Musique mise à jour');
     }
 
-    deleteMusic() {
-        if (confirm('Êtes-vous sûr de vouloir supprimer la musique ?')) {
+    async deleteMusic() {
+        if (confirm('Êetes-vous sûr de vouloir supprimer la musique ?')) {
             this.music = null;
-            this.saveMusic();
+            await this.saveMusic();
             this.renderMusic();
         }
     }
@@ -341,7 +341,7 @@ class LevelEditor {
         // Form pour les records
         const recordForm = document.getElementById('addRecordForm');
         if (recordForm) {
-            recordForm.addEventListener('submit', (e) => {
+            recordForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
                 const recordData = {
@@ -351,7 +351,7 @@ class LevelEditor {
                     device: document.getElementById('deviceType').value
                 };
 
-                this.addRecord(recordData);
+                await this.addRecord(recordData);
                 recordForm.reset();
                 this.toggleRecordForm();
             });
@@ -360,7 +360,7 @@ class LevelEditor {
         // Form pour la musique
         const musicForm = document.getElementById('addMusicForm');
         if (musicForm) {
-            musicForm.addEventListener('submit', (e) => {
+            musicForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
                 const musicData = {
@@ -370,7 +370,7 @@ class LevelEditor {
                     newgroundsId: document.getElementById('newgroundsId').value.trim()
                 };
 
-                this.updateMusic(musicData);
+                await this.updateMusic(musicData);
                 this.toggleMusicForm();
             });
         }
