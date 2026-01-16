@@ -7,10 +7,10 @@ class RankingManager {
         this.loadLevels();
     }
 
-    loadLevels() {
-        // Charger uniquement les soumissions acceptées depuis localStorage
+    async loadLevels() {
+        // Charger uniquement les soumissions acceptées depuis Supabase
         const manager = new SubmissionManager();
-        const allSubmissions = manager.getSubmissions();
+        const allSubmissions = await manager.getSubmissions();
         const acceptedSubmissions = allSubmissions
             .filter(s => s.status === 'accepted')
             .map(s => ({

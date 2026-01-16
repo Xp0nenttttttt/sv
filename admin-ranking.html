@@ -54,6 +54,33 @@
         <p>SV Challenge List - Gestion du Classement</p>
     </footer>
 
+    <!-- Supabase Storage -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+        // Initialiser Supabase PUIS le stockage (en séquence)
+        console.log('🔄 Initialisation du stockage (admin-ranking)...');
+
+        async function initializeAdminRanking() {
+            try {
+                // D'abord activer Supabase (charge la lib et initialise le client)
+                await enableSupabaseStorage();
+                console.log('✅ Supabase activé et client initialisé');
+
+                // Puis initialiser le stockage avec le client global
+                await initializeSupabaseStorage();
+                console.log('✅ Stockage prêt (admin-ranking)');
+            } catch (err) {
+                console.error('❌ Erreur initialisation stockage:', err.message);
+                throw err;
+            }
+        }
+
+        // Lancer l'initialisation
+        initializeAdminRanking();
+    </script>
+
     <script src="submission.js"></script>
     <script src="admin-ranking.js"></script>
 </body>
