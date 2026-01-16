@@ -80,17 +80,19 @@
     <script src="record-submission.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await enableSupabaseStorage();
-                console.log('✅ Supabase activé (pages publiques)');
-
-                // Recharger les niveaux après activation de Supabase
-                if (typeof initializeLevels === 'function') {
-                    await initializeLevels();
-                    console.log('✅ Niveaux chargés depuis Supabase');
+            // Tenter d'activer Supabase, mais ne jamais bloquer l'affichage
+            if (typeof enableSupabaseStorage === 'function') {
+                try {
+                    await enableSupabaseStorage();
+                    console.log('✅ Supabase activé (pages publiques)');
+                } catch (err) {
+                    console.error('❌ Activation Supabase échouée, fallback localStorage', err);
                 }
-            } catch (err) {
-                console.error('❌ Activation Supabase échouée, fallback localStorage', err);
+            }
+
+            // Toujours charger les niveaux, même sans Supabase
+            if (typeof initializeLevels === 'function') {
+                await initializeLevels();
             }
         });
     </script>
