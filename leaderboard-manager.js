@@ -72,8 +72,10 @@ class LeaderboardManager {
     async getVerifiersLeaderboard() {
         let allSubmissions;
 
-        // Utiliser DataSyncManager si disponible
-        if (typeof dataSyncManager !== 'undefined') {
+        // Supabase via universalStorage si disponible
+        if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+            allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+        } else if (typeof dataSyncManager !== 'undefined') {
             allSubmissions = await dataSyncManager.loadLevels();
         } else {
             allSubmissions = this.submissionManager.getSubmissions()
@@ -122,8 +124,14 @@ class LeaderboardManager {
         let acceptedRecords;
         let allSubmissions;
 
-        // Utiliser DataSyncManager si disponible
-        if (typeof dataSyncManager !== 'undefined') {
+        // Supabase via universalStorage si disponible
+        if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+            acceptedRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+            allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+            // Ne garder que les records acceptés
+            acceptedRecords = acceptedRecords.filter(s => s.status === 'accepted');
+            allSubmissions = allSubmissions.filter(s => s.status === 'accepted');
+        } else if (typeof dataSyncManager !== 'undefined') {
             acceptedRecords = await dataSyncManager.loadRecords();
             allSubmissions = await dataSyncManager.loadLevels();
         } else {
@@ -194,8 +202,12 @@ class LeaderboardManager {
         let allSubmissions;
         let acceptedRecords;
 
-        // Utiliser DataSyncManager si disponible
-        if (typeof dataSyncManager !== 'undefined') {
+        // Supabase via universalStorage si disponible
+        if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+            allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+            acceptedRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+            acceptedRecords = acceptedRecords.filter(s => s.status === 'accepted');
+        } else if (typeof dataSyncManager !== 'undefined') {
             allSubmissions = await dataSyncManager.loadLevels();
             acceptedRecords = await dataSyncManager.loadRecords();
         } else {

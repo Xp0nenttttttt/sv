@@ -12,9 +12,38 @@ function calculatePoints(rank) {
     return 10; // Au-delà du top 100
 }
 
-// Charger les niveaux avec les soumissions acceptées
+// Charger les niveaux avec priorité Supabase -> JSON -> localStorage
 async function loadAllLevels() {
-    // Utiliser DataSyncManager pour charger depuis JSON (ou fallback localStorage)
+    // 1) Supabase via universalStorage (cache ou fetch)
+    if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+        const acceptedSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+
+        if (acceptedSubmissions.length > 0) {
+            const submittedLevels = acceptedSubmissions.map((submission) => {
+                const rank = submission.approvedRank || (levels.length + 100);
+                return {
+                    id: submission.id,
+                    rank: rank,
+                    name: submission.levelName,
+                    creator: submission.creatorName,
+                    difficulty: submission.approvedDifficulty || 'Moyen',
+                    length: submission.length,
+                    points: calculatePoints(rank),
+                    author: submission.authorName,
+                    image: submission.imageBase64 || submission.imageUrl,
+                    submittedBy: submission.authorName,
+                    isSubmitted: true,
+                    proposedTop: submission.proposedTop,
+                    tags: submission.tags || [],
+                    badge: submission.badge || null
+                };
+            });
+
+            return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
+        }
+    }
+
+    // 2) JSON data (fallback multi-PC hors Supabase)
     if (typeof dataSyncManager !== 'undefined') {
         const acceptedSubmissions = await dataSyncManager.loadLevels();
 
@@ -38,10 +67,12 @@ async function loadAllLevels() {
             };
         });
 
-        return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
+        if (submittedLevels.length > 0) {
+            return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
+        }
     }
 
-    // Fallback classique si DataSyncManager n'est pas chargé
+    // 3) Fallback localStorage direct
     if (typeof SubmissionManager !== 'undefined') {
         const manager = new SubmissionManager();
         const acceptedSubmissions = manager.getAcceptedSubmissions();
