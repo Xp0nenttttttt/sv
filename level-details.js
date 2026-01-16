@@ -42,17 +42,23 @@ class LevelDetailsManager {
         await this.loadRecords();
 
         // Charger la musique
-        this.loadMusic();
+        await this.loadMusic();
 
         // Afficher les détails
         this.renderLevelDetails();
     }
 
     // Charger la musique depuis localStorage
-    loadMusic() {
+    async loadMusic() {
         const storageKey = `level_music_${this.level.id}`;
-        const data = localStorage.getItem(storageKey);
-        this.music = data ? JSON.parse(data) : null;
+        try {
+            const data = await universalStorage.getData(storageKey);
+            this.music = data ? (typeof data === 'string' ? JSON.parse(data) : data) : null;
+            console.log(`🎵 Musique chargée: ${this.music ? this.music.name : 'aucune'}`);
+        } catch (err) {
+            console.warn('⚠️ Erreur chargement musique:', err.message);
+            this.music = null;
+        }
     }
 
     // Fonction pour calculer les points selon le rang
