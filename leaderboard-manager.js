@@ -82,9 +82,9 @@ class LeaderboardManager {
             allSubmissions = await dataSyncManager.loadLevels();
         }
 
-        // Fallback localStorage
+        // Fallback localStorage - AVEC AWAIT
         if (!allSubmissions || allSubmissions.length === 0) {
-            allSubmissions = this.submissionManager.getSubmissions()
+            allSubmissions = (await this.submissionManager.getSubmissions())
                 .filter(s => s.status === 'accepted');
         }
 
@@ -145,11 +145,11 @@ class LeaderboardManager {
             allSubmissions = await dataSyncManager.loadLevels();
         }
 
-        // Fallback localStorage
+        // Fallback localStorage - AVEC AWAIT
         if (!acceptedRecords || acceptedRecords.length === 0) {
-            acceptedRecords = this.recordSubmissionManager.getSubmissions()
+            acceptedRecords = (await this.recordSubmissionManager.getSubmissions())
                 .filter(s => s.status === 'accepted');
-            allSubmissions = this.submissionManager.getSubmissions()
+            allSubmissions = (await this.submissionManager.getSubmissions())
                 .filter(s => s.status === 'accepted');
         }
 
