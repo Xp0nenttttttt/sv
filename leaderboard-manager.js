@@ -75,9 +75,15 @@ class LeaderboardManager {
         // Supabase via universalStorage si disponible
         if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
             allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
-        } else if (typeof dataSyncManager !== 'undefined') {
+        }
+
+        // Fallback JSON
+        if ((!allSubmissions || allSubmissions.length === 0) && typeof dataSyncManager !== 'undefined') {
             allSubmissions = await dataSyncManager.loadLevels();
-        } else {
+        }
+
+        // Fallback localStorage
+        if (!allSubmissions || allSubmissions.length === 0) {
             allSubmissions = this.submissionManager.getSubmissions()
                 .filter(s => s.status === 'accepted');
         }
@@ -131,10 +137,16 @@ class LeaderboardManager {
             // Ne garder que les records acceptés
             acceptedRecords = acceptedRecords.filter(s => s.status === 'accepted');
             allSubmissions = allSubmissions.filter(s => s.status === 'accepted');
-        } else if (typeof dataSyncManager !== 'undefined') {
+        }
+
+        // Fallback JSON
+        if ((!acceptedRecords || acceptedRecords.length === 0) && typeof dataSyncManager !== 'undefined') {
             acceptedRecords = await dataSyncManager.loadRecords();
             allSubmissions = await dataSyncManager.loadLevels();
-        } else {
+        }
+
+        // Fallback localStorage
+        if (!acceptedRecords || acceptedRecords.length === 0) {
             acceptedRecords = this.recordSubmissionManager.getSubmissions()
                 .filter(s => s.status === 'accepted');
             allSubmissions = this.submissionManager.getSubmissions()
@@ -207,10 +219,16 @@ class LeaderboardManager {
             allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
             acceptedRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
             acceptedRecords = acceptedRecords.filter(s => s.status === 'accepted');
-        } else if (typeof dataSyncManager !== 'undefined') {
+        }
+
+        // Fallback JSON
+        if ((!allSubmissions || allSubmissions.length === 0) && typeof dataSyncManager !== 'undefined') {
             allSubmissions = await dataSyncManager.loadLevels();
             acceptedRecords = await dataSyncManager.loadRecords();
-        } else {
+        }
+
+        // Fallback localStorage
+        if (!allSubmissions || allSubmissions.length === 0) {
             allSubmissions = this.submissionManager.getSubmissions();
             acceptedRecords = this.recordSubmissionManager.getSubmissions()
                 .filter(s => s.status === 'accepted');
