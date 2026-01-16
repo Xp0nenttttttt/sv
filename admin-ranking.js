@@ -147,22 +147,28 @@ function logoutRanking() {
 }
 
 function renderRankingList() {
-    rankingManager.loadLevels();
-    const container = document.getElementById('rankingList');
-    const countDiv = document.getElementById('rankingCount');
+    rankingManager.loadLevels()
+        .then(() => {
+            const container = document.getElementById('rankingList');
+            const countDiv = document.getElementById('rankingCount');
 
-    container.innerHTML = '';
-    countDiv.textContent = rankingManager.levels.length;
+            container.innerHTML = '';
+            countDiv.textContent = rankingManager.levels.length;
 
-    if (rankingManager.levels.length === 0) {
-        container.innerHTML = '<p class="no-data">Aucun niveau au classement</p>';
-        return;
-    }
+            if (rankingManager.levels.length === 0) {
+                container.innerHTML = '<p class="no-data">Aucun niveau au classement</p>';
+                return;
+            }
 
-    rankingManager.levels.forEach(level => {
-        const card = createRankingCard(level);
-        container.appendChild(card);
-    });
+            rankingManager.levels.forEach(level => {
+                const card = createRankingCard(level);
+                container.appendChild(card);
+            });
+        })
+        .catch(err => {
+            console.error('Erreur chargement niveaux:', err);
+        });
+}
 }
 
 function createRankingCard(level) {
