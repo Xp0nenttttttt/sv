@@ -100,8 +100,12 @@
 
                     // Charger les données depuis Supabase dans le cache
                     if (typeof universalStorage !== 'undefined') {
-                        await universalStorage.getData('svChallengeSubmissions');
-                        await universalStorage.getData('svChallengeRecordSubmissions');
+                        const subs = await universalStorage.getData('svChallengeSubmissions');
+                        const recs = await universalStorage.getData('svChallengeRecordSubmissions');
+
+                        // Sauvegarder aussi dans localStorage pour les fallbacks
+                        if (subs) localStorage.setItem('svChallengeSubmissions', JSON.stringify(subs));
+                        if (recs) localStorage.setItem('svChallengeRecordSubmissions', JSON.stringify(recs));
                     }
                 } catch (err) {
                     console.error('❌ Activation Supabase échouée, fallback localStorage', err);
