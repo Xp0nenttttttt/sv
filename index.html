@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SV CHALLENGE LIST</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<!-- Charger les adaptateurs de stockage (localStorage uniquement) -->
+<script src="storage-adapter.js"></script>
+<script src="supabase-config.js"></script>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>SV CHALLENGE LIST</h1>
+            <div class="header-links">
+                <a href="leaderboard.html" class="link-leaderboard">🏆 Classements</a>
+                <a href="submission.html" class="link-submit">📝 Soumettre un niveau</a>
+                <a href="admin.html" class="link-admin">👨‍💼 Admin</a>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number" id="levelCount">13</span>
+                    <span class="stat-label">Niveaux</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="recordCount">42</span>
+                    <span class="stat-label">Records</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Filtres -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="difficulty-filter">Difficulté:</label>
+                    <select id="difficulty-filter">
+                        <option value="">Tous</option>
+                        <option value="Extrême">Extrême Demon</option>
+                        <option value="Très Difficile">Très Difficile Demon</option>
+                        <option value="Difficile">Difficile Demon</option>
+                        <option value="Moyen">Moyen Demon</option>
+                        <option value="Facile">Facile Demon</option>
+                        <option value="Très Facile">Très Facile Demon</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="length-filter">Longueur:</label>
+                    <select id="length-filter">
+                        <option value="">Tous</option>
+                        <option value="Tiny">Tiny</option>
+                        <option value="Short">Short</option>
+                        <option value="Medium">Medium</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <input type="text" id="search-input" placeholder="Rechercher un niveau...">
+                </div>
+            </div>
+
+            <!-- Liste des niveaux -->
+            <div class="levels-list" id="levelsList">
+                <!-- Les niveaux seront générés par JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SV Challenge List - Créé par Spleen</p>
+    </footer>
+
+    <script src="badge-particles.js"></script>
+    <script src="script.js"></script>
+    <script src="submission.js"></script>
+    <script src="record-submission.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await enableSupabaseStorage();
+                console.log('✅ Supabase activé (pages publiques)');
+
+                // Recharger les niveaux après activation de Supabase
+                if (typeof initializeLevels === 'function') {
+                    await initializeLevels();
+                    console.log('✅ Niveaux chargés depuis Supabase');
+                }
+            } catch (err) {
+                console.error('❌ Activation Supabase échouée, fallback localStorage', err);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Créer les badges</title>
+</head>
+
+<body>
+    <h1>Badges à télécharger</h1>
+
+    <h2>featured.png</h2>
+    <canvas id="canvas1" width="150" height="150" style="border: 1px solid #ccc;"></canvas>
+    <button onclick="downloadFeatured()">Télécharger featured.png</button>
+
+    <h2>epic.png</h2>
+    <canvas id="canvas2" width="150" height="150" style="border: 1px solid #ccc;"></canvas>
+    <button onclick="downloadEpic()">Télécharger epic.png</button>
+
+    <h2>mythic.png</h2>
+    <canvas id="canvas3" width="150" height="150" style="border: 1px solid #ccc;"></canvas>
+    <button onclick="downloadMythic()">Télécharger mythic.png</button>
+
+    <script>
+        // Featured - Couleur or/jaune
+        const canvas1 = document.getElementById('canvas1');
+        const ctx1 = canvas1.getContext('2d');
+        ctx1.fillStyle = '#FFD700';
+        ctx1.beginPath();
+        ctx1.arc(75, 75, 70, 0, Math.PI * 2);
+        ctx1.fill();
+        ctx1.fillStyle = '#FFA500';
+        ctx1.font = 'bold 40px Arial';
+        ctx1.textAlign = 'center';
+        ctx1.textBaseline = 'middle';
+        ctx1.fillText('⭐', 75, 75);
+
+        // Epic - Couleur violette
+        const canvas2 = document.getElementById('canvas2');
+        const ctx2 = canvas2.getContext('2d');
+        ctx2.fillStyle = '#9945FF';
+        ctx2.beginPath();
+        ctx2.arc(75, 75, 70, 0, Math.PI * 2);
+        ctx2.fill();
+        ctx2.fillStyle = '#FF00FF';
+        ctx2.font = 'bold 50px Arial';
+        ctx2.textAlign = 'center';
+        ctx2.textBaseline = 'middle';
+        ctx2.fillText('✦', 75, 75);
+
+        // Mythic - Couleur rouge/orange
+        const canvas3 = document.getElementById('canvas3');
+        const ctx3 = canvas3.getContext('2d');
+        ctx3.fillStyle = '#FF6B35';
+        ctx3.beginPath();
+        ctx3.arc(75, 75, 70, 0, Math.PI * 2);
+        ctx3.fill();
+        ctx3.fillStyle = '#FF0000';
+        ctx3.font = 'bold 50px Arial';
+        ctx3.textAlign = 'center';
+        ctx3.textBaseline = 'middle';
+        ctx3.fillText('🔥', 75, 75);
+
+        function downloadFeatured() {
+            const link = document.createElement('a');
+            link.download = 'featured.png';
+            link.href = document.getElementById('canvas1').toDataURL();
+            link.click();
+        }
+
+        function downloadEpic() {
+            const link = document.createElement('a');
+            link.download = 'epic.png';
+            link.href = document.getElementById('canvas2').toDataURL();
+            link.click();
+        }
+
+        function downloadMythic() {
+            const link = document.createElement('a');
+            link.download = 'mythic.png';
+            link.href = document.getElementById('canvas3').toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+
+</html>

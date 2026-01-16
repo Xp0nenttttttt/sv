@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion du Stockage - SV CHALLENGE LIST</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="submission.css">
+    <style>
+        .storage-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .storage-usage {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .storage-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .storage-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50 0%, #ffc107 70%, #f44336 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .storage-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .stat-card-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-card-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .cleanup-actions {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .cleanup-actions h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .action-button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-button.warning {
+            background: #ff9800;
+        }
+
+        .action-button.warning:hover {
+            background: #e68900;
+        }
+
+        .action-button.critical {
+            background: #f44336;
+        }
+
+        .action-button.critical:hover {
+            background: #d32f2f;
+        }
+
+        .breakdown-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .breakdown-table th,
+        .breakdown-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .breakdown-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .breakdown-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-ok {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .status-warning {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+
+        .status-critical {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+
+        .result-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-section.success {
+            border-left-color: #4caf50;
+        }
+
+        .result-section.warning {
+            border-left-color: #ff9800;
+        }
+
+        .result-section.error {
+            border-left-color: #f44336;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            padding: 5px 0;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>SV CHALLENGE LIST</h1>
+            <div class="header-links">
+                <a href="index.html">← Retour à la liste</a>
+                <a href="admin.html">← Retour à l'admin</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="storage-container">
+            <div id="loginSection" class="login-wrapper">
+                <h2>🔐 Admin Login</h2>
+                <form id="storageLoginForm" class="login-form">
+                    <input type="password" id="storagePassword" placeholder="Mot de passe admin"
+                        autocomplete="current-password">
+                    <button type="submit">Se connecter</button>
+                </form>
+                <div id="loginError" class="error-message hidden"></div>
+            </div>
+
+            <div id="storageSection" class="hidden">
+                <h1>💾 Gestion du Stockage LocalStorage</h1>
+
+                <!-- Storage Usage -->
+                <div class="storage-usage">
+                    <h2>Utilisation Actuelle</h2>
+                    <div class="storage-bar">
+                        <div class="storage-bar-fill" id="storageBarFill" style="width: 0%">
+                            <span id="usagePercentage">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="storage-stats">
+                        <div class="stat-card">
+                            <div class="stat-card-label">Utilisé</div>
+                            <div class="stat-card-value" id="usedSpace">0 MB</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-label">Total Disponible</div>
+                            <div class="stat-card-value">5 MB</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-label">Status</div>
+                            <div class="stat-card-value" id="storageStatus">✅ OK</div>
+                        </div>
+                    </div>
+
+                    <div id="statusMessage" style="margin-top: 20px; padding: 15px; border-radius: 5px; display: none;">
+                    </div>
+                </div>
+
+                <!-- Cleanup Actions -->
+                <div class="cleanup-actions">
+                    <h3>🧹 Actions de Nettoyage</h3>
+                    <p style="color: #666; margin-bottom: 20px;">Sélectionnez l'action appropriée pour libérer de
+                        l'espace.</p>
+
+                    <button class="action-button" onclick="cleanupImages()">
+                        🖼️ Supprimer les Images Base64 Volumineuses
+                    </button>
+
+                    <button class="action-button warning" onclick="removeRejected()">
+                        ❌ Supprimer les Soumissions Rejetées
+                    </button>
+
+                    <button class="action-button warning" onclick="optimizeData()">
+                        🔧 Optimiser les Données
+                    </button>
+
+                    <button class="action-button critical" onclick="fullCleanup()">
+                        🔴 Nettoyage Complet
+                    </button>
+                </div>
+
+                <!-- Data Breakdown -->
+                <div class="breakdown-section">
+                    <h2>📊 Détails du Stockage</h2>
+                    <table class="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th>Clé de Stockage</th>
+                                <th>Taille</th>
+                                <th>Contenu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdownTable">
+                            <tr>
+                                <td colspan="3" style="text-align: center; color: #999;">Chargement...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultSection" class="result-section" style="display: none;"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SV Challenge List - Storage Manager</p>
+    </footer>
+
+    <script src="submission.js"></script>
+    <script src="record-submission.js"></script>
+    <script src="storage-cleanup.js"></script>
+    <script>
+        const ADMIN_PASSWORD = 'SV2026';
+
+        document.getElementById('storageLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('storagePassword').value;
+            const error = document.getElementById('loginError');
+
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('storageSection').classList.remove('hidden');
+                updateStorageInfo();
+            } else {
+                error.textContent = '❌ Mot de passe incorrect';
+                error.classList.remove('hidden');
+            }
+        });
+
+        function updateStorageInfo() {
+            const usage = storageManager.getStorageUsage();
+            const percentage = parseFloat(usage.percentage);
+
+            // Mettre à jour les statistiques
+            document.getElementById('usedSpace').textContent = usage.used;
+            document.getElementById('usagePercentage').textContent = percentage.toFixed(1) + '%';
+            document.getElementById('storageBarFill').style.width = Math.min(percentage, 100) + '%';
+
+            // Mettre à jour le statut
+            let statusClass, statusText;
+            if (percentage > 90) {
+                statusClass = 'status-critical';
+                statusText = '🔴 CRITIQUE';
+            } else if (percentage > 70) {
+                statusClass = 'status-warning';
+                statusText = '🟠 ATTENTION';
+            } else {
+                statusClass = 'status-ok';
+                statusText = '🟢 OK';
+            }
+
+            const statusElement = document.getElementById('storageStatus');
+            statusElement.textContent = statusText;
+            statusElement.className = 'stat-card-value ' + statusClass;
+
+            // Afficher le message de recommandation
+            const msgDiv = document.getElementById('statusMessage');
+            if (percentage > 80) {
+                msgDiv.className = 'result-section critical';
+                msgDiv.innerHTML = `<strong>⚠️ ALERTE:</strong> L'espace de stockage est presque plein (${percentage.toFixed(1)}%). 
+                    Un nettoyage est fortement recommandé pour éviter les erreurs de sauvegarde.`;
+                msgDiv.style.display = 'block';
+            } else if (percentage > 50) {
+                msgDiv.className = 'result-section warning';
+                msgDiv.innerHTML = `<strong>⚠️ ATTENTION:</strong> L'espace de stockage est à ${percentage.toFixed(1)}%. 
+                    Considérez un nettoyage proactif.`;
+                msgDiv.style.display = 'block';
+            } else {
+                msgDiv.style.display = 'none';
+            }
+
+            // Mettre à jour le tableau de détails
+            updateBreakdownTable();
+        }
+
+        function updateBreakdownTable() {
+            const breakdown = storageManager.getStorageBreakdown();
+            const tbody = document.getElementById('breakdownTable');
+
+            const rows = Object.entries(breakdown).map(([key, value]) => {
+                const getDescription = (key) => {
+                    if (key === 'svChallengeSubmissions') return 'Soumissions de niveaux';
+                    if (key === 'svChallengeRecordSubmissions') return 'Soumissions de records';
+                    if (key.includes('level_records')) return 'Records des niveaux';
+                    if (key.includes('rankingsCache')) return 'Cache des classements';
+                    if (key === 'TOTAL') return 'Taille totale';
+                    return 'Autres données';
+                };
+
+                return `<tr>
+                    <td><code>${key}</code></td>
+                    <td><strong>${value}</strong></td>
+                    <td>${getDescription(key)}</td>
+                </tr>`;
+            }).join('');
+
+            tbody.innerHTML = rows;
+        }
+
+        function cleanupImages() {
+            if (!confirm('Supprimer toutes les images Base64 volumineuses ?')) return;
+
+            const cleaned = storageManager.cleanupLargeImages();
+            showResult('success', `✅ Nettoyage des Images`,
+                `${cleaned} image(s) volumineuse(s) supprimée(s).`);
+            updateStorageInfo();
+        }
+
+        function removeRejected() {
+            if (!confirm('Supprimer toutes les soumissions rejetées ? Cette action est irréversible.')) return;
+
+            const result = storageManager.removeRejectedSubmissions();
+            showResult('success', `✅ Suppression des Soumissions Rejetées`,
+                `Soumissions conservées: ${result.submissions}\nRecords conservés: ${result.records}`);
+            updateStorageInfo();
+        }
+
+        function optimizeData() {
+            if (!confirm('Optimiser les données stockées ?')) return;
+
+            const count = storageManager.optimizeSubmissions();
+            showResult('success', `✅ Optimisation Complétée`,
+                `${count} soumission(s) optimisée(s).`);
+            updateStorageInfo();
+        }
+
+        function fullCleanup() {
+            if (!confirm('Exécuter un nettoyage COMPLET ? Cette action supprimera les soumissions rejetées, les images volumineuses et optimisera les données.')) return;
+
+            const results = storageManager.fullCleanup();
+            showResult('success', `✅ Nettoyage Complet Terminé`,
+                `Images nettoyées: ${results.imagesCleaned}\n` +
+                `Soumissions rejetées: ${results.rejectedRemoved.submissions}\n` +
+                `Records rejetés: ${results.rejectedRemoved.records}\n` +
+                `Fichiers obsolètes: ${results.obsoleteRemoved}\n` +
+                `Soumissions optimisées: ${results.submissionsOptimized}`);
+            updateStorageInfo();
+        }
+
+        function showResult(type, title, message) {
+            const resultDiv = document.getElementById('resultSection');
+            resultDiv.className = `result-section ${type}`;
+            resultDiv.innerHTML = `<div class="result-title">${title}</div>
+                ${message.split('\n').map(line => `<div class="result-item">${line}</div>`).join('')}`;
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Charger les infos au chargement
+        window.addEventListener('load', () => {
+            // L'affichage de storageSection est contrôlé par le login
+        });
+    </script>
+</body>
+
+</html>

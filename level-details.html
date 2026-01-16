@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du niveau - SV CHALLENGE LIST</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="level-details.css">
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>SV CHALLENGE LIST</h1>
+            <div class="header-links">
+                <a href="leaderboard.html">🏆 Classements</a>
+                <a href="index.html">← Retour à la liste</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div id="levelDetails">
+                <!-- Le contenu sera généré par JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SV Challenge List - Détails du niveau</p>
+    </footer>
+
+    <script src="badge-particles.js"></script>
+    <script src="submission.js"></script>
+    <script src="record-submission.js"></script>
+    <script src="level-details.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await enableSupabaseStorage();
+                console.log('✅ Supabase activé (level details)');
+            } catch (err) {
+                console.error('❌ Activation Supabase échouée, fallback localStorage', err);
+            }
+        });
+    </script>
+</body>
+
+</html>

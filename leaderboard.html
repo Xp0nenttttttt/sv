@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classements - SV CHALLENGE LIST</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="leaderboard.css">
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>SV CHALLENGE LIST</h1>
+            <div class="header-links">
+                <a href="index.html">← Retour à la liste</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Stats globales -->
+            <div class="global-stats">
+                <div class="stat-item">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Niveaux</div>
+                        <div class="stat-value" id="statsLevels">0</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">🏅</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Records</div>
+                        <div class="stat-value" id="statsRecords">0</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">�</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Participants</div>
+                        <div class="stat-value" id="statsPlayers">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classement Global -->
+            <div class="leaderboard-section">
+                <div class="section-header">
+                    <h2>🏆 Classement Global</h2>
+                    <p class="section-subtitle">Meilleurs joueurs et vérificateurs</p>
+                </div>
+
+                <!-- Filtres par pays/région -->
+                <div class="leaderboard-filters">
+                    <div class="filter-group">
+                        <label for="countryFilter">Pays:</label>
+                        <select id="countryFilter">
+                            <option value="">Tous les pays</option>
+                            <option value="France">🇫🇷 France</option>
+                            <option value="Belgique">🇧🇪 Belgique</option>
+                            <option value="Suisse">🇨🇭 Suisse</option>
+                            <option value="Canada">🇨🇦 Canada</option>
+                            <option value="Luxembourg">🇱🇺 Luxembourg</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="regionFilter">Région:</label>
+                        <input type="text" id="regionFilter" placeholder="Filtrer par région...">
+                    </div>
+                    <button id="resetFilters" class="btn-reset">Réinitialiser</button>
+                </div>
+
+                <div id="combinedLeaderboard" class="leaderboard-list"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SV Challenge List - Classements</p>
+    </footer>
+
+    <script src="submission.js"></script>
+    <script src="record-submission.js"></script>
+    <script src="leaderboard-manager.js"></script>
+    <script src="leaderboard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await enableSupabaseStorage();
+                console.log('✅ Supabase activé (leaderboard)');
+
+                // Recharger les leaderboards après activation Supabase
+                if (typeof loadLeaderboards === 'function') {
+                    loadLeaderboards();
+                    console.log('✅ Leaderboards chargés depuis Supabase');
+                }
+            } catch (err) {
+                console.error('❌ Activation Supabase échouée, fallback localStorage', err);
+            }
+        });
+    </script>
+</body>
+
+</html>

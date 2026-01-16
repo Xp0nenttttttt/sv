@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - SV CHALLENGE LIST</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="submission.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>SV CHALLENGE LIST</h1>
+            <div class="header-links">
+                <a href="index.html">← Retour à la liste</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container" id="adminContainer">
+            <!-- Login Form (affiché par défaut) -->
+            <div id="loginSection" class="login-wrapper">
+                <h2>🔐 Admin Login</h2>
+                <form id="loginForm" class="login-form">
+                    <input type="password" id="adminPassword" placeholder="Mot de passe admin"
+                        autocomplete="current-password">
+                    <button type="submit">Se connecter</button>
+                </form>
+                <div id="loginError" class="login-error hidden"></div>
+            </div>
+
+            <!-- Admin Panel (caché par défaut) -->
+            <div id="adminPanel" class="hidden">
+                <div class="admin-header">
+                    <h2>👨‍💼 Panneau d'administration</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="admin-ranking.html" class="btn-primary">🏆 Gérer le classement</a>
+                        <a href="admin-records.html" class="btn-primary">🏅 Gérer les records</a>
+                        <a href="admin-accounts.html" class="btn-primary">👤 Gérer les comptes</a>
+                        <a href="admin-storage.html" class="btn-primary">💾 Gestion du stockage</a>
+                        <button class="btn-logout" onclick="logoutAdmin()">Se déconnecter</button>
+                    </div>
+                </div>
+
+                <div class="stats-admin">
+                    <div class="stat-box">
+                        <h3>En attente</h3>
+                        <div class="stat-number" id="pendingCount">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Acceptées</h3>
+                        <div class="stat-number" id="acceptedCount">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Rejetées</h3>
+                        <div class="stat-number" id="rejectedCount">0</div>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchTab('pending')">⏳ En attente</button>
+                    <button class="tab-button" onclick="switchTab('accepted')">✅ Acceptées</button>
+                    <button class="tab-button" onclick="switchTab('rejected')">❌ Rejetées</button>
+                </div>
+
+                <div id="submissionsContainer"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SV Challenge List - Admin Panel</p>
+    </footer>
+
+    <script src="submission.js"></script>
+    <script src="admin.js"></script>
+
+    <!-- Supabase (optionnel, pour usage futur) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const activated = await enableSupabaseStorage();
+                console.log(activated ? '✅ Supabase activé (admin)' : 'ℹ️ Supabase non activé, fallback localStorage');
+            } catch (err) {
+                console.error('❌ Activation Supabase échouée, fallback localStorage', err);
+            }
+        });
+    </script>
+</body>
+
+</html>

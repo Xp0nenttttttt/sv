@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migration → Supabase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #log {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            background: #fafafa;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        .log-item {
+            margin-bottom: 8px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .log-success {
+            color: #2e7d32;
+            background: #c8e6c9;
+        }
+
+        .log-error {
+            color: #c62828;
+            background: #ffcdd2;
+        }
+
+        .log-info {
+            color: #1565c0;
+            background: #bbdefb;
+        }
+
+        .log-warning {
+            color: #e65100;
+            background: #ffe0b2;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📤 Migration des Données</h1>
+        <p class="subtitle">localStorage → Supabase</p>
+
+        <div class="info-box">
+            ℹ️ Cette opération va copier toutes vos données depuis localStorage vers Supabase.
+            Assurez-vous d'avoir correctement configuré `supabase-config.js`.
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Données Trouvées</div>
+                <div class="stat-value" id="foundCount">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Transférées</div>
+                <div class="stat-value" id="migratedCount">0</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <button onclick="scanData()" id="scanBtn">🔍 Analyser les Données</button>
+        <button onclick="startMigration()" id="migrateBtn" disabled>🚀 Démarrer Migration</button>
+        <button onclick="location.reload()" id="restartBtn" style="display: none; background: #666;">🔄
+            Recommencer</button>
+
+        <div id="log"></div>
+    </div>
+
+    <!-- Scripts Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="submission.js"></script>
+    <script src="record-submission.js"></script>
+
+    <script>
+        let allData = {};
+        let supabaseAdapter = null;
+
+        function addLog(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const item = document.createElement('div');
+            item.className = `log-item log-${type}`;
+            item.textContent = message;
+            logDiv.appendChild(item);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function scanData() {
+            try {
+                addLog('⏳ Analyse des données...', 'info');
+
+                const localStorage_adapter = new LocalStorageAdapter();
+                const keys = await localStorage_adapter.getAllKeys();
+
+                addLog(`📊 ${keys.length} clé(s) trouvée(s)`, 'success');
+
+                allData = {};
+                let totalSize = 0;
+
+                for (const key of keys) {
+                    const data = await localStorage_adapter.getData(key);
+                    allData[key] = data;
+                    const size = new Blob([JSON.stringify(data)]).size;
+                    totalSize += size;
+                    addLog(`  • ${key}: ${(size / 1024).toFixed(2)} KB`, 'info');
+                }
+
+                addLog(`📦 Taille totale: ${(totalSize / 1024 / 1024).toFixed(2)} MB`, 'success');
+                document.getElementById('foundCount').textContent = keys.length;
+
+                document.getElementById('migrateBtn').disabled = false;
+                addLog('✅ Prêt pour la migration', 'success');
+            } catch (error) {
+                addLog(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        async function startMigration() {
+            try {
+                document.getElementById('migrateBtn').disabled = true;
+                document.getElementById('scanBtn').disabled = true;
+
+                addLog('⏳ Initialisation de Supabase...', 'info');
+
+                supabaseAdapter = new SupabaseStorageAdapter(
+                    SUPABASE_CONFIG.URL,
+                    SUPABASE_CONFIG.KEY
+                );
+
+                const keys = Object.keys(allData);
+                addLog(`📤 Migration de ${keys.length} données...`, 'warning');
+
+                let migrated = 0;
+                for (const key of keys) {
+                    try {
+                        await supabaseAdapter.setData(key, allData[key]);
+                        migrated++;
+                        const percentage = Math.round((migrated / keys.length) * 100);
+                        document.getElementById('progressFill').style.width = percentage + '%';
+                        document.getElementById('migratedCount').textContent = migrated;
+                        addLog(`✅ [${migrated}/${keys.length}] ${key}`, 'success');
+                    } catch (error) {
+                        addLog(`❌ Erreur pour ${key}: ${error.message}`, 'error');
+                    }
+                }
+
+                addLog('', 'info');
+                addLog('🎉 Migration terminée !', 'success');
+                addLog('Les données sont maintenant dans Supabase', 'success');
+                addLog('', 'info');
+                addLog('Prochaines étapes:', 'info');
+                addLog('1. Vérifiez vos données dans Supabase (Table Editor)', 'info');
+                addLog('2. Activez Supabase dans votre application', 'info');
+                addLog('3. Dans index.html, appelez: enableSupabaseStorage()', 'info');
+
+                document.getElementById('restartBtn').style.display = 'block';
+            } catch (error) {
+                addLog(`❌ Erreur de migration: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        // Scan au chargement
+        window.addEventListener('load', () => {
+            setTimeout(scanData, 500);
+        });
+    </script>
+</body>
+
+</html>

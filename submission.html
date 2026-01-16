@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soumettre un niveau - SV CHALLENGE LIST</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="submission.css">
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>SV CHALLENGE LIST</h1>
+            <div class="header-links">
+                <a href="index.html">← Retour à la liste</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="submission-wrapper">
+                <h2>📝 Soumettre un nouveau niveau</h2>
+
+                <form id="submissionForm" class="submission-form">
+                    <div class="form-group">
+                        <label for="levelName">Nom du niveau *</label>
+                        <input type="text" id="levelName" name="levelName" placeholder="Ex: SV Kawai" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="creatorName">Créateur du niveau *</label>
+                            <input type="text" id="creatorName" name="creatorName" placeholder="Créateur" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="authorName">Auteur du record *</label>
+                            <input type="text" id="authorName" name="authorName" placeholder="Votre pseudo" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="playerCountry">Pays *</label>
+                            <select id="playerCountry" name="playerCountry" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="France">🇫🇷 France</option>
+                                <option value="Belgique">🇧🇪 Belgique</option>
+                                <option value="Suisse">🇨🇭 Suisse</option>
+                                <option value="Canada">🇨🇦 Canada</option>
+                                <option value="Luxembourg">🇱🇺 Luxembourg</option>
+                                <option value="Autre">🌍 Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="playerRegion">Région</label>
+                            <input type="text" id="playerRegion" name="playerRegion"
+                                placeholder="Ex: Île-de-France, Québec...">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="length">Longueur *</label>
+                            <select id="length" name="length" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="Tiny">Tiny</option>
+                                <option value="Short">Short</option>
+                                <option value="Medium">Medium</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="proposedTop">Top proposé *</label>
+                        <input type="number" id="proposedTop" name="proposedTop" placeholder="Ex: 1, 5, 10..." min="1"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tags (caractéristiques du niveau)</label>
+                        <div class="tags-container">
+                            <label class="tag-label wave">
+                                <input type="checkbox" name="tags" value="wave">
+                                <span class="tag-text">🌊 wave</span>
+                            </label>
+                            <label class="tag-label ship">
+                                <input type="checkbox" name="tags" value="ship">
+                                <span class="tag-text">🚀 ship</span>
+                            </label>
+                            <label class="tag-label overall">
+                                <input type="checkbox" name="tags" value="overall">
+                                <span class="tag-text">🎯 overall</span>
+                            </label>
+                            <label class="tag-label timing">
+                                <input type="checkbox" name="tags" value="timing">
+                                <span class="tag-text">⏱️ timing</span>
+                            </label>
+                            <label class="tag-label vitesse">
+                                <input type="checkbox" name="tags" value="vitesse">
+                                <span class="tag-text">⚡ vitesse</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="levelImage">Image du niveau *</label>
+                        <input type="file" id="levelImage" name="levelImage" accept="image/*" required>
+                        <small>Formats acceptés: JPG, PNG, GIF (max 5MB)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description/Commentaires</label>
+                        <textarea id="description" name="description" placeholder="Ajoute des détails sur ce niveau..."
+                            rows="4"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">📤 Soumettre le niveau</button>
+                </form>
+
+                <div id="successMessage" class="success-message hidden">
+                    ✅ Niveau soumis avec succès ! L'admin examinera votre soumission.
+                </div>
+
+                <div id="errorMessage" class="error-message hidden"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SV Challenge List - Créé par Spleen</p>
+    </footer>
+
+    <script src="submission.js"></script>
+    <script src="submit-handler.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await enableSupabaseStorage();
+                console.log('✅ Supabase activé (submission)');
+            } catch (err) {
+                console.error('❌ Activation Supabase échouée, fallback localStorage', err);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion du Classement - SV CHALLENGE LIST</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="submission.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>SV CHALLENGE LIST</h1>
+            <div class="header-links">
+                <a href="index.html">← Retour à la liste</a>
+                <a href="admin.html">← Retour à l'admin</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div id="loginSection" class="login-wrapper">
+                <h2>🔐 Admin Login</h2>
+                <form id="rankingLoginForm" class="login-form">
+                    <input type="password" id="rankingPassword" placeholder="Mot de passe admin"
+                        autocomplete="current-password">
+                    <button type="submit">Se connecter</button>
+                </form>
+                <div id="rankingLoginError" class="login-error hidden"></div>
+            </div>
+
+            <div id="rankingPanel" class="hidden">
+                <div class="admin-header">
+                    <h2>🏆 Gestion du Classement</h2>
+                    <button class="btn-logout" onclick="logoutRanking()">Se déconnecter</button>
+                </div>
+
+                <div class="ranking-stats">
+                    <div class="stat-box">
+                        <h3>Niveaux au classement</h3>
+                        <div class="stat-number" id="rankingCount">0</div>
+                    </div>
+                </div>
+
+                <div class="ranking-container" id="rankingList"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SV Challenge List - Gestion du Classement</p>
+    </footer>
+
+    <script src="submission.js"></script>
+    <script src="admin-ranking.js"></script>
+</body>
+
+</html>
