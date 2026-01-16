@@ -54,6 +54,18 @@ class AccountManager {
     }
 
     async loadAccounts() {
+        // Attendre que Supabase soit prêt
+        let attempts = 0;
+        while (!universalStorage && attempts < 100) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        if (!universalStorage) {
+            console.error('❌ universalStorage pas disponible dans loadAccounts');
+            return;
+        }
+
         const accountsMap = {};
 
         // Charger tous les joueurs
@@ -71,7 +83,8 @@ class AccountManager {
                 });
             }
 
-            const level = await this.leaderboardManager.submissionManager.getSubmissions()
+            const allSubmissions = await this.leaderboardManager.submissionManager.getSubmissions();
+            const level = allSubmissions
                 .filter(s => s.status === 'accepted')
                 .find(s => s.id === record.levelId);
 
@@ -213,10 +226,24 @@ class AccountManager {
     }
 }
 
-let accountManager = new AccountManager();
+let accountManager;
 
 // === INITIALIZATION ===
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Attendre que Supabase soit prêt
+    let attempts = 0;
+    while (!universalStorage && attempts < 100) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+
+    if (!universalStorage) {
+        console.error('❌ universalStorage pas disponible');
+        return;
+    }
+
+    console.log('✅ Création AccountManager...');
+    accountManager = new AccountManager();
     const loginForm = document.getElementById('accountsLoginForm');
     loginForm.addEventListener('submit', handleAccountsLogin);
 
