@@ -17,11 +17,26 @@ class DataSyncManager {
         throw new Error('Supabase client non disponible. Appelez enableSupabaseStorage() d\'abord');
     }
 
-    // Charger les niveaux acceptés depuis Supabase
+    // Charger les niveaux acceptés depuis Supabase ou universalStorage
     async loadLevels() {
         try {
-            const client = await this.getSupabaseClient();
+            // D'abord essayer de charger depuis universalStorage (storage_data table)
+            if (typeof universalStorage !== 'undefined' && universalStorage) {
+                try {
+                    const levels = await universalStorage.getData('svChallengeSubmissions');
+                    if (levels && levels.length > 0) {
+                        // Filtrer pour avoir les acceptés seulement
+                        const accepted = levels.filter(l => l.status === 'accepted');
+                        console.log(`✅ ${accepted.length} niveaux chargés depuis Supabase storage_data`);
+                        return accepted;
+                    }
+                } catch (storageErr) {
+                    console.warn('⚠️ Impossible de charger depuis storage_data:', storageErr.message);
+                }
+            }
 
+            // Fallback: charger depuis la table submissions si elle existe
+            const client = await this.getSupabaseClient();
             const { data, error } = await client
                 .from('submissions')
                 .select('*')
@@ -30,7 +45,7 @@ class DataSyncManager {
 
             if (error) throw error;
 
-            console.log('✅ Niveaux chargés depuis Supabase');
+            console.log(`✅ ${data.length} niveaux chargés depuis Supabase submissions`);
             return data || [];
         } catch (err) {
             console.error('❌ Impossible de charger les niveaux depuis Supabase:', err);
@@ -38,9 +53,25 @@ class DataSyncManager {
         }
     }
 
-    // Charger les records acceptés depuis Supabase
+    // Charger les records acceptés depuis Supabase ou universalStorage
     async loadRecords() {
         try {
+            // D'abord essayer de charger depuis universalStorage (storage_data table)
+            if (typeof universalStorage !== 'undefined' && universalStorage) {
+                try {
+                    const records = await universalStorage.getData('svChallengeRecordSubmissions');
+                    if (records && records.length > 0) {
+                        // Filtrer pour avoir les acceptés seulement
+                        const accepted = records.filter(r => r.status === 'accepted');
+                        console.log(`✅ ${accepted.length} records chargés depuis Supabase storage_data`);
+                        return accepted;
+                    }
+                } catch (storageErr) {
+                    console.warn('⚠️ Impossible de charger depuis storage_data:', storageErr.message);
+                }
+            }
+
+            // Fallback: charger depuis la table submissions si elle existe
             const client = await this.getSupabaseClient();
 
             const { data, error } = await client
@@ -51,7 +82,7 @@ class DataSyncManager {
 
             if (error) throw error;
 
-            console.log('✅ Records chargés depuis Supabase');
+            console.log(`✅ ${data.length} records chargés depuis Supabase submissions`);
             return data || [];
         } catch (err) {
             console.error('❌ Impossible de charger les records depuis Supabase:', err);
