@@ -13,7 +13,7 @@ class LevelEditor {
         return parseInt(urlParams.get('id'));
     }
 
-    loadLevel() {
+    async loadLevel() {
         const levelId = this.getLevelIdFromUrl();
         if (!levelId) {
             this.showError('Aucun niveau spécifié');
@@ -21,7 +21,7 @@ class LevelEditor {
         }
 
         const manager = new SubmissionManager();
-        const allSubmissions = manager.getSubmissions();
+        const allSubmissions = await manager.getSubmissions();
         const submission = allSubmissions.find(s => s.id === levelId && s.status === 'accepted');
 
         if (!submission) {
@@ -37,33 +37,33 @@ class LevelEditor {
 
     loadRecords() {
         const storageKey = `level_records_${this.level.id}`;
-        const data = localStorage.getItem(storageKey);
+        const data = universalStorage.getData(storageKey);
         this.records = data ? JSON.parse(data) : [];
     }
 
     saveRecords() {
         const storageKey = `level_records_${this.level.id}`;
-        localStorage.setItem(storageKey, JSON.stringify(this.records));
+        universalStorage.setData(storageKey, JSON.stringify(this.records));
     }
 
     loadMusic() {
         const storageKey = `level_music_${this.level.id}`;
-        const data = localStorage.getItem(storageKey);
+        const data = universalStorage.getData(storageKey);
         this.music = data ? JSON.parse(data) : null;
     }
 
     saveMusic() {
         const storageKey = `level_music_${this.level.id}`;
         if (this.music) {
-            localStorage.setItem(storageKey, JSON.stringify(this.music));
+            universalStorage.setData(storageKey, JSON.stringify(this.music));
         } else {
-            localStorage.removeItem(storageKey);
+            universalStorage.removeData(storageKey);
         }
     }
 
-    updateLevelId(newId) {
+    async updateLevelId(newId) {
         const manager = new SubmissionManager();
-        const allSubmissions = manager.getSubmissions();
+        const allSubmissions = await manager.getSubmissions();
 
         // Vérifier que le nouvel ID n'existe pas déjà
         const existingLevel = allSubmissions.find(s => s.id === parseInt(newId) && s.id !== this.level.id);
@@ -78,24 +78,24 @@ class LevelEditor {
         const newRecordsKey = `level_records_${newId}`;
         const newMusicKey = `level_music_${newId}`;
 
-        const records = localStorage.getItem(oldRecordsKey);
-        const music = localStorage.getItem(oldMusicKey);
+        const records = universalStorage.getData(oldRecordsKey);
+        const music = universalStorage.getData(oldMusicKey);
 
         if (records) {
-            localStorage.setItem(newRecordsKey, records);
-            localStorage.removeItem(oldRecordsKey);
+            universalStorage.setData(newRecordsKey, records);
+            universalStorage.removeData(oldRecordsKey);
         }
 
         if (music) {
-            localStorage.setItem(newMusicKey, music);
-            localStorage.removeItem(oldMusicKey);
+            universalStorage.setData(newMusicKey, music);
+            universalStorage.removeData(oldMusicKey);
         }
 
         // Mettre à jour le niveau
         const submission = allSubmissions.find(s => s.id === this.level.id);
         if (submission) {
             submission.id = parseInt(newId);
-            localStorage.setItem('svChallengeSubmissions', JSON.stringify(allSubmissions));
+            await manager.updateSubmissionStatus(submission.id, submission.status);
         }
 
         this.level.id = parseInt(newId);
@@ -376,7 +376,7 @@ class LevelEditor {
         }
     }
 
-    handleIdChange() {
+    async handleIdChange() {
         const newId = document.getElementById('newLevelId').value;
         if (!newId || newId === this.level.id.toString()) {
             alert('❌ Veuillez entrer un nouvel ID différent');
@@ -384,7 +384,7 @@ class LevelEditor {
         }
 
         if (confirm(`Êtes-vous sûr de vouloir changer l'ID de ${this.level.id} à ${newId} ?`)) {
-            this.updateLevelId(newId);
+            await this.updateLevelId(newId);
         }
     }
 
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function handleEditLogin(e) {
+async function handleEditLogin(e) {
     e.preventDefault();
     const password = document.getElementById('editPassword').value;
     const errorDiv = document.getElementById('editLoginError');
@@ -420,18 +420,18 @@ function handleEditLogin(e) {
         sessionStorage.setItem('editAdminSession', 'active');
         document.getElementById('editPassword').value = '';
         errorDiv.classList.add('hidden');
-        showEditPanel();
+        await showEditPanel();
     } else {
         errorDiv.textContent = '❌ Mot de passe incorrect';
         errorDiv.classList.remove('hidden');
     }
 }
 
-function showEditPanel() {
+async function showEditPanel() {
     document.getElementById('loginSection').classList.add('hidden');
     document.getElementById('editPanel').classList.remove('hidden');
     levelEditor = new LevelEditor();
-    levelEditor.loadLevel();
+    await levelEditor.loadLevel();
 }
 
 function logoutEdit() {
