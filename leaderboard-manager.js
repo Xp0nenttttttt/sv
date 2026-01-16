@@ -153,6 +153,11 @@ class LeaderboardManager {
                 .filter(s => s.status === 'accepted');
         }
 
+        // S'assurer que allSubmissions est un array
+        if (!allSubmissions) {
+            allSubmissions = [];
+        }
+
         const players = {};
 
         acceptedRecords.forEach(record => {

@@ -111,10 +111,29 @@ class LevelDetailsManager {
     }
 
     // Charger les records depuis localStorage
-    loadRecords() {
-        const storageKey = `level_records_${this.level.id}`;
-        const data = localStorage.getItem(storageKey);
-        this.records = data ? JSON.parse(data) : [];
+    async loadRecords() {
+        // Charger les records acceptés depuis Supabase
+        let allRecords = [];
+
+        // D'abord essayer universalStorage (Supabase)
+        if (typeof universalStorage !== 'undefined' && universalStorage) {
+            try {
+                allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+            } catch (err) {
+                console.warn('⚠️ Erreur universalStorage records:', err.message);
+            }
+        }
+
+        // Fallback: RecordSubmissionManager
+        if (!allRecords || allRecords.length === 0) {
+            const manager = new RecordSubmissionManager();
+            allRecords = await manager.getSubmissions() || [];
+        }
+
+        // Filtrer les records acceptés pour ce niveau
+        this.records = (allRecords || [])
+            .filter(r => r.status === 'accepted' && r.levelId === this.level.id)
+            .sort((a, b) => b.percentage - a.percentage);
     }
 
     // Sauvegarder les records
