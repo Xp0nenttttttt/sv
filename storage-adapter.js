@@ -92,13 +92,14 @@ class SupabaseStorageAdapter extends StorageAdapter {
             .from(this.tableName)
             .select('data')
             .eq('storage_key', key)
-            .single();
+            .order('updated_at', { ascending: false })
+            .limit(1);
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+        if (error) {
             throw error;
         }
 
-        return data ? data.data : null;
+        return Array.isArray(data) && data.length ? data[0].data : null;
     }
 
     async setData(key, data) {
