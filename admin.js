@@ -28,8 +28,8 @@ async function showAdminPanel() {
     // Synchroniser depuis JSON d'abord
     await syncFromJSON();
 
-    loadSubmissions();
-    updateStats();
+    await loadSubmissions();
+    await updateStats();
 }
 
 // Gestion du login
@@ -91,8 +91,8 @@ async function syncFromJSON() {
 }
 
 // Charger les soumissions
-function loadSubmissions() {
-    const submissions = submissionManager.getSubmissions();
+async function loadSubmissions() {
+    const submissions = await submissionManager.getSubmissions();
     const container = document.getElementById('submissionsContainer');
 
     const filtered = submissions.filter(s => s.status === currentTab);
@@ -174,7 +174,7 @@ function loadSubmissions() {
 }
 
 // Accepter une soumission
-function acceptSubmission(id) {
+async function acceptSubmission(id) {
     const difficultySelect = document.getElementById(`difficulty-${id}`);
     const rankInput = document.getElementById(`rank-${id}`);
     const difficulty = difficultySelect ? difficultySelect.value : null;
@@ -186,30 +186,32 @@ function acceptSubmission(id) {
     }
 
     if (confirm('Êtes-vous sûr de vouloir accepter cette soumission ?\n\nDifficulté: ' + difficulty + (approvedRank ? `\nRang: #${approvedRank}` : '\nRang: Pas spécifié'))) {
-        submissionManager.updateSubmissionStatus(id, 'accepted', approvedRank ? parseInt(approvedRank) : null, difficulty);
+        await submissionManager.updateSubmissionStatus(id, 'accepted', approvedRank ? parseInt(approvedRank) : null, difficulty);
+        await loadSubmissions();
+        await updateStats();
     }
 }
 
 // Rejeter une soumission
-function rejectSubmission(id) {
+async function rejectSubmission(id) {
     if (confirm('Êtes-vous sûr de vouloir rejeter cette soumission ?')) {
-        submissionManager.updateSubmissionStatus(id, 'rejected');
-        loadSubmissions();
-        updateStats();
+        await submissionManager.updateSubmissionStatus(id, 'rejected');
+        await loadSubmissions();
+        await updateStats();
     }
 }
 
 // Supprimer une soumission
-function deleteSubmission(id) {
+async function deleteSubmission(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette soumission définitivement ?')) {
-        submissionManager.deleteSubmission(id);
-        loadSubmissions();
-        updateStats();
+        await submissionManager.deleteSubmission(id);
+        await loadSubmissions();
+        await updateStats();
     }
 }
 
 // Changer d'onglet
-function switchTab(tab) {
+async function switchTab(tab) {
     currentTab = tab;
 
     // Mettre à jour les boutons
@@ -218,12 +220,12 @@ function switchTab(tab) {
     });
     event.target.classList.add('active');
 
-    loadSubmissions();
+    await loadSubmissions();
 }
 
 // Mettre à jour les stats
-function updateStats() {
-    const submissions = submissionManager.getSubmissions();
+async function updateStats() {
+    const submissions = await submissionManager.getSubmissions();
     document.getElementById('pendingCount').textContent = submissions.filter(s => s.status === 'pending').length;
     document.getElementById('acceptedCount').textContent = submissions.filter(s => s.status === 'accepted').length;
     document.getElementById('rejectedCount').textContent = submissions.filter(s => s.status === 'rejected').length;
