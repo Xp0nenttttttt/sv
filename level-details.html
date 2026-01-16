@@ -26,12 +26,16 @@
                 console.log('✅ Stockage prêt (level-details)');
             } catch (err) {
                 console.error('❌ Erreur initialisation stockage:', err.message);
+                console.error('Stack trace:', err);
                 throw err;
             }
         }
 
         // Lancer l'initialisation
-        initializeLevelDetails();
+        initializeLevelDetails()
+            .catch(err => {
+                console.error('❌ Erreur critique initializeLevelDetails:', err);
+            });
     </script>
 </head>
 
