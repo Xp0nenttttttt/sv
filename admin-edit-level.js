@@ -36,9 +36,16 @@ class LevelEditor {
     }
 
     async loadRecords() {
-        const storageKey = `level_records_${this.level.id}`;
-        const data = await universalStorage.getData(storageKey);
-        this.records = data ? JSON.parse(data) : [];
+        // Charger depuis le système de soumissions acceptées
+        const manager = new RecordSubmissionManager();
+        const submissions = await manager.getSubmissions();
+
+        // Filtrer les records acceptés pour ce niveau
+        this.records = submissions
+            .filter(r => r.levelId === this.level.id && r.status === 'accepted')
+            .sort((a, b) => b.percentage - a.percentage);
+
+        console.log(`✅ ${this.records.length} records chargés pour niveau ${this.level.id}`);
     }
 
     async saveRecords() {
@@ -109,23 +116,51 @@ class LevelEditor {
     async addRecord(recordData) {
         const newRecord = {
             id: Date.now(),
+            levelId: this.level.id,
             player: recordData.player,
             percentage: parseInt(recordData.percentage),
             videoLink: recordData.videoLink || '',
             device: recordData.device || 'PC',
+            status: 'accepted',  // Ajouter directement en accepté
             submittedAt: new Date().toISOString()
         };
-        this.records.push(newRecord);
-        this.records.sort((a, b) => b.percentage - a.percentage);
-        await this.saveRecords();
+
+        // Ajouter via RecordSubmissionManager pour que ce soit synchronisé partout
+        const manager = new RecordSubmissionManager();
+        const submissions = await manager.getSubmissions();
+        submissions.push(newRecord);
+
+        if (universalStorage) {
+            await universalStorage.setData('svChallengeRecordSubmissions', submissions);
+        }
+
+        // Recharger les records locaux pour l'affichage immédiat
+        this.records = submissions
+            .filter(r => r.levelId === this.level.id && r.status === 'accepted')
+            .sort((a, b) => b.percentage - a.percentage);
+
         this.renderRecords();
+        console.log('✅ Record ajouté et synchronisé');
     }
 
     async deleteRecord(recordId) {
-        if (confirm('Êetes-vous sûr de vouloir supprimer ce record ?')) {
-            this.records = this.records.filter(r => r.id !== recordId);
-            await this.saveRecords();
+        if (confirm('Êtes-vous sûr de vouloir supprimer ce record ?')) {
+            // Supprimer du système de soumissions
+            const manager = new RecordSubmissionManager();
+            const submissions = await manager.getSubmissions();
+            const filtered = submissions.filter(r => r.id !== recordId);
+
+            if (universalStorage) {
+                await universalStorage.setData('svChallengeRecordSubmissions', filtered);
+            }
+
+            // Recharger les records locaux
+            this.records = filtered
+                .filter(r => r.levelId === this.level.id && r.status === 'accepted')
+                .sort((a, b) => b.percentage - a.percentage);
+
             this.renderRecords();
+            console.log('✅ Record supprimé et synchronisé');
         }
     }
 
