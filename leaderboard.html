@@ -108,9 +108,11 @@
                 }
             }
 
-            // Charger les classements
+            // Attendre un peu pour que le cache soit rempli, puis charger les classements
+            await new Promise(resolve => setTimeout(resolve, 500));
+
             if (typeof loadLeaderboards === 'function') {
-                loadLeaderboards();
+                await loadLeaderboards();
             }
         });
     </script>
