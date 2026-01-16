@@ -132,53 +132,61 @@ class LevelDetailsManager {
             console.log(`📊 Records depuis RecordSubmissionManager: ${allRecords.length}`, allRecords);
         }
 
+        // DEBUG: afficher le niveau en cours
+        console.log(`🎮 Niveau en cours: ID=${this.level.id}`, this.level);
+
         // Filtrer les records acceptés pour ce niveau
-        this.records = (allRecords || [])
-            .filter(r => r.status === 'accepted' && r.levelId === this.level.id)
-            .sort((a, b) => b.percentage - a.percentage);
+        const filtered = (allRecords || []).filter(r => {
+            const match = r.status === 'accepted' && r.levelId === this.level.id;
+            console.log(`  Record: ID=${r.id}, levelId=${r.levelId}, status=${r.status}, match=${match}`);
+            return match;
+        });
 
+        this.records = filtered.sort((a, b) => b.percentage - a.percentage);
         console.log(`✅ Records chargés pour niveau ${this.level.id}: ${this.records.length}`, this.records);
-        // Ajouter un record
-        addRecord(recordData) {
-            const newRecord = {
-                id: Date.now(),
-                player: recordData.player,
-                percentage: parseInt(recordData.percentage),
-                videoLink: recordData.videoLink || '',
-                device: recordData.device || 'PC',
-                submittedAt: new Date().toISOString()
-            };
-            this.records.push(newRecord);
-            this.records.sort((a, b) => b.percentage - a.percentage);
-            this.saveRecords();
-            this.renderRecords();
-        }
+    }
 
-        // Supprimer un record
-        deleteRecord(recordId) {
-            this.records = this.records.filter(r => r.id !== recordId);
-            this.saveRecords();
-            this.renderRecords();
-        }
+    // Ajouter un record
+    addRecord(recordData) {
+        const newRecord = {
+            id: Date.now(),
+            player: recordData.player,
+            percentage: parseInt(recordData.percentage),
+            videoLink: recordData.videoLink || '',
+            device: recordData.device || 'PC',
+            submittedAt: new Date().toISOString()
+        };
+        this.records.push(newRecord);
+        this.records.sort((a, b) => b.percentage - a.percentage);
+        this.saveRecords();
+        this.renderRecords();
+    }
 
-        // Afficher une erreur
-        showError(message) {
-            const container = document.getElementById('levelDetails');
-            container.innerHTML = `
+    // Supprimer un record
+    deleteRecord(recordId) {
+        this.records = this.records.filter(r => r.id !== recordId);
+        this.saveRecords();
+        this.renderRecords();
+    }
+
+    // Afficher une erreur
+    showError(message) {
+        const container = document.getElementById('levelDetails');
+        container.innerHTML = `
             <div class="error-message">
                 <h2>❌ Erreur</h2>
                 <p>${message}</p>
                 <a href="index.html" class="btn-primary">Retour à la liste</a>
             </div>
         `;
-        }
+    }
 
-        // Afficher les détails du niveau
-        renderLevelDetails() {
-            const container = document.getElementById('levelDetails');
-            const difficultyClass = `difficulty-${this.level.difficulty.toLowerCase()}`;
+    // Afficher les détails du niveau
+    renderLevelDetails() {
+        const container = document.getElementById('levelDetails');
+        const difficultyClass = `difficulty-${this.level.difficulty.toLowerCase()}`;
 
-            container.innerHTML = `
+        container.innerHTML = `
             <div class="level-header">
                 <div class="level-header-content">
                     <div class="level-rank-large">#${this.level.rank}</div>
@@ -321,25 +329,25 @@ class LevelDetailsManager {
             </div>
         `;
 
-            this.renderRecords();
-            this.setupRecordForm();
-        }
+        this.renderRecords();
+        this.setupRecordForm();
+    }
 
-        // Afficher les records
-        renderRecords() {
-            const container = document.getElementById('recordsList');
+    // Afficher les records
+    renderRecords() {
+        const container = document.getElementById('recordsList');
 
-            if (this.records.length === 0) {
-                container.innerHTML = `
+        if (this.records.length === 0) {
+            container.innerHTML = `
                 <div class="no-records">
                     <p>Aucun record enregistré pour ce niveau</p>
                     <p class="hint">Soyez le premier à ajouter votre record !</p>
                 </div>
             `;
-                return;
-            }
+            return;
+        }
 
-            container.innerHTML = this.records.map((record, index) => `
+        container.innerHTML = this.records.map((record, index) => `
             <div class="record-card ${record.percentage === 100 ? 'record-complete' : ''}">
                 <div class="record-rank">#${index + 1}</div>
                 <div class="record-info">
@@ -359,90 +367,90 @@ class LevelDetailsManager {
                 </div>
             </div>
         `).join('');
-        }
+    }
 
-        // Gérer le formulaire d'ajout de record
-        setupRecordForm() {
-            const form = document.getElementById('addRecordForm');
-            const successMsg = document.getElementById('recordSuccessMsg');
-            const errorMsg = document.getElementById('recordErrorMsg');
+    // Gérer le formulaire d'ajout de record
+    setupRecordForm() {
+        const form = document.getElementById('addRecordForm');
+        const successMsg = document.getElementById('recordSuccessMsg');
+        const errorMsg = document.getElementById('recordErrorMsg');
 
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-                const recordData = {
-                    player: document.getElementById('playerName').value.trim(),
-                    playerCountry: document.getElementById('playerCountryRecord').value,
-                    playerRegion: document.getElementById('playerRegionRecord').value.trim(),
-                    percentage: document.getElementById('recordPercentage').value,
-                    videoLink: document.getElementById('videoLink').value.trim(),
-                    device: document.getElementById('deviceType').value
-                };
-
-                // Validation
-                if (!recordData.player || !recordData.percentage || !recordData.videoLink) {
-                    errorMsg.textContent = '❌ Veuillez remplir tous les champs obligatoires';
-                    errorMsg.classList.remove('hidden');
-                    successMsg.classList.add('hidden');
-                    return;
-                }
-
-                // Vérifier que c'est un lien YouTube
-                if (!recordData.videoLink.includes('youtube.com') && !recordData.videoLink.includes('youtu.be')) {
-                    errorMsg.textContent = '❌ Veuillez fournir un lien YouTube valide';
-                    errorMsg.classList.remove('hidden');
-                    successMsg.classList.add('hidden');
-                    return;
-                }
-
-                // Soumettre le record
-                if (typeof recordSubmissionManager !== 'undefined') {
-                    recordSubmissionManager.submitRecord(this.level.id, recordData);
-
-                    successMsg.textContent = '✅ Record soumis avec succès ! Il sera vérifié par un administrateur.';
-                    successMsg.classList.remove('hidden');
-                    errorMsg.classList.add('hidden');
-
-                    form.reset();
-
-                    setTimeout(() => {
-                        successMsg.classList.add('hidden');
-                        this.toggleRecordForm();
-                    }, 3000);
-                } else {
-                    errorMsg.textContent = '❌ Erreur lors de la soumission';
-                    errorMsg.classList.remove('hidden');
-                    successMsg.classList.add('hidden');
-                }
-            });
-        }
-
-        // Afficher/masquer le formulaire de record
-        toggleRecordForm() {
-            const form = document.getElementById('recordForm');
-            const successMsg = document.getElementById('recordSuccessMsg');
-            const errorMsg = document.getElementById('recordErrorMsg');
-
-            form.classList.toggle('hidden');
-
-            if (form.classList.contains('hidden')) {
-                successMsg.classList.add('hidden');
-                errorMsg.classList.add('hidden');
-            }
-        }
-
-        // Obtenir l'emoji du tag
-        getTagEmoji(tag) {
-            const emojis = {
-                wave: '🌊',
-                ship: '🚀',
-                overall: '🏄',
-                timing: '⏱️',
-                vitesse: '⚡'
+            const recordData = {
+                player: document.getElementById('playerName').value.trim(),
+                playerCountry: document.getElementById('playerCountryRecord').value,
+                playerRegion: document.getElementById('playerRegionRecord').value.trim(),
+                percentage: document.getElementById('recordPercentage').value,
+                videoLink: document.getElementById('videoLink').value.trim(),
+                device: document.getElementById('deviceType').value
             };
-            return emojis[tag] || '🏷️';
+
+            // Validation
+            if (!recordData.player || !recordData.percentage || !recordData.videoLink) {
+                errorMsg.textContent = '❌ Veuillez remplir tous les champs obligatoires';
+                errorMsg.classList.remove('hidden');
+                successMsg.classList.add('hidden');
+                return;
+            }
+
+            // Vérifier que c'est un lien YouTube
+            if (!recordData.videoLink.includes('youtube.com') && !recordData.videoLink.includes('youtu.be')) {
+                errorMsg.textContent = '❌ Veuillez fournir un lien YouTube valide';
+                errorMsg.classList.remove('hidden');
+                successMsg.classList.add('hidden');
+                return;
+            }
+
+            // Soumettre le record
+            if (typeof recordSubmissionManager !== 'undefined') {
+                recordSubmissionManager.submitRecord(this.level.id, recordData);
+
+                successMsg.textContent = '✅ Record soumis avec succès ! Il sera vérifié par un administrateur.';
+                successMsg.classList.remove('hidden');
+                errorMsg.classList.add('hidden');
+
+                form.reset();
+
+                setTimeout(() => {
+                    successMsg.classList.add('hidden');
+                    this.toggleRecordForm();
+                }, 3000);
+            } else {
+                errorMsg.textContent = '❌ Erreur lors de la soumission';
+                errorMsg.classList.remove('hidden');
+                successMsg.classList.add('hidden');
+            }
+        });
+    }
+
+    // Afficher/masquer le formulaire de record
+    toggleRecordForm() {
+        const form = document.getElementById('recordForm');
+        const successMsg = document.getElementById('recordSuccessMsg');
+        const errorMsg = document.getElementById('recordErrorMsg');
+
+        form.classList.toggle('hidden');
+
+        if (form.classList.contains('hidden')) {
+            successMsg.classList.add('hidden');
+            errorMsg.classList.add('hidden');
         }
     }
+
+    // Obtenir l'emoji du tag
+    getTagEmoji(tag) {
+        const emojis = {
+            wave: '🌊',
+            ship: '🚀',
+            overall: '🏄',
+            timing: '⏱️',
+            vitesse: '⚡'
+        };
+        return emojis[tag] || '🏷️';
+    }
+}
 
 // Initialiser la page
 let levelDetailsManager;
