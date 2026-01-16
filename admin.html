@@ -88,16 +88,26 @@
     <script src="storage-adapter.js"></script>
     <script src="supabase-config.js"></script>
     <script>
-        // Initialiser le stockage IMMÉDIATEMENT au chargement du script (pas d'attendre DOMContentLoaded)
-        // Cela permet à admin.js d'utiliser universalStorage sans race condition
+        // Initialiser Supabase PUIS le stockage (en séquence)
         console.log('🔄 Initialisation du stockage (admin.html)...');
-        initializeSupabaseStorage()
-            .then(() => {
+
+        async function initializeAdmin() {
+            try {
+                // D'abord activer Supabase (charge la lib et initialise le client)
+                await enableSupabaseStorage();
+                console.log('✅ Supabase activé et client initialisé');
+
+                // Puis initialiser le stockage avec le client global
+                await initializeSupabaseStorage();
                 console.log('✅ Stockage prêt (admin.html)');
-            })
-            .catch(err => {
-                console.error('❌ Erreur initialisation stockage:', err.message);
-            });
+            } catch (err) {
+                console.error('❌ Erreur initialisation:', err.message);
+                throw err;
+            }
+        }
+
+        // Lancer l'initialisation
+        initializeAdmin();
     </script>
 
     <!-- Charger admin.js APRÈS l'initialisation du stockage -->
