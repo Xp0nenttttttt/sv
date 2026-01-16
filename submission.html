@@ -9,8 +9,21 @@
     <link rel="stylesheet" href="submission.css">
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="mobile-optimized.css">
+    <!-- Supabase Storage (Supabase + localStorage fallback) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="storage-adapter.js"></script>
     <script src="supabase-config.js"></script>
+    <script>
+        // Initialiser le stockage immédiatement (avant les autres scripts)
+        console.log('🔄 Initialisation du stockage (submission)...');
+        initializeSupabaseStorage()
+            .then(() => {
+                console.log('✅ Stockage prêt (submission)');
+            })
+            .catch(err => {
+                console.error('❌ Erreur initialisation stockage:', err.message);
+            });
+    </script>
 </head>
 
 <body>
@@ -150,11 +163,19 @@
     <script src="submit-handler.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await enableSupabaseStorage();
-                console.log('✅ Supabase activé (submission)');
-            } catch (err) {
-                console.error('❌ Activation Supabase échouée, fallback localStorage', err);
+            console.log('📝 Submission: DOMContentLoaded appelé');
+
+            // Attendre que le stockage soit initialisé
+            let attempts = 0;
+            while (!universalStorage && attempts < 100) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                attempts++;
+            }
+
+            if (!universalStorage) {
+                console.error('⚠️ Stockage non initialisé, utilisé fallback');
+            } else {
+                console.log('✅ Stockage prêt (', universalStorage.getCurrentAdapter(), ')');
             }
         });
     </script>

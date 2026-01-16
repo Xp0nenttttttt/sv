@@ -34,8 +34,9 @@ async function showAdminPanel() {
 
 // Gestion du login
 document.addEventListener('DOMContentLoaded', async function () {
-    // Attendre que Supabase soit initialisé
-    console.log('⏳ Admin: attente initialisation Supabase...');
+    console.log('⏳ Admin: DOMContentLoaded appelé');
+
+    // Attendre que le stockage soit initialisé
     let attempts = 0;
     while (!universalStorage && attempts < 100) {
         await new Promise(resolve => setTimeout(resolve, 50));
@@ -43,10 +44,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     if (!universalStorage) {
-        console.error('❌ Admin: Supabase non initialisé après attente');
+        console.error('❌ Admin: Stockage non initialisé après 5s (utilisation du fallback)');
     } else {
-        console.log('✅ Admin: Supabase prêt');
+        console.log('✅ Admin: Stockage prêt (', universalStorage.getCurrentAdapter(), ')');
     }
+
+    checkAdminLogin();
 
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
@@ -70,8 +73,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         });
     }
-
-    checkAdminLogin();
 });
 
 // Déconnexion

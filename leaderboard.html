@@ -9,9 +9,21 @@
     <link rel="stylesheet" href="leaderboard.css">
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="mobile-optimized.css">
-    <!-- Stockage (localStorage par défaut, Supabase optionnel) -->
+    <!-- Supabase Storage (Supabase + localStorage fallback) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="storage-adapter.js"></script>
     <script src="supabase-config.js"></script>
+    <script>
+        // Initialiser le stockage immédiatement (avant les autres scripts)
+        console.log('🔄 Initialisation du stockage (leaderboard)...');
+        initializeSupabaseStorage()
+            .then(() => {
+                console.log('✅ Stockage prêt (leaderboard)');
+            })
+            .catch(err => {
+                console.error('❌ Erreur initialisation stockage:', err.message);
+            });
+    </script>
 </head>
 
 <body>
@@ -94,29 +106,22 @@
     <script src="leaderboard.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // Activer Supabase si la config est disponible, sinon continuer en localStorage
-            if (typeof enableSupabaseStorage === 'function') {
-                try {
-                    await enableSupabaseStorage();
-                    console.log('✅ Supabase activé (leaderboard)');
+            console.log('📊 Leaderboard: DOMContentLoaded appelé');
 
-                    // Charger les données depuis Supabase dans le cache
-                    if (typeof universalStorage !== 'undefined') {
-                        const subs = await universalStorage.getData('svChallengeSubmissions');
-                        const recs = await universalStorage.getData('svChallengeRecordSubmissions');
-
-                        // Sauvegarder aussi dans localStorage pour les fallbacks
-                        if (subs) localStorage.setItem('svChallengeSubmissions', JSON.stringify(subs));
-                        if (recs) localStorage.setItem('svChallengeRecordSubmissions', JSON.stringify(recs));
-                    }
-                } catch (err) {
-                    console.error('❌ Activation Supabase échouée, fallback localStorage', err);
-                }
+            // Attendre que le stockage soit initialisé
+            let attempts = 0;
+            while (!universalStorage && attempts < 100) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                attempts++;
             }
 
-            // Attendre un peu pour que le cache soit rempli, puis charger les classements
-            await new Promise(resolve => setTimeout(resolve, 500));
+            if (!universalStorage) {
+                console.error('⚠️ Stockage non initialisé, utilisé fallback');
+            } else {
+                console.log('✅ Stockage prêt (', universalStorage.getCurrentAdapter(), ')');
+            }
 
+            // Charger les classements
             if (typeof loadLeaderboards === 'function') {
                 await loadLeaderboards();
             }
