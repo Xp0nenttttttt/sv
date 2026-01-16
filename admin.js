@@ -21,9 +21,13 @@ function showLoginForm() {
 }
 
 // Afficher le panel admin
-function showAdminPanel() {
+async function showAdminPanel() {
     document.getElementById('loginSection').classList.add('hidden');
     document.getElementById('adminPanel').classList.remove('hidden');
+
+    // Synchroniser depuis JSON d'abord
+    await syncFromJSON();
+
     loadSubmissions();
     updateStats();
 }
@@ -32,7 +36,7 @@ function showAdminPanel() {
 document.addEventListener('DOMContentLoaded', function () {
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
-        loginForm.addEventListener('submit', function (e) {
+        loginForm.addEventListener('submit', async function (e) {
             e.preventDefault();
             const password = document.getElementById('adminPassword').value;
 
@@ -40,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (submissionManager.admins.admin === password) {
                 sessionStorage.setItem('adminToken', 'ADMIN_SESSION_VALID');
                 adminLoggedIn = true;
-                showAdminPanel();
+                await showAdminPanel();
                 document.getElementById('adminPassword').value = '';
             } else {
                 const errorMsg = document.getElementById('loginError');
@@ -63,6 +67,27 @@ function logoutAdmin() {
     document.getElementById('adminPassword').value = '';
     showLoginForm();
     document.getElementById('loginError').classList.add('hidden');
+}
+
+// Synchroniser avec les JSON au démarrage
+async function syncFromJSON() {
+    if (typeof dataSyncManager !== 'undefined') {
+        try {
+            const levels = await dataSyncManager.loadLevels();
+            const records = await dataSyncManager.loadRecords();
+
+            // Sauvegarder dans localStorage pour l'admin
+            if (levels && levels.length > 0) {
+                localStorage.setItem('svChallengeSubmissions', JSON.stringify(levels));
+            }
+            if (records && records.length > 0) {
+                localStorage.setItem('svChallengeRecordSubmissions', JSON.stringify(records));
+            }
+            console.log('✅ Données synchronisées depuis JSON');
+        } catch (err) {
+            console.log('ℹ️ Pas de synchronisation JSON disponible');
+        }
+    }
 }
 
 // Charger les soumissions
