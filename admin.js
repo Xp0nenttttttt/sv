@@ -131,6 +131,15 @@ function loadSubmissions() {
                 </div>
             </div>
 
+            ${submission.youtubeLink ? `
+                <div style="margin: 15px 0; padding: 10px; background: #f0f0f0; border-left: 3px solid #ff0000; border-radius: 3px;">
+                    <strong>🎥 Lien de vérification:</strong><br>
+                    <a href="${escapeHtml(submission.youtubeLink)}" target="_blank" style="color: #0066cc; word-break: break-all;">
+                        ${escapeHtml(submission.youtubeLink)}
+                    </a>
+                </div>
+            ` : ''}
+
             ${submission.description ? `<p style="margin: 10px 0; color: #666;"><strong>Description:</strong> ${escapeHtml(submission.description)}</p>` : ''}
 
             <div style="font-size: 0.9em; color: #999; margin: 10px 0;">

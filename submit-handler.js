@@ -17,6 +17,13 @@ function handleSubmit(event) {
         tags.push(checkbox.value);
     });
 
+    // Valider le lien YouTube
+    const youtubeLink = formData.get('youtubeLink');
+    if (!youtubeLink || !isValidYoutubeUrl(youtubeLink)) {
+        alert('Veuillez entrer un lien YouTube valide');
+        return;
+    }
+
     // Créer l'objet de données
     const submissionData = {
         levelName: formData.get('levelName'),
@@ -26,6 +33,7 @@ function handleSubmit(event) {
         playerRegion: formData.get('playerRegion') || '',
         length: formData.get('length'),
         proposedTop: parseInt(formData.get('proposedTop')),
+        youtubeLink: youtubeLink,
         description: formData.get('description'),
         tags: tags
     };
@@ -42,6 +50,12 @@ function handleSubmit(event) {
     } else {
         alert('Veuillez sélectionner une image');
     }
+}
+
+// Valider l'URL YouTube
+function isValidYoutubeUrl(url) {
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
+    return youtubeRegex.test(url);
 }
 
 function submitLevel(data) {
