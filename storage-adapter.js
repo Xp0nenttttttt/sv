@@ -318,74 +318,47 @@ class UniversalStorageManager {
 // Créer avec fallback localStorage en cas de problème Supabase
 let universalStorage = null;
 
-// Initialiser Supabase au démarrage (avec fallback localStorage)
+// Initialiser Supabase au démarrage (PAS de fallback localStorage)
 async function initializeSupabaseStorage() {
     if (universalStorage) return; // Déjà initialisé
 
     try {
-        console.log('🔄 Initialisation du stockage...');
+        console.log('🔄 Initialisation du stockage Supabase...');
 
-        // Charger la bibliothèque Supabase
-        console.log('📦 Chargement bibliothèque Supabase...');
-        await new Promise((resolve, reject) => {
-            if (typeof supabase !== 'undefined' && supabase.createClient) {
-                console.log('✅ Supabase déjà chargé');
-                resolve();
-            } else {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
-                script.onload = () => {
-                    console.log('✅ Supabase chargé du CDN');
-                    resolve();
-                };
-                script.onerror = () => {
-                    console.error('❌ Impossible de charger Supabase');
-                    reject(new Error('Impossible de charger Supabase'));
-                };
-                document.head.appendChild(script);
-            }
-        });
+        // Utiliser le client Supabase global (déjà chargé et initialisé)
+        if (typeof supabaseClient === 'undefined' || !supabaseClient) {
+            throw new Error('Supabase client non disponible. Appelez enableSupabaseStorage() d\'abord');
+        }
 
-        // Créer l'adaptateur Supabase
-        console.log('🔧 Création adaptateur Supabase...');
-        const supabaseAdapter = new SupabaseStorageAdapter(
-            'https://bpgotjdnrbrbwfckaayz.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZ290amRucmJyYndmY2thYXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1NzAwMTcsImV4cCI6MjA4NDE0NjAxN30.c0Y9MLW6HQBBJhN04MGHamOE6flLKxPWRbyQBmNI_8'
-        );
+        console.log('✅ Client Supabase disponible');
 
-        // Initialiser et tester la connexion
-        console.log('🌐 Initialisation client Supabase...');
+        // Créer l'adaptateur Supabase avec le client global
+        const supabaseAdapter = new SupabaseStorageAdapter(null, null);
+        supabaseAdapter.client = supabaseClient; // Utiliser le client déjà initialisé
+        supabaseAdapter.initialized = true;
+
+        // Vérifier la connexion Supabase
+        console.log('🌐 Vérification connexion Supabase...');
         try {
-            await supabaseAdapter.initialize();
+            await supabaseAdapter.ensureTableExists();
             console.log('✅ Supabase connecté');
 
-            // Créer un adaptateur hybride Supabase + localStorage
-            console.log('⚙️ Création adaptateur hybride...');
-            const localStorageAdapter = new LocalStorageAdapter();
-            const hybridAdapter = new HybridStorageAdapter(supabaseAdapter, localStorageAdapter);
+            // Créer l'adaptateur hybride UNIQUEMENT Supabase (pas de fallback localStorage)
+            console.log('⚙️ Création adaptateur Supabase uniquement...');
+            const hybridAdapter = new HybridStorageAdapter(supabaseAdapter, null);
             universalStorage = new UniversalStorageManager(hybridAdapter);
-            console.log('✅ Stockage hybride initialisé (Supabase + localStorage)');
+            console.log('✅ Stockage Supabase initialisé (SANS fallback localStorage)');
         } catch (supabaseError) {
-            console.warn('⚠️ Supabase non disponible, utilisation de localStorage uniquement:', supabaseError.message);
-            // Fallback sur localStorage uniquement
-            const localStorageAdapter = new LocalStorageAdapter();
-            universalStorage = new UniversalStorageManager(localStorageAdapter);
-            console.log('✅ Stockage localStorage activé (mode fallback)');
+            console.error('❌ Erreur Supabase - PAS de fallback:', supabaseError.message);
+            // NE PAS FALLBACK - lever l'erreur
+            throw supabaseError;
         }
 
         return true;
     } catch (error) {
-        console.error('❌ Erreur initialisation stockage:', error);
-        // Dernière chance : fallback localStorage
-        try {
-            const localStorageAdapter = new LocalStorageAdapter();
-            universalStorage = new UniversalStorageManager(localStorageAdapter);
-            console.log('⚠️ Fallback localStorage activé');
-            return true;
-        } catch (fallbackError) {
-            console.error('❌ Erreur fallback localStorage:', fallbackError);
-            throw fallbackError;
-        }
+        console.error('❌ Erreur initialisation stockage Supabase:', error);
+        // NE PAS FALLBACK SUR LOCALSTORAGE
+        throw error;
     }
 }
 

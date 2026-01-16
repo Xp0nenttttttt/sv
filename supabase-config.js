@@ -77,6 +77,11 @@ async function enableSupabaseStorage() {
         // Puis initialiser le client
         await initSupabase();
 
+        // Initialiser le stockage universel avec Supabase
+        if (typeof initializeSupabaseStorage === 'function') {
+            await initializeSupabaseStorage();
+        }
+
         console.log('✅ Supabase Storage initialisé (stockage unique)');
         return true;
     } catch (error) {
