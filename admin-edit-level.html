@@ -48,6 +48,21 @@
         <p>SV Challenge List - Édition du niveau</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="storage-adapter.js"></script>
+    <script src="supabase-config.js"></script>
+
+    <script>
+        // Initialiser Supabase en deux étapes
+        enableSupabaseStorage();
+
+        // Attendre que le client soit prêt
+        setTimeout(() => {
+            initializeSupabaseStorage();
+            console.log('✅ Supabase Storage initialisé - admin-edit-level');
+        }, 500);
+    </script>
+
     <script src="submission.js"></script>
     <script src="admin-edit-level.js"></script>
 </body>
