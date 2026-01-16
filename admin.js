@@ -33,7 +33,21 @@ async function showAdminPanel() {
 }
 
 // Gestion du login
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+    // Attendre que Supabase soit initialisé
+    console.log('⏳ Admin: attente initialisation Supabase...');
+    let attempts = 0;
+    while (!universalStorage && attempts < 100) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        attempts++;
+    }
+
+    if (!universalStorage) {
+        console.error('❌ Admin: Supabase non initialisé après attente');
+    } else {
+        console.log('✅ Admin: Supabase prêt');
+    }
+
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', async function (e) {
