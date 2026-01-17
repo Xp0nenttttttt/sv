@@ -296,6 +296,18 @@
                 background-position: 0% 50%;
             }
         }
+
+        header {
+            position: relative;
+            overflow: hidden;
+        }
+
+        #starCanvas {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
     </style>
 </head>
 <!-- Charger les adaptateurs de stockage (localStorage uniquement) -->
@@ -305,6 +317,7 @@
 
 <body>
     <header class="reveal-header">
+        <canvas id="starCanvas"></canvas>
 
         <div class="header-content">
             <div class="sv-logo">

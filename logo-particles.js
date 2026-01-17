@@ -1,66 +1,70 @@
-const canvas = document.getElementById("logoParticles");
-const ctx = canvas.getContext("2d");
-const logo = document.querySelector(".sv-logo");
+const starCanvas = document.getElementById("starCanvas");
+const starCtx = starCanvas.getContext("2d");
+const header = document.querySelector("header");
 
-let particles = [];
+let stars = [];
+let mouse = { x: null, y: null };
 
-function resizeLogoCanvas() {
-    const rect = logo.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+function resizeStars() {
+    const rect = header.getBoundingClientRect();
+    starCanvas.width = rect.width;
+    starCanvas.height = rect.height;
 }
 
-resizeLogoCanvas();
-window.addEventListener("resize", resizeLogoCanvas);
+resizeStars();
+window.addEventListener("resize", resizeStars);
 
-function spawnParticle() {
-    particles.push({
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        dx: (Math.random() - 0.5) * 1.5,
-        dy: (Math.random() - 0.5) * 1.5,
-        r: Math.random() * 2 + 1,
-        life: 100,
-        hue: Math.random() * 360
-    });
-}
+header.addEventListener("mousemove", e => {
+    const rect = header.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
 
-function animateLogoParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (particles.length < 80) spawnParticle();
-
-    particles.forEach((p, i) => {
-        p.x += p.dx;
-        p.y += p.dy;
-        p.life--;
-
-        ctx.beginPath();
-        ctx.fillStyle = `hsla(${p.hue},100%,70%,0.8)`;
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-
-        if (p.life <= 0) particles.splice(i, 1);
-    });
-
-    requestAnimationFrame(animateLogoParticles);
-}
-
-animateLogoParticles();
-logo.addEventListener("mousemove", e => {
-    const rect = logo.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    for (let i = 0; i < 6; i++) {
-        particles.push({
-            x,
-            y,
-            dx: (Math.random() - 0.5) * 3,
-            dy: (Math.random() - 0.5) * 3,
-            r: Math.random() * 2 + 1,
+    for (let i = 0; i < 2; i++) {
+        stars.push({
+            x: mouse.x,
+            y: mouse.y,
+            dx: (Math.random() - 0.5) * 0.6,
+            dy: (Math.random() - 0.5) * 0.6,
+            size: Math.random() * 2 + 1.5,
             life: 60,
-            hue: Math.random() * 360
+            rotation: Math.random() * Math.PI
         });
     }
 });
+
+function drawStar(x, y, r, rotation) {
+    starCtx.save();
+    starCtx.translate(x, y);
+    starCtx.rotate(rotation);
+    starCtx.beginPath();
+    for (let i = 0; i < 4; i++) {
+        starCtx.lineTo(0, r);
+        starCtx.translate(0, r);
+        starCtx.rotate(Math.PI / 2);
+    }
+    starCtx.closePath();
+    starCtx.restore();
+}
+
+function animateStars() {
+    starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+
+    stars.forEach((s, i) => {
+        s.x += s.dx;
+        s.y += s.dy;
+        s.life--;
+        s.rotation += 0.05;
+
+        starCtx.strokeStyle = `rgba(255,255,255,${s.life / 60})`;
+        starCtx.lineWidth = 1;
+        drawStar(s.x, s.y, s.size, s.rotation);
+        starCtx.stroke();
+
+        if (s.life <= 0) stars.splice(i, 1);
+    });
+
+    requestAnimationFrame(animateStars);
+}
+
+animateStars();
+if (window.innerWidth < 768) stars = [];
