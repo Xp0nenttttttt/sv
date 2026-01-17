@@ -240,10 +240,10 @@ main {
 
 .badge-gif-chip {
     inset: auto;
-    top: -15px;
+    top: -17px;
     left: -13px;
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
 }
 
 .level-info {
