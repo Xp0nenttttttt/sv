@@ -2,8 +2,7 @@ const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 
 let w, h, particles = [];
-const topClanCard = document.getElementById("topClanCard");
-topClanCard.style.display = "block";
+
 function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
