@@ -207,7 +207,8 @@ create table if not exists public.admin_users (
 );
 
 alter table public.admin_users enable row level security;
-create policy "Admin users are private" on public.admin_users for select using (false);
+create policy "Users can check own admin status" on public.admin_users 
+  for select using (auth.uid() = id);
 
 -- RPC: Admin delete any clan
 create or replace function public.admin_delete_clan(clan_id uuid)
@@ -234,6 +235,54 @@ end;
 $$;
 
 grant execute on function public.admin_delete_clan(uuid) to authenticated;
+
+-- RPC: Repair clans by adding missing owner memberships
+create or replace function public.repair_clans()
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    clan_record record;
+    repaired_count integer := 0;
+begin
+    -- For each clan, ensure owner is a member
+    for clan_record in select id, owner_id from public.clans
+    loop
+        -- Check if owner is already a member
+        if not exists (
+            select 1 from public.clan_members 
+            where clan_id = clan_record.id 
+            and user_id = clan_record.owner_id
+        ) then
+            -- Add owner as leader
+            insert into public.clan_members (clan_id, user_id, role)
+            values (clan_record.id, clan_record.owner_id, 'leader');
+            repaired_count := repaired_count + 1;
+        end if;
+    end loop;
+    
+    return 'Clans réparés: ' || repaired_count;
+end;
+$$;
+
+grant execute on function public.repair_clans() to authenticated;
+
+-- Storage buckets for avatars and clan logos
+-- Note: Create these buckets in Supabase Dashboard > Storage or via SQL
+-- Bucket: avatars (public, for user profile pictures)
+-- Bucket: clan-logos (public, for clan logos)
+
+-- Storage policies will be set in the Dashboard:
+-- avatars bucket: 
+--   - Allow authenticated users to upload (INSERT)
+--   - Allow public read (SELECT)
+--   - Allow users to update/delete their own files
+-- clan-logos bucket:
+--   - Allow authenticated users to upload (INSERT)
+--   - Allow public read (SELECT)
+--   - Allow clan owners to update/delete their clan's logo
 
 -- Cleanup expired invites: function + daily pg_cron schedule
 create or replace function public.cleanup_expired_clan_invites()

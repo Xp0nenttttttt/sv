@@ -131,8 +131,13 @@
                     </div>
                     <textarea id="clanDescription" placeholder="Description"
                         style="width:100%; margin-top:8px;"></textarea>
-                    <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
-                        <input type="text" id="clanLogo" placeholder="Logo URL (optionnel)" style="flex:1;">
+                    <div style="margin-top:8px;">
+                        <label>Logo du clan</label>
+                        <input type="file" id="clanLogoFile" accept="image/*" style="width:100%;">
+                        <div class="muted" style="font-size:0.85em; margin-top:4px;">Ou URL:</div>
+                        <input type="text" id="clanLogo" placeholder="Logo URL (optionnel)" style="width:100%;">
+                    </div>
+                    <div style="margin-top:8px;">
                         <button class="btn" id="createClanBtn">Créer</button>
                     </div>
                     <div id="clanCreateMsg" class="muted" style="margin-top:6px;"></div>

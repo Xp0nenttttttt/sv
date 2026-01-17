@@ -95,7 +95,7 @@ async function createClan() {
     const name = document.getElementById('clanName').value.trim();
     const tag = document.getElementById('clanTag').value.trim();
     const desc = document.getElementById('clanDescription').value.trim();
-    const logo = document.getElementById('clanLogo').value.trim();
+    let logo = document.getElementById('clanLogo').value.trim();
     msg.textContent = '';
 
     if (!currentSession) {
@@ -105,6 +105,28 @@ async function createClan() {
     if (!name || !tag) {
         msg.textContent = 'Nom et tag requis';
         return;
+    }
+
+    // Check if user selected a file for logo
+    const logoFile = document.getElementById('clanLogoFile').files[0];
+    if (logoFile) {
+        // Upload to Supabase Storage
+        const fileExt = logoFile.name.split('.').pop();
+        const fileName = `${currentSession.user.id}_${Date.now()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await clansClient.storage
+            .from('clan-logos')
+            .upload(fileName, logoFile, { upsert: true });
+
+        if (uploadError) {
+            msg.textContent = 'Erreur upload logo: ' + uploadError.message;
+            return;
+        }
+
+        // Get public URL
+        const { data: urlData } = clansClient.storage
+            .from('clan-logos')
+            .getPublicUrl(fileName);
+        logo = urlData.publicUrl;
     }
 
     // Créer le clan et récupérer son id

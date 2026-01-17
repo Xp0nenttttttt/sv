@@ -90,14 +90,29 @@ async function saveProfile() {
     }
     const username = document.getElementById('username').value.trim();
     const country = document.getElementById('country').value.trim();
-    const avatar_url = document.getElementById('avatar').value.trim();
+    let avatar_url = document.getElementById('avatar').value.trim();
 
-    // Use secure RPC to upsert profile (handles creation/update server-side)
-    const { error } = await accountClient.rpc('upsert_profile', {
-        p_username: username,
-        p_country: country,
-        p_avatar_url: avatar_url
-    });
+    // Check if user selected a file
+    const avatarFile = document.getElementById('avatarFile').files[0];
+    if (avatarFile) {
+        // Upload to Supabase Storage
+        const fileExt = avatarFile.name.split('.').pop();
+        const fileName = `${accountSession.user.id}_${Date.now()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await accountClient.storage
+            .from('avatars')
+            .upload(fileName, avatarFile, { upsert: true });
+
+        if (uploadError) {
+            showToast('Erreur upload: ' + uploadError.message, 'error');
+            return;
+        }
+
+        // Get public URL
+        const { data: urlData } = accountClient.storage
+            .from('avatars')
+            .getPublicUrl(fileName);
+        avatar_url = urlData.publicUrl;
+    }
 
     if (error) {
         showToast('Erreur: ' + error.message, 'error');
