@@ -50,7 +50,7 @@ class AccountManager {
         // Lancer loadAccounts async
         this.loadAccounts().catch(err => {
             console.error('Erreur chargement comptes:', err);
-        });
+        }
     }
 
     async loadAccounts() {
@@ -71,7 +71,7 @@ class AccountManager {
         // Charger tous les joueurs
         const allRecords = await this.recordManager.getSubmissions();
         const acceptedRecords = allRecords.filter(s => s.status === 'accepted');
-        acceptedRecords.forEach(record => {
+        for (const record of acceptedRecords) {
             const key = record.player.toLowerCase();
             if (!accountsMap[key]) {
                 accountsMap[key] = new Account({
@@ -94,12 +94,12 @@ class AccountManager {
                 accountsMap[key].playerTotalPoints += points;
                 accountsMap[key].maxPercentage = Math.max(accountsMap[key].maxPercentage, record.percentage);
             }
-        });
+        }
 
         // Charger tous les vérificateurs
         const allSubmissions = await this.submissionManager.getSubmissions();
         const acceptedSubmissions = allSubmissions.filter(s => s.status === 'accepted');
-        acceptedSubmissions.forEach(submission => {
+        for (const submission of acceptedSubmissions) {
             const key = submission.authorName.toLowerCase();
             if (!accountsMap[key]) {
                 accountsMap[key] = new Account({
@@ -129,7 +129,7 @@ class AccountManager {
                 accountsMap[key].country = submission.playerCountry;
                 accountsMap[key].region = submission.playerRegion || '';
             }
-        });
+        }
 
         this.accounts = Object.values(accountsMap).sort((a, b) => b.getTotalPoints() - a.getTotalPoints());
     }
