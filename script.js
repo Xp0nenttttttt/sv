@@ -236,18 +236,18 @@ function getDifficultyIcon(difficulty, badge) {
                     : 'easy';
 
     const filename = {
-        extreme: 'extreme.png',
+        extreme: 'extreme.webp',
         insane: 'insane.png',
         hard: 'hard.webp',
         medium: 'medium.webp',
         easy: 'easy.webp'
     }[key] || 'easy.webp';
 
-    const isMythic = (badge || '').toLowerCase() === 'mythic';
     let file = filename;
-    if (isMythic) {
-        const lastDot = filename.lastIndexOf('.');
-        file = filename.substring(0, lastDot) + '_mythic' + filename.substring(lastDot);
+    if ((badge || '').toLowerCase() === 'mythic') {
+        const parts = filename.split('.');
+        parts.pop(); // Remove extension
+        file = parts.join('.') + '_mythic.png'; // Force .png for mythic variants
     }
 
     return {

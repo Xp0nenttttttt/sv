@@ -289,11 +289,11 @@ class LevelDetailsManager {
             easy: 'easy.webp'
         }[key] || 'easy.webp';
 
-        const isMythic = (badge || '').toLowerCase() === '_mythic';
         let file = filename;
-        if (isMythic) {
-            const lastDot = filename.lastIndexOf('.');
-            file = filename.substring(0, lastDot) + '_mythic' + filename.substring(lastDot);
+        if ((badge || '').toLowerCase() === 'mythic') {
+            const parts = filename.split('.');
+            parts.pop(); // Remove extension
+            file = parts.join('.') + '_mythic.png'; // Force .png for mythic variants
         }
 
         return {
