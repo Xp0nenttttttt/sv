@@ -221,7 +221,7 @@ main {
     width: 160px;
     height: 160px;
     z-index: 1;
-    opacity: 0.9;
+    opacity: 1;
     pointer-events: none;
 }
 
