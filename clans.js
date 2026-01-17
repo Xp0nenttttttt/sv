@@ -89,19 +89,35 @@ async function createClan() {
         return;
     }
 
-    const { error } = await clansClient.from('clans').insert({
-        name,
-        tag,
-        description: desc,
-        logo_url: logo || null,
-        owner_id: currentSession.user.id
-    });
-    if (error) {
-        console.error(error);
-        msg.textContent = 'Erreur: ' + error.message;
+    // Créer le clan et récupérer son id
+    const { data: clanRow, error: clanErr } = await clansClient
+        .from('clans')
+        .insert({
+            name,
+            tag,
+            description: desc,
+            logo_url: logo || null,
+            owner_id: currentSession.user.id
+        })
+        .select('*')
+        .single();
+    if (clanErr) {
+        console.error(clanErr);
+        msg.textContent = 'Erreur: ' + clanErr.message;
         return;
     }
-    msg.textContent = 'Clan créé';
+
+    // Ajouter automatiquement le créateur comme leader dans les membres
+    const { error: memberErr } = await clansClient
+        .from('clan_members')
+        .insert({ clan_id: clanRow.id, user_id: currentSession.user.id, role: 'leader' });
+    if (memberErr) {
+        console.warn('Clan créé mais ajout membre échoué:', memberErr.message);
+        msg.textContent = 'Clan créé (ajout membre échoué). Vous pouvez réessayer plus tard.';
+    } else {
+        msg.textContent = 'Clan créé';
+    }
+
     await loadClans();
 }
 
