@@ -252,10 +252,37 @@ class LevelDetailsManager {
         `;
     }
 
+    // Retourne l'icône de difficulté (fallback sur easy)
+    getDifficultyIcon(difficulty) {
+        const normalized = (difficulty || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+
+        const key = normalized.includes('extreme') ? 'extreme'
+            : normalized.includes('tres difficile') || normalized.includes('très difficile') || normalized.includes('insane') ? 'insane'
+                : normalized.includes('difficile') || normalized.includes('hard') ? 'hard'
+                    : normalized.includes('moyen') || normalized.includes('medium') ? 'medium'
+                        : 'easy';
+
+        const file = {
+            extreme: 'extreme.webp',
+            insane: 'insane.webp',
+            hard: 'hard.webp',
+            medium: 'medium.webp',
+            easy: 'easy.webp'
+        }[key] || 'easy.webp';
+
+        return {
+            src: `image/${file}`,
+            alt: `${difficulty || key} Demon`
+        };
+    }
+
     // Afficher les détails du niveau
     renderLevelDetails() {
         const container = document.getElementById('levelDetails');
-        const difficultyClass = `difficulty-${this.level.difficulty.toLowerCase()}`;
+        const difficultyIcon = this.getDifficultyIcon(this.level.difficulty);
 
         container.innerHTML = `
             <div class="level-header">
@@ -264,7 +291,7 @@ class LevelDetailsManager {
                     <div class="level-title-section">
                         <h1>${this.level.name}</h1>
                         <div class="level-meta-large">
-                            <span class="${difficultyClass}">${this.level.difficulty} Demon</span>
+                            <img src="${difficultyIcon.src}" alt="${difficultyIcon.alt}" class="difficulty-icon difficulty-icon-large">
                             <span class="length-badge">${this.level.length}</span>
                             <span class="points-badge">${this.level.points} pts</span>
                         </div>

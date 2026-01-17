@@ -205,12 +205,38 @@ const searchInput = document.getElementById('search-input');
 const levelCountElement = document.getElementById('levelCount');
 const recordCountElement = document.getElementById('recordCount');
 
+// Retourne l'icône de difficulté (fallback sur easy)
+function getDifficultyIcon(difficulty) {
+    const normalized = (difficulty || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+    const key = normalized.includes('extreme') ? 'extreme'
+        : normalized.includes('tres difficile') || normalized.includes('très difficile') || normalized.includes('insane') ? 'insane'
+            : normalized.includes('difficile') || normalized.includes('hard') ? 'hard'
+                : normalized.includes('moyen') || normalized.includes('medium') ? 'medium'
+                    : 'easy';
+
+    const file = {
+        extreme: 'extreme.webp',
+        insane: 'insane.webp',
+        hard: 'hard.webp',
+        medium: 'medium.webp',
+        easy: 'easy.webp'
+    }[key] || 'easy.webp';
+
+    return {
+        src: `image/${file}`,
+        alt: `${difficulty || key} Demon`
+    };
+}
+
 // Fonction pour afficher les niveaux
 function renderLevels(filteredLevels) {
     levelsList.innerHTML = '';
 
     filteredLevels.forEach(level => {
-        const difficultyClass = `difficulty-${level.difficulty.toLowerCase()}`;
         const levelCard = document.createElement('div');
         let cardClass = 'level-card';
 
@@ -235,6 +261,7 @@ function renderLevels(filteredLevels) {
         }
 
         const badgeHTML = level.badge ? `<canvas class="badge-canvas level-badge" data-badge-type="${level.badge}" width="160" height="160"></canvas>` : '';
+        const difficultyIcon = getDifficultyIcon(level.difficulty);
 
         levelCard.innerHTML = `
             <div class="${containerClass}">
@@ -246,7 +273,7 @@ function renderLevels(filteredLevels) {
                     <div class="level-rank">${rankDisplay}</div>
                     <h3>${level.name}</h3>
                     <div class="level-meta">
-                        <span class="${difficultyClass}">${level.difficulty} Demon</span>
+                        <img src="${difficultyIcon.src}" alt="${difficultyIcon.alt}" class="difficulty-icon">
                         <span>${level.length}</span>
                     </div>
                     ${level.tags && level.tags.length > 0 ? `

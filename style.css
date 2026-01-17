@@ -365,6 +365,7 @@ main {
     gap: 15px;
     flex-wrap: wrap;
     font-size: 0.9em;
+    align-items: center;
 }
 
 .level-meta span {
@@ -377,6 +378,18 @@ main {
 .level-meta span:not(.difficulty-extreme):not(.difficulty-extrême):not(.difficulty-hard):not(.difficulty-difficile):not(.difficulty-très):not(.difficulty-medium):not(.difficulty-moyen):not(.difficulty-facile) {
     background: white;
     border: 1px solid #ddd;
+}
+
+.difficulty-icon {
+    height: 28px;
+    width: auto;
+    display: inline-block;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.difficulty-icon-large {
+    height: 40px;
 }
 
 .level-tags {
