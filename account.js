@@ -94,7 +94,9 @@ async function saveProfile() {
         country: document.getElementById('country').value.trim(),
         avatar_url: document.getElementById('avatar').value.trim()
     };
-    const { error } = await accountClient.from('profiles').upsert(payload, { onConflict: 'id' });
+    const { error } = await accountClient
+        .from('profiles')
+        .upsert(payload, { onConflict: 'id', returning: 'minimal' });
     if (error) {
         document.getElementById('profileMsg').textContent = 'Erreur: ' + error.message;
         return;
