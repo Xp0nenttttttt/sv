@@ -323,7 +323,7 @@ async function loadClanLevels(clanId) {
         `;
     }).join('');
 }
-}
+
 
 async function leaveClan(clanId) {
     if (!confirm('Êtes-vous sûr de vouloir quitter ce clan ?')) return;
