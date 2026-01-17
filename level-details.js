@@ -289,7 +289,8 @@ class LevelDetailsManager {
 
         return {
             src: `image/${file}`,
-            alt: `${difficulty || key} Demon`
+            alt: `${difficulty || key} Demon`,
+            key
         };
     }
 
@@ -305,7 +306,9 @@ class LevelDetailsManager {
                     <div class="level-title-section">
                         <h1>${this.level.name}</h1>
                         <div class="level-meta-large">
-                            <img src="${difficultyIcon.src}" alt="${difficultyIcon.alt}" class="difficulty-icon difficulty-icon-large">
+                            <span class="difficulty-chip difficulty-bg-${difficultyIcon.key}">
+                                <img src="${difficultyIcon.src}" alt="${difficultyIcon.alt}" class="difficulty-icon difficulty-icon-large">
+                            </span>
                             <span class="length-badge">${this.level.length}</span>
                             <span class="points-badge">${this.level.points} pts</span>
                         </div>

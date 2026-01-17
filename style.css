@@ -386,6 +386,45 @@ main {
     border: 1px solid #ddd;
 }
 
+.difficulty-chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.difficulty-chip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.35;
+    filter: blur(2px);
+    pointer-events: none;
+}
+
+.difficulty-bg-extreme::before {
+    background-image: url('image/mythic.gif');
+}
+
+.difficulty-bg-insane::before {
+    background-image: url('image/epic.gif');
+}
+
+.difficulty-bg-hard::before {
+    background-image: url('image/legendary.gif');
+}
+
+.difficulty-bg-medium::before,
+.difficulty-bg-easy::before {
+    background-image: none;
+}
+
 .difficulty-icon {
     height: 50px;
     width: auto;

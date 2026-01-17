@@ -243,7 +243,8 @@ function getDifficultyIcon(difficulty) {
 
     return {
         src: `image/${file}`,
-        alt: `${difficulty || key} Demon`
+        alt: `${difficulty || key} Demon`,
+        key
     };
 }
 
@@ -288,7 +289,9 @@ function renderLevels(filteredLevels) {
                     <div class="level-rank">${rankDisplay}</div>
                     <h3>${level.name}</h3>
                     <div class="level-meta">
-                        <img src="${difficultyIcon.src}" alt="${difficultyIcon.alt}" class="difficulty-icon">
+                        <span class="difficulty-chip difficulty-bg-${difficultyIcon.key}">
+                            <img src="${difficultyIcon.src}" alt="${difficultyIcon.alt}" class="difficulty-icon">
+                        </span>
                         <span>${level.length}</span>
                     </div>
                     ${level.tags && level.tags.length > 0 ? `
