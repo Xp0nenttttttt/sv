@@ -209,6 +209,19 @@ async function loadClanLevels(clanId) {
     const levelsList = document.getElementById('levelsList');
     levelsList.innerHTML = '<p class="muted">Chargement...</p>';
 
+    // Attendre que universalStorage soit initialisé
+    let attempts = 0;
+    while (!universalStorage && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+
+    if (!universalStorage) {
+        console.error('❌ universalStorage non disponible');
+        levelsList.innerHTML = '<p class="muted">Erreur de chargement des données</p>';
+        return;
+    }
+
     // Récupérer les membres du clan
     const { data: members, error: membersError } = await clanClient
         .from('clan_members')
