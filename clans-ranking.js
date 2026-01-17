@@ -105,8 +105,13 @@ async function loadClanRanking() {
                     const level = allLevels.find(l => String(l.id) === String(record.levelId));
                     let points = 0;
                     if (level && level.approvedRank) {
-                        // Calculer les points en fonction du rang (rank 1 = 100 points, rank 2 = 90 points, etc)
-                        points = Math.max(100 - (level.approvedRank - 1) * 5, 10);
+                        // Utiliser la même formule que le leaderboard
+                        const rank = level.approvedRank;
+                        if (rank === 1) points = 150;
+                        else if (rank <= 10) points = 150 - (rank - 1) * 5;
+                        else if (rank <= 50) points = 100 - (rank - 10) * 2;
+                        else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
+                        else points = 10;
                     }
                     levelPointsMap[record.levelId] = points;
                 }
