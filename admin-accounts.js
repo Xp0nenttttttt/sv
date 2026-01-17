@@ -50,7 +50,7 @@ class AccountManager {
         // Lancer loadAccounts async
         this.loadAccounts().catch(err => {
             console.error('Erreur chargement comptes:', err);
-        }
+        });
     }
 
     async loadAccounts() {
