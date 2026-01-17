@@ -235,7 +235,7 @@ function getDifficultyIcon(difficulty) {
 
     const file = {
         extreme: 'extreme.webp',
-        insane: 'insane.webp',
+        insane: 'insane.png',
         hard: 'hard.webp',
         medium: 'medium.webp',
         easy: 'easy.webp'
