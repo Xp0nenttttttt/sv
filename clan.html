@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clan - SV Challenge</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile-optimized.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <style>
+        .page {
+            max-width: 960px;
+            margin: 0 auto;
+            color: #f2f4fb;
+        }
+
+        .card {
+            background: #1f2430;
+            border: 1px solid #2b3240;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .muted {
+            color: #9aa2b5;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .member-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .invite-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .invite-row input {
+            flex: 1 1 220px;
+        }
+
+        .badge-role {
+            background: #262d3a;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="auth.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1 id="clanTitle">Clan</h1>
+            <div class="header-links">
+                <a href="clans.html">← Retour aux clans</a>
+            </div>
+        </div>
+    </header>
+    <main class="page">
+        <div class="card" id="clanInfo">Chargement...</div>
+        <div class="card">
+            <h3>Membres</h3>
+            <div id="memberList" class="member-list"></div>
+        </div>
+        <div class="card" id="inviteCard" style="display:none;">
+            <h3>Inviter</h3>
+            <div class="invite-row">
+                <input type="email" id="inviteEmail" placeholder="Email du joueur">
+                <button class="btn" id="inviteBtn">Générer une invitation</button>
+            </div>
+            <div id="inviteMsg" class="muted" style="margin-top:6px;"></div>
+        </div>
+    </main>
+    <script src="clan.js"></script>
+</body>
+
+</html>

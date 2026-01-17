@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clans - SV Challenge</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile-optimized.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <style>
+        .clan-container {
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .panel {
+            background: #1f2430;
+            color: #f2f4fb;
+            border: 1px solid #2b3240;
+            border-radius: 8px;
+            padding: 16px;
+            flex: 1 1 280px;
+        }
+
+        .panel h3 {
+            margin-top: 0;
+        }
+
+        .clan-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .clan-card {
+            padding: 12px;
+            border: 1px solid #2b3240;
+            border-radius: 6px;
+            background: #262d3a;
+        }
+
+        .clan-card a {
+            color: #9bb4ff;
+            text-decoration: none;
+        }
+
+        .clan-card a:hover {
+            text-decoration: underline;
+        }
+
+        .inline-inputs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .inline-inputs input {
+            flex: 1 1 140px;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .muted {
+            color: #9aa2b5;
+            font-size: 0.9em;
+        }
+
+        .error {
+            color: #ff8c8c;
+            font-size: 0.9em;
+        }
+
+        .success {
+            color: #7ee0a3;
+            font-size: 0.9em;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="auth.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Clans</h1>
+            <div class="header-links">
+                <a href="index.html">← Retour à la liste</a>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="clan-container">
+            <div class="panel" id="authPanel">
+                <h3>Connexion</h3>
+                <div class="muted">Compte requis pour créer/rejoindre un clan.</div>
+                <div class="inline-inputs">
+                    <input type="email" id="authEmail" placeholder="Email">
+                    <input type="password" id="authPassword" placeholder="Mot de passe">
+                </div>
+                <div style="margin-top:8px; display:flex; gap:8px;">
+                    <button class="btn" id="loginBtn">Se connecter</button>
+                    <button class="btn" id="signupBtn" style="background:#4caf50;">Créer un compte</button>
+                    <button class="btn" id="logoutBtn" style="background:#ff6b6b; display:none;">Se déconnecter</button>
+                </div>
+                <div id="authStatus" class="muted" style="margin-top:8px;"></div>
+                <div id="authError" class="error"></div>
+            </div>
+
+            <div class="panel" id="createClanPanel">
+                <h3>Créer un clan</h3>
+                <div class="muted" id="createClanHint">Connectez-vous pour créer un clan.</div>
+                <div id="createClanForm" style="display:none;">
+                    <div class="inline-inputs">
+                        <input type="text" id="clanName" placeholder="Nom du clan">
+                        <input type="text" id="clanTag" placeholder="Tag (ex: SV)" maxlength="6">
+                    </div>
+                    <textarea id="clanDescription" placeholder="Description"
+                        style="width:100%; margin-top:8px;"></textarea>
+                    <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+                        <input type="text" id="clanLogo" placeholder="Logo URL (optionnel)" style="flex:1;">
+                        <button class="btn" id="createClanBtn">Créer</button>
+                    </div>
+                    <div id="clanCreateMsg" class="muted" style="margin-top:6px;"></div>
+                </div>
+            </div>
+
+            <div class="panel" style="flex:1 1 100%;">
+                <h3>Liste des clans</h3>
+                <div id="clanList" class="clan-list"></div>
+                <div id="clanListMsg" class="muted"></div>
+            </div>
+        </div>
+    </main>
+    <script src="clans.js"></script>
+</body>
+
+</html>
