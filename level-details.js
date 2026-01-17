@@ -282,7 +282,7 @@ class LevelDetailsManager {
                         : 'easy';
 
         const filename = {
-            extreme: 'extreme.png',
+            extreme: 'extreme.webp',
             insane: 'insane.png',
             hard: 'hard.webp',
             medium: 'medium.webp',
