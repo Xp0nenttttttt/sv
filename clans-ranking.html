@@ -42,17 +42,18 @@
             justify-content: center;
         }
 
+
         .filter-btn {
             background: transparent;
             border: 1px solid var(--border-soft);
             color: #cfd6ff;
         }
 
-
         .filter-btn.active {
             background: linear-gradient(135deg, var(--accent), #9aa8ff);
             box-shadow: 0 0 20px var(--accent-glow);
         }
+
 
         .ranking-table {
             overflow: hidden;
@@ -99,6 +100,7 @@
         .clan-name {
             font-weight: 600;
         }
+
 
         .stat {
             font-variant-numeric: tabular-nums;
@@ -263,6 +265,90 @@
             color: #f2f4fb;
             border-color: #667eea;
         }
+
+        .top-clan-card {
+            position: relative;
+            margin-bottom: 32px;
+            padding: 24px 28px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #ff0080, #7928ca, #2afadf);
+            background-size: 300% 300%;
+            animation: gradientMove 8s ease infinite;
+            box-shadow: 0 0 40px rgba(255, 0, 128, 0.4), 0 0 80px rgba(42, 250, 223, 0.25);
+            overflow: hidden;
+        }
+
+        .top-clan-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.05) 0px,
+                    rgba(255, 255, 255, 0.05) 2px,
+                    transparent 2px,
+                    transparent 6px);
+            mix-blend-mode: overlay;
+        }
+
+        .top-clan-rank {
+            position: absolute;
+            top: -18px;
+            right: -18px;
+            background: #ffd700;
+            color: #000;
+            font-size: 32px;
+            font-weight: 900;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+
+        .top-clan-content {
+            position: relative;
+            z-index: 2;
+        }
+
+
+        .top-clan-title {
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 2px;
+            opacity: 0.85;
+            margin-bottom: 6px;
+        }
+
+        .top-clan-name {
+            font-size: 28px;
+            font-weight: 800;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            margin-bottom: 12px;
+        }
+
+
+        .top-clan-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
     </style>
 </head>
 
@@ -277,7 +363,22 @@
         </div>
     </header>
 
+
     <main class="page">
+
+        <div id="topClan" class="top-clan-card">
+            <div class="top-clan-rank">#1</div>
+            <div class="top-clan-content">
+                <h3 class="top-clan-title">Champion en titre</h3>
+                <div class="top-clan-name">[TAG] Nom du Clan</div>
+                <div class="top-clan-stats">
+                    <span>🔥 Points : <strong>12345</strong></span>
+                    <span>👥 Membres : <strong>12</strong></span>
+                    <span>🏆 Records : <strong>42</strong></span>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <h2>Classement des Clans</h2>
             <div class="filters">

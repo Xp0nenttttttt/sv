@@ -208,6 +208,18 @@ function displayRanking(stats) {
         if (rank === 1) rankClass = 'rank-1';
         else if (rank === 2) rankClass = 'rank-2';
         else if (rank === 3) rankClass = 'rank-3';
+        const topClan = stats[0];
+        if (topClan) {
+            document.getElementById('topClan').querySelector('.top-clan-name').textContent =
+                `${topClan.tag ? `[${topClan.tag}] ` : ''}${topClan.name}`;
+
+
+            document.getElementById('topClan').querySelector('.top-clan-stats').innerHTML = `
+<span>🔥 Points : <strong>${topClan.points}</strong></span>
+<span>👥 Membres : <strong>${topClan.members}</strong></span>
+<span>🏆 Records : <strong>${topClan.records}</strong></span>
+`;
+        }
 
         return `
             <tr>
