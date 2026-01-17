@@ -9,6 +9,118 @@
     <link rel="stylesheet" href="mobile-optimized.css">
     <link rel="stylesheet" href="dark-mode.css">
     <style>
+        :root {
+            --bg-main: #0f1220;
+            --bg-card: rgba(31, 36, 48, 0.85);
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --accent: #7c8cff;
+            --accent-glow: rgba(124, 140, 255, 0.4);
+        }
+
+
+        body {
+            background: radial-gradient(circle at top, #1a1f35, #0f1220 60%);
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-soft);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+
+        h1,
+        h2 {
+            letter-spacing: 0.5px;
+        }
+
+
+        .filters {
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border-soft);
+            color: #cfd6ff;
+        }
+
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--accent), #9aa8ff);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .ranking-table {
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+
+        .ranking-table th {
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .ranking-table tr {
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+
+
+        .ranking-table tr:hover {
+            transform: scale(1.01);
+            background: rgba(124, 140, 255, 0.08);
+        }
+
+
+        .rank-badge {
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .rank-1 {
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+        }
+
+
+        .rank-2 {
+            box-shadow: 0 0 20px rgba(192, 192, 192, 0.6);
+        }
+
+
+        .rank-3 {
+            box-shadow: 0 0 20px rgba(205, 127, 50, 0.6);
+        }
+
+
+        .clan-name {
+            font-weight: 600;
+        }
+
+        .stat {
+            font-variant-numeric: tabular-nums;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        .ranking-table tbody tr {
+            animation: fadeUp 0.4s ease both;
+        }
+
         .page {
             max-width: 1000px;
             margin: 0 auto;
