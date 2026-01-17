@@ -34,7 +34,12 @@
     }
 
     async function signUp(email, password) {
-        const { data, error } = await client.auth.signUp({ email, password });
+        const redirectTo = `${window.location.origin}/auth.html`;
+        const { data, error } = await client.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: redirectTo }
+        });
         if (error) throw error;
         return data.session;
     }
