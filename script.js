@@ -225,16 +225,18 @@ function getDifficultyIcon(difficulty, badge) {
     const normalized = (difficulty || '')
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase();
+        .toLowerCase()
+        .trim();
 
+    // Test strict pour éviter les confusions (extreme avant hard, insane avant difficile)
     const key = normalized.includes('extreme') ? 'extreme'
-        : normalized.includes('tres difficile') || normalized.includes('très difficile') || normalized.includes('insane') ? 'insane'
-            : normalized.includes('difficile') || normalized.includes('hard') ? 'hard'
-                : normalized.includes('moyen') || normalized.includes('medium') ? 'medium'
+        : normalized.includes('insane') || normalized.includes('tres difficile') ? 'insane'
+            : normalized.includes('hard') || (normalized.includes('difficile') && !normalized.includes('tres')) ? 'hard'
+                : normalized.includes('medium') || normalized.includes('moyen') ? 'medium'
                     : 'easy';
 
     const filename = {
-        extreme: 'extreme.webp',
+        extreme: 'extreme.png',
         insane: 'insane.png',
         hard: 'hard.webp',
         medium: 'medium.webp',
