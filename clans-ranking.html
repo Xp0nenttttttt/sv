@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classement des Clans - SV Challenge</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile-optimized.css">
+    <link rel="stylesheet" href="dark-mode.css">
+    <style>
+        .page {
+            max-width: 1000px;
+            margin: 0 auto;
+            color: #f2f4fb;
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .ranking-table th {
+            background: #2b3240;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .ranking-table td {
+            padding: 12px;
+            border-bottom: 1px solid #2b3240;
+        }
+
+        .ranking-table tr:hover {
+            background: #262d3a;
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .rank-1 {
+            background: #ffd700;
+            color: #000;
+        }
+
+        .rank-2 {
+            background: #c0c0c0;
+            color: #000;
+        }
+
+        .rank-3 {
+            background: #cd7f32;
+            color: #fff;
+        }
+
+        .rank-other {
+            background: #667eea;
+            color: #fff;
+        }
+
+        .clan-name {
+            color: #9bb4ff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .clan-name:hover {
+            text-decoration: underline;
+        }
+
+        .stat {
+            text-align: center;
+            color: #9aa2b5;
+        }
+
+        .card {
+            background: #1f2430;
+            border: 1px solid #2b3240;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .muted {
+            color: #9aa2b5;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: #2b3240;
+            color: #9aa2b5;
+            border: 1px solid #2b3240;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: #667eea;
+            color: #f2f4fb;
+            border-color: #667eea;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: #f2f4fb;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🛡️ Classement des Clans</h1>
+            <div class="header-links">
+                <a href="index.html">← Accueil</a>
+                <a href="clans.html">Clans</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page">
+        <div class="card">
+            <h2>Classement des Clans</h2>
+            <div class="filters">
+                <button class="filter-btn active" onclick="setSortBy('points')">Par Points</button>
+                <button class="filter-btn" onclick="setSortBy('members')">Par Membres</button>
+                <button class="filter-btn" onclick="setSortBy('levels')">Par Niveaux</button>
+                <button class="filter-btn" onclick="setSortBy('records')">Par Records</button>
+            </div>
+
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th>Rang</th>
+                        <th>Clan</th>
+                        <th>Membres</th>
+                        <th>Points</th>
+                        <th>Niveaux</th>
+                        <th>Records</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingBody">
+                    <tr>
+                        <td colspan="6" class="muted" style="text-align: center; padding: 20px;">Chargement...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="supabase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="storage-adapter.js"></script>
+    <script src="clans-ranking.js"></script>
+</body>
+
+</html>
