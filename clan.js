@@ -118,12 +118,10 @@ async function generateInvite(clanId) {
 }
 
 async function acceptInvite(token, clanId) {
-    const { data, error } = await clanClient.from('clan_invites').select('*').eq('token', token).eq('clan_id', clanId).maybeSingle();
-    if (error || !data) return;
-    // Check existing membership
-    const { data: existing } = await clanClient.from('clan_members').select('*').eq('clan_id', clanId).eq('user_id', currentSession.user.id).maybeSingle();
-    if (!existing) {
-        await clanClient.from('clan_members').insert({ clan_id: clanId, user_id: currentSession.user.id, role: 'member' });
+    // Use secure RPC to accept invite by token (handles validation + membership insert server-side)
+    const { error } = await clanClient.rpc('accept_clan_invite', { invite_token: token });
+    if (error) {
+        console.error('Accept invite failed:', error.message);
     }
 }
 
