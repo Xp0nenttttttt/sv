@@ -221,7 +221,7 @@ function normalizeDifficulty(rawDifficulty) {
 }
 
 // Retourne l'icône de difficulté (fallback sur easy)
-function getDifficultyIcon(difficulty) {
+function getDifficultyIcon(difficulty, badge) {
     const normalized = (difficulty || '')
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
@@ -233,13 +233,16 @@ function getDifficultyIcon(difficulty) {
                 : normalized.includes('moyen') || normalized.includes('medium') ? 'medium'
                     : 'easy';
 
-    const file = {
+    const filename = {
         extreme: 'extreme.webp',
         insane: 'insane.png',
         hard: 'hard.webp',
         medium: 'medium.webp',
         easy: 'easy.webp'
     }[key] || 'easy.webp';
+
+    const isMythic = (badge || '').toLowerCase() === 'mythic';
+    const file = isMythic ? filename.replace(/(\.[a-z0-9]+)$/i, '_mythic$1') : filename;
 
     return {
         src: `image/${file}`,
@@ -295,8 +298,8 @@ function renderLevels(filteredLevels) {
             topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="160" height="160"></canvas>';
         }
 
-        const difficultyIcon = getDifficultyIcon(level.difficulty);
         const badge = getBadgeGif(level.badge);
+        const difficultyIcon = getDifficultyIcon(level.difficulty, level.badge);
 
         levelCard.innerHTML = `
             <div class="${containerClass}">

@@ -267,7 +267,7 @@ class LevelDetailsManager {
     }
 
     // Retourne l'icône de difficulté (fallback sur easy)
-    getDifficultyIcon(difficulty) {
+    getDifficultyIcon(difficulty, badge) {
         const normalized = (difficulty || '')
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
@@ -279,13 +279,16 @@ class LevelDetailsManager {
                     : normalized.includes('moyen') || normalized.includes('medium') ? 'medium'
                         : 'easy';
 
-        const file = {
+        const filename = {
             extreme: 'extreme.webp',
             insane: 'insane.webp',
             hard: 'hard.webp',
             medium: 'medium.webp',
             easy: 'easy.webp'
         }[key] || 'easy.webp';
+
+        const isMythic = (badge || '').toLowerCase() === 'mythic';
+        const file = isMythic ? filename.replace(/(\.[a-z0-9]+)$/i, '_mythic$1') : filename;
 
         return {
             src: `image/${file}`,
@@ -308,8 +311,8 @@ class LevelDetailsManager {
     // Afficher les détails du niveau
     renderLevelDetails() {
         const container = document.getElementById('levelDetails');
-        const difficultyIcon = this.getDifficultyIcon(this.level.difficulty);
         const badge = this.getBadgeGif(this.level.badge);
+        const difficultyIcon = this.getDifficultyIcon(this.level.difficulty, this.level.badge);
         const topParticles = this.level.rank === 1
             ? '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top1" width="200" height="200"></canvas>'
             : this.level.rank === 2
