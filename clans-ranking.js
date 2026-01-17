@@ -90,6 +90,13 @@ async function loadClanRanking() {
                 r.status === 'accepted' && memberUsernames.includes(r.player)
             );
 
+            console.log(`Clan ${clan.name}:`, {
+                memberUsernames,
+                totalRecords: allRecords.length,
+                clanRecordsCount: clanRecords.length,
+                sampleRecord: clanRecords[0]
+            });
+
             // Grouper par levelId et compter les points une seule fois par niveau
             const levelPointsMap = {};
             clanRecords.forEach(record => {
@@ -102,6 +109,8 @@ async function loadClanRanking() {
             Object.values(levelPointsMap).forEach(points => {
                 totalPoints += points;
             });
+
+            console.log(`Clan ${clan.name} points:`, { levelPointsMap, totalPoints });
 
             // Compter les niveaux uniques complétés
             const completedLevels = Object.keys(levelPointsMap).length;
