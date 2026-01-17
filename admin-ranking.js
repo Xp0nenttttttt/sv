@@ -61,6 +61,10 @@ class RankingManager {
                 const manager = new SubmissionManager();
                 manager.updateSubmissionStatus(levelId, 'accepted', newRank, level.difficulty)
                     .catch(err => console.error('Erreur updateSubmissionStatus:', err));
+                // Vider le cache du classement
+                if (typeof leaderboardManager !== 'undefined') {
+                    leaderboardManager.clearCache();
+                }
             }
 
             this.levels.sort((a, b) => a.rank - b.rank);

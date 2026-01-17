@@ -145,6 +145,10 @@ async function displayRecordSubmissions(status) {
 function acceptRecord(submissionId) {
     if (confirm('Accepter ce record ?')) {
         recordSubmissionManager.acceptSubmission(submissionId);
+        // Vider le cache du classement pour forcer le rechargement
+        if (typeof leaderboardManager !== 'undefined') {
+            leaderboardManager.clearCache();
+        }
         loadRecordSubmissions();
         alert('✅ Record accepté et ajouté au niveau !');
     }

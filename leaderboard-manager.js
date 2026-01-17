@@ -3,10 +3,24 @@ class LeaderboardManager {
     constructor() {
         this.submissionManager = new SubmissionManager();
         this.recordSubmissionManager = new RecordSubmissionManager();
+        this.combinedCache = null;
+        this.lastCacheTime = 0;
+    }
+
+    // Vider le cache
+    clearCache() {
+        this.combinedCache = null;
+        this.lastCacheTime = 0;
     }
 
     // Obtenir le classement combiné (joueurs + vérificateurs)
     async getCombinedLeaderboard() {
+        // Forcer rechargement si cache vieux de plus de 5 secondes
+        const now = Date.now();
+        if (this.combinedCache && (now - this.lastCacheTime) < 5000) {
+            return this.combinedCache;
+        }
+
         const players = await this.getPlayersLeaderboard();
         const verifiers = await this.getVerifiersLeaderboard();
 
@@ -65,7 +79,13 @@ class LeaderboardManager {
         });
 
         // Convertir en tableau et trier par points totaux
-        return Object.values(combined).sort((a, b) => b.totalPoints - a.totalPoints);
+        const result = Object.values(combined).sort((a, b) => b.totalPoints - a.totalPoints);
+
+        // Mettre en cache
+        this.combinedCache = result;
+        this.lastCacheTime = Date.now();
+
+        return result;
     }
 
     // Obtenir le classement des vérificateurs
