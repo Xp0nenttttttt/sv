@@ -295,15 +295,13 @@ function renderLevels(filteredLevels) {
             topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="160" height="160"></canvas>';
         }
 
-        const badge = getBadgeGif(level.badge);
-        const badgeHTML = badge ? `<img class="badge-gif" src="${badge.src}" alt="${badge.alt}">` : '';
         const difficultyIcon = getDifficultyIcon(level.difficulty);
+        const badge = getBadgeGif(level.badge);
 
         levelCard.innerHTML = `
             <div class="${containerClass}">
                 <div class="image-wrapper">
                     ${topParticles}
-                    ${badgeHTML}
                     ${imageHTML}
                 </div>
                 <div class="level-info">
@@ -311,6 +309,7 @@ function renderLevels(filteredLevels) {
                     <h3>${level.name}</h3>
                     <div class="level-meta">
                         <span class="difficulty-chip difficulty-bg-${difficultyIcon.key}">
+                            ${badge ? `<img class="badge-gif badge-gif-chip" src="${badge.src}" alt="${badge.alt}">` : ''}
                             <img src="${difficultyIcon.src}" alt="${difficultyIcon.alt}" class="difficulty-icon">
                         </span>
                         <span>${level.length}</span>
