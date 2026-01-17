@@ -761,3 +761,73 @@ footer {
         transform: translateY(0);
     }
 }
+
+.level-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.level-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+            rgba(42, 250, 223, 0.35),
+            transparent 55%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+.level-card:hover::after {
+    opacity: 1;
+}
+
+.header-links a {
+    position: relative;
+    overflow: hidden;
+}
+
+.header-links a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg,
+            transparent,
+            rgba(255, 255, 255, 0.25),
+            transparent);
+    transform: translateX(-100%);
+}
+
+.header-links a:hover::after {
+    animation: shine 0.6s ease;
+}
+
+@keyframes shine {
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.filter-group.changed {
+    animation: filterPulse 0.4s ease;
+}
+
+@keyframes filterPulse {
+    0% {
+        box-shadow: 0 0 0 rgba(42, 250, 223, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 25px rgba(42, 250, 223, 0.8);
+    }
+
+    100% {
+        box-shadow: 0 0 0 rgba(42, 250, 223, 0);
+    }
+}
+
+button:active,
+.header-links a:active {
+    transform: scale(0.96);
+}

@@ -327,7 +327,7 @@
     <main>
         <div class="container">
             <!-- Meilleur Clan -->
-            <div id="topClanCard" class="reveal-top">
+            <div id="topClanCard" class="reveal-top" style="display: none; margin-bottom: 24px;">
 
                 <div
                     style="position: relative; padding: 24px 28px; border-radius: 20px; background: linear-gradient(135deg, #ff0080, #7928ca, #2afadf); background-size: 300% 300%; animation: gradientMove 8s ease infinite; box-shadow: 0 0 40px rgba(255, 0, 128, 0.4), 0 0 80px rgba(42, 250, 223, 0.25); overflow: hidden;">
@@ -351,7 +351,7 @@
             </div>
 
             <!-- Meilleur Joueur -->
-            <div id="topPlayerCard" style="display: none; margin-bottom: 24px;">
+            <div id="topPlayerCard" class="reveal-top" style="display: none; margin-bottom: 24px;">
                 <div
                     style="position: relative; padding: 24px 28px; border-radius: 20px; background: linear-gradient(135deg, #00d4ff, #0099ff, #6a5acd); background-size: 300% 300%; animation: gradientMove 8s ease infinite; box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), 0 0 80px rgba(106, 90, 205, 0.25); overflow: hidden;">
                     <div
@@ -461,6 +461,9 @@
             }
         });
     </script>
+    <script src="card-glow.js"></script>
+    <script src="filter-feedback.js"></script>
+
     <script src="dark-mode.js"></script>
     <canvas id="particles"></canvas>
     <script src="particles.js"></script>
