@@ -109,14 +109,41 @@ class LeaderboardManager {
         }
 
         const verifiers = {};
+        const profilesCache = {};
 
-        allSubmissions.forEach(submission => {
+        // Charger les profils pour récupérer les infos manquantes
+        if (window.supabaseClient) {
+            for (const submission of allSubmissions) {
+                if (submission.status === 'accepted') {
+                    const verifierName = submission.authorName || submission.submitterEmail;
+                    const verifierId = submission.submittedBy;
+
+                    if (verifierId && !profilesCache[verifierId]) {
+                        try {
+                            const { data } = await window.supabaseClient
+                                .from('profiles')
+                                .select('username, country, region')
+                                .eq('id', verifierId)
+                                .maybeSingle();
+                            profilesCache[verifierId] = data;
+                        } catch (err) {
+                            console.warn(`Erreur chargement profil ${verifierId}:`, err);
+                            profilesCache[verifierId] = null;
+                        }
+                    }
+                }
+            }
+        }
+
+        allSubmissions.filter(s => s.status === 'accepted').forEach(submission => {
             const verifier = submission.authorName;
+            const profile = submission.submittedBy ? profilesCache[submission.submittedBy] : null;
+
             if (!verifiers[verifier]) {
                 verifiers[verifier] = {
                     name: verifier,
-                    country: submission.playerCountry || '',
-                    region: submission.playerRegion || '',
+                    country: profile?.country || submission.playerCountry || '',
+                    region: profile?.region || submission.playerRegion || '',
                     levelsVerified: 0,
                     totalPoints: 0,
                     levels: []
