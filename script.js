@@ -257,7 +257,6 @@ function getBadgeGif(badge) {
         mythic: { src: 'image/mythic.gif', alt: 'Mythic Badge' },
         legendary: { src: 'image/legendary.gif', alt: 'Legendary Badge' },
         epic: { src: 'image/epic.gif', alt: 'Epic Badge' },
-        featured: { src: 'image/epic.gif', alt: 'Featured Badge' }
     };
     return mapping[badge] || null;
 }
