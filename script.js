@@ -552,6 +552,7 @@ async function loadTopClan() {
         }
 
         if (topClan) {
+            console.log('🏆 Meilleur clan trouvé:', topClan);
             document.getElementById('topClanCard').style.display = 'block';
             document.getElementById('topClanName').textContent = `${topClan.tag ? `[${topClan.tag}] ` : ''}${topClan.name}`;
             document.getElementById('topClanStats').innerHTML = `
@@ -561,6 +562,8 @@ async function loadTopClan() {
             `;
             document.getElementById('topClanCard').onclick = () => window.location.href = `clan.html?id=${topClan.id}`;
             document.getElementById('topClanCard').style.cursor = 'pointer';
+        } else {
+            console.log('❌ Aucun clan trouvé avec des points');
         }
     } catch (error) {
         console.error('Erreur chargement meilleur clan:', error);
