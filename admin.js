@@ -3,6 +3,30 @@
 let currentTab = 'pending';
 let adminLoggedIn = false;
 
+// Normalise une difficulté vers les paliers Demon canoniques
+function normalizeDifficulty(rawDifficulty) {
+    const normalized = (rawDifficulty || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+    if (normalized.includes('extreme')) return 'Extreme Demon';
+    if (normalized.includes('tres difficile') || normalized.includes('très difficile') || normalized.includes('insane')) return 'Insane Demon';
+    if (normalized.includes('difficile') || normalized.includes('hard')) return 'Hard Demon';
+    if (normalized.includes('moyen') || normalized.includes('medium')) return 'Medium Demon';
+    return normalized ? 'Easy Demon' : '';
+}
+
+function getDifficultyClass(label) {
+    const val = (label || '').toLowerCase();
+    if (val.includes('extreme')) return 'extreme';
+    if (val.includes('insane')) return 'insane';
+    if (val.includes('hard')) return 'hard';
+    if (val.includes('medium')) return 'medium';
+    if (val.includes('easy')) return 'easy';
+    return '';
+}
+
 // Vérifier si admin est connecté
 function checkAdminLogin() {
     const token = sessionStorage.getItem('adminToken');
@@ -118,6 +142,7 @@ async function loadSubmissions() {
             ${submission.imageUrl ? `<div style="margin: 15px 0;"><img src="${submission.imageUrl}" alt="Preview" style="max-width: 150px; border-radius: 5px;"></div>` : ''}
 
             <div class="submission-meta">
+                ${(() => { const d = normalizeDifficulty(submission.approvedDifficulty || submission.difficulty); return `<div class="submission-meta-item"><span class="submission-meta-label">Difficulté:</span><br>${d || 'Non précisée'}</div>`; })()}
                 <div class="submission-meta-item">
                     <span class="submission-meta-label">Créateur:</span><br>
                     ${escapeHtml(submission.creatorName)}
@@ -125,10 +150,6 @@ async function loadSubmissions() {
                 <div class="submission-meta-item">
                     <span class="submission-meta-label">Auteur record:</span><br>
                     ${escapeHtml(submission.authorName)}
-                </div>
-                <div class="submission-meta-item">
-                    <span class="submission-meta-label">Difficulté:</span><br>
-                    ${submission.difficulty} Demon
                 </div>
                 <div class="submission-meta-item">
                     <span class="submission-meta-label">Longueur:</span><br>
@@ -164,11 +185,13 @@ async function loadSubmissions() {
 
             <div class="submission-actions">
                 ${submission.status === 'pending' ? `
-                    <select id="difficulty-${submission.id}" class="difficulty-select" onchange="updateDifficultyColor(this)">
+                    <select id="difficulty-${submission.id}" class="difficulty-select ${getDifficultyClass(normalizeDifficulty(submission.approvedDifficulty || submission.difficulty))}" onchange="updateDifficultyColor(this)">
                         <option value="">Difficulté *</option>
-                        <option value="Extreme">Extreme Demon</option>
-                        <option value="Hard">Hard Demon</option>
-                        <option value="Medium">Medium Demon</option>
+                        <option value="Easy Demon" ${normalizeDifficulty(submission.approvedDifficulty || submission.difficulty) === 'Easy Demon' ? 'selected' : ''}>Easy Demon</option>
+                        <option value="Medium Demon" ${normalizeDifficulty(submission.approvedDifficulty || submission.difficulty) === 'Medium Demon' ? 'selected' : ''}>Medium Demon</option>
+                        <option value="Hard Demon" ${normalizeDifficulty(submission.approvedDifficulty || submission.difficulty) === 'Hard Demon' ? 'selected' : ''}>Hard Demon</option>
+                        <option value="Insane Demon" ${normalizeDifficulty(submission.approvedDifficulty || submission.difficulty) === 'Insane Demon' ? 'selected' : ''}>Insane Demon</option>
+                        <option value="Extreme Demon" ${normalizeDifficulty(submission.approvedDifficulty || submission.difficulty) === 'Extreme Demon' ? 'selected' : ''}>Extreme Demon</option>
                     </select>
                     <input type="number" id="rank-${submission.id}" placeholder="Rang (optionnel)" min="1" style="padding: 10px; border: 2px solid #ddd; border-radius: 5px; flex: 1;">
                     <button class="btn-accept" onclick="acceptSubmission(${submission.id})">✅ Accepter</button>
@@ -334,6 +357,17 @@ style.textContent = `
         background-color: white;
     }
 
+    .difficulty-select.insane {
+        background-color: #d9489b;
+        color: white;
+        border-color: #d9489b;
+    }
+
+    .difficulty-select.insane option {
+        color: #333;
+        background-color: white;
+    }
+
     .difficulty-select.medium {
         background-color: #74c0fc;
         color: white;
@@ -341,6 +375,17 @@ style.textContent = `
     }
 
     .difficulty-select.medium option {
+        color: #333;
+        background-color: white;
+    }
+
+    .difficulty-select.easy {
+        background-color: #63e6be;
+        color: #064d3b;
+        border-color: #38c994;
+    }
+
+    .difficulty-select.easy option {
         color: #333;
         background-color: white;
     }
@@ -364,8 +409,8 @@ document.head.appendChild(style);
 // Fonction pour changer la couleur du select en fonction de la difficulté
 function updateDifficultyColor(select) {
     select.className = 'difficulty-select';
-    const value = select.value.toLowerCase();
-    if (value) {
-        select.classList.add(value);
+    const cls = getDifficultyClass(select.value);
+    if (cls) {
+        select.classList.add(cls);
     }
 }
