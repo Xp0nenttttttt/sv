@@ -406,11 +406,12 @@ async function loadClanVerifiedLevels(clanId) {
         console.log('📦 Total niveaux bruts:', rawSubmissions.length);
         if (rawSubmissions.length > 0) {
             console.log('Statuts des niveaux:', rawSubmissions.map(s => ({ name: s.levelName, status: s.status })));
+            console.log('Premier niveau complet:', rawSubmissions[0]);
         }
         allSubmissions = rawSubmissions.filter(s => s.status === 'verified');
     }
 
-    console.log('✅ Total niveaux vérifiés:', allSubmissions.length);
+    console.log('✅ Total niveaux vérifiés (status=verified):', allSubmissions.length);
 
     // Filtrer les submissions des membres du clan
     const memberUsernames = Object.values(profilesMap);
