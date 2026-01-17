@@ -244,7 +244,11 @@ function getDifficultyIcon(difficulty, badge) {
     }[key] || 'easy.webp';
 
     const isMythic = (badge || '').toLowerCase() === 'mythic';
-    const file = isMythic ? filename.replace(/(\.[a-z0-9]+)$/i, '_mythic$1') : filename;
+    let file = filename;
+    if (isMythic) {
+        const lastDot = filename.lastIndexOf('.');
+        file = filename.substring(0, lastDot) + '_mythic' + filename.substring(lastDot);
+    }
 
     return {
         src: `image/${file}`,
