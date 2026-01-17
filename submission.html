@@ -32,9 +32,6 @@
 
                 // Initialiser le client d'authentification
                 submissionClient = window.supabaseClient;
-
-                // Vérifier la session utilisateur
-                await checkUserSession();
             } catch (err) {
                 console.error('❌ Erreur initialisation stockage:', err.message);
                 throw err;
@@ -58,15 +55,17 @@
 
         function showLoginRequired() {
             const formContainer = document.querySelector('.submission-wrapper');
-            formContainer.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <h2>🔒 Connexion requise</h2>
-                    <p style="margin: 20px 0;">Vous devez être connecté pour soumettre un niveau.</p>
-                    <a href="auth.html" class="btn-submit" style="display: inline-block; text-decoration: none;">
-                        Se connecter / S'inscrire
-                    </a>
-                </div>
-            `;
+            if (formContainer) {
+                formContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <h2>🔒 Connexion requise</h2>
+                        <p style="margin: 20px 0;">Vous devez être connecté pour soumettre un niveau.</p>
+                        <a href="auth.html" class="btn-submit" style="display: inline-block; text-decoration: none;">
+                            Se connecter / S'inscrire
+                        </a>
+                    </div>
+                `;
+            }
         }
 
         // Lancer l'initialisation
@@ -233,6 +232,9 @@
             } else {
                 console.log('✅ Stockage prêt (', universalStorage.getCurrentAdapter(), ')');
             }
+
+            // Vérifier la session utilisateur une fois le DOM chargé
+            await checkUserSession();
         });
     </script>
     <script src="dark-mode.js"></script>
