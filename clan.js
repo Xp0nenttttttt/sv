@@ -122,7 +122,35 @@ async function acceptInvite(token, clanId) {
     const { error } = await clanClient.rpc('accept_clan_invite', { invite_token: token });
     if (error) {
         console.error('Accept invite failed:', error.message);
+        showToast('Échec de l\'acceptation de l\'invitation: ' + error.message, 'error');
+        return;
     }
+    showToast('Invitation acceptée. Vous avez rejoint le clan.', 'success');
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    const bg = type === 'error' ? 'rgba(220, 53, 69, 0.95)' : 'rgba(25, 135, 84, 0.95)';
+    toast.style.cssText = [
+        'position:fixed',
+        'bottom:20px',
+        'left:50%', 'transform:translateX(-50%)',
+        `background:${bg}`,
+        'color:#fff',
+        'padding:10px 16px',
+        'border-radius:8px',
+        'box-shadow:0 6px 20px rgba(0,0,0,0.2)',
+        'z-index:9999',
+        'font-weight:600',
+        'max-width:80%', 'text-align:center'
+    ].join(';');
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.transition = 'opacity 250ms ease';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
 }
 
 document.addEventListener('DOMContentLoaded', initClanPage);

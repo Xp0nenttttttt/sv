@@ -107,3 +107,23 @@ end;
 $$;
 
 grant execute on function public.accept_clan_invite(text) to authenticated;
+
+-- Cleanup expired invites: function + daily pg_cron schedule
+create or replace function public.cleanup_expired_clan_invites()
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  delete from public.clan_invites
+  where expires_at is not null and expires_at < now();
+$$;
+
+-- Note: pg_cron is available in Supabase by default.
+-- If needed, enable: CREATE EXTENSION IF NOT EXISTS pg_cron;
+-- Schedule daily cleanup at 03:00 UTC
+select cron.schedule(
+  'cleanup_expired_clan_invites_daily',
+  '0 3 * * *',
+  $$select public.cleanup_expired_clan_invites();$$
+);
