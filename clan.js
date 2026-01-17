@@ -404,6 +404,9 @@ async function loadClanVerifiedLevels(clanId) {
     if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
         const rawSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
         console.log('📦 Total niveaux bruts:', rawSubmissions.length);
+        if (rawSubmissions.length > 0) {
+            console.log('Statuts des niveaux:', rawSubmissions.map(s => ({ name: s.levelName, status: s.status })));
+        }
         allSubmissions = rawSubmissions.filter(s => s.status === 'verified');
     }
 
