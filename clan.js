@@ -240,8 +240,9 @@ async function loadClanLevels(clanId) {
     // Charger les records acceptés via universalStorage
     let allRecords = [];
     if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
-        allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
-        allRecords = allRecords.filter(r => r.status === 'accepted');
+        const rawRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+        console.log('📦 Total records bruts:', rawRecords.length, rawRecords.map(r => ({ player: r.player, status: r.status })));
+        allRecords = rawRecords.filter(r => r.status === 'accepted');
     }
 
     console.log('🏆 Total records acceptés:', allRecords.length);
@@ -249,59 +250,57 @@ async function loadClanLevels(clanId) {
     // Charger les niveaux acceptés
     let allLevels = [];
     if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
-        allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
-        allLevels = allLevels.filter(l => l.status === 'accepted');
-    }
+        const rawLevels = await universalStorage.getData('svChallengeSubmissions') || [];
+        console.log('📦 Total niveaux bruts:', rawLevels.length, rawLevels.map(l => ({ name: l.levelName, status: l.status })));
+        allLevels = rawLevels.filter(l => l.status === 'accepted');
 
-    console.log('📊 Total niveaux acceptés:', allLevels.length);
+        // Filtrer les records des membres du clan
+        const memberUsernames = Object.values(profilesMap);
+        console.log('🔍 Usernames des membres:', memberUsernames);
 
-    // Filtrer les records des membres du clan
-    const memberUsernames = Object.values(profilesMap);
-    console.log('🔍 Usernames des membres:', memberUsernames);
+        const clanRecords = allRecords.filter(r => {
+            const match = memberUsernames.includes(r.player);
+            if (match) {
+                console.log('✅ Record trouvé pour membre:', r.player, 'sur niveau', r.levelId);
+            }
+            return match;
+        });
 
-    const clanRecords = allRecords.filter(r => {
-        const match = memberUsernames.includes(r.player);
-        if (match) {
-            console.log('✅ Record trouvé pour membre:', r.player, 'sur niveau', r.levelId);
+        console.log('🎯 Records du clan:', clanRecords.length);
+
+        // Grouper par niveau
+        const levelMap = {};
+        clanRecords.forEach(record => {
+            const levelId = record.levelId;
+            if (!levelMap[levelId]) {
+                levelMap[levelId] = {
+                    records: [],
+                    level: allLevels.find(l => String(l.id) === String(levelId))
+                };
+            }
+            levelMap[levelId].records.push(record);
+        });
+
+        // Afficher les niveaux
+        const levelEntries = Object.values(levelMap).filter(entry => entry.level);
+
+        if (levelEntries.length === 0) {
+            levelsList.innerHTML = '<p class="muted">Aucun niveau complété par les membres du clan</p>';
+            return;
         }
-        return match;
-    });
 
-    console.log('🎯 Records du clan:', clanRecords.length);
+        // Trier par rang du niveau
+        levelEntries.sort((a, b) => (a.level.approvedRank || 999) - (b.level.approvedRank || 999));
 
-    // Grouper par niveau
-    const levelMap = {};
-    clanRecords.forEach(record => {
-        const levelId = record.levelId;
-        if (!levelMap[levelId]) {
-            levelMap[levelId] = {
-                records: [],
-                level: allLevels.find(l => String(l.id) === String(levelId))
-            };
-        }
-        levelMap[levelId].records.push(record);
-    });
+        levelsList.innerHTML = levelEntries.map(entry => {
+            // Trier les records par date pour trouver le premier
+            const sortedRecords = entry.records.sort((a, b) =>
+                new Date(a.submittedAt) - new Date(b.submittedAt)
+            );
+            const firstClear = sortedRecords[0];
+            const completionCount = entry.records.length;
 
-    // Afficher les niveaux
-    const levelEntries = Object.values(levelMap).filter(entry => entry.level);
-
-    if (levelEntries.length === 0) {
-        levelsList.innerHTML = '<p class="muted">Aucun niveau complété par les membres du clan</p>';
-        return;
-    }
-
-    // Trier par rang du niveau
-    levelEntries.sort((a, b) => (a.level.approvedRank || 999) - (b.level.approvedRank || 999));
-
-    levelsList.innerHTML = levelEntries.map(entry => {
-        // Trier les records par date pour trouver le premier
-        const sortedRecords = entry.records.sort((a, b) =>
-            new Date(a.submittedAt) - new Date(b.submittedAt)
-        );
-        const firstClear = sortedRecords[0];
-        const completionCount = entry.records.length;
-
-        return `
+            return `
             <div class="level-item">
                 <div>
                     <div class="level-name">
@@ -319,44 +318,44 @@ async function loadClanLevels(clanId) {
                 </div>
             </div>
         `;
-    }).join('');
-}
-
-async function leaveClan(clanId) {
-    if (!confirm('Êtes-vous sûr de vouloir quitter ce clan ?')) return;
-    const { error } = await clanClient.rpc('leave_clan', { clan_id: clanId });
-    if (error) {
-        showToast('Erreur: ' + error.message, 'error');
-        return;
+        }).join('');
     }
-    showToast('Vous avez quitté le clan', 'success');
-    setTimeout(() => window.location.href = 'clans.html', 1500);
-}
+
+    async function leaveClan(clanId) {
+        if (!confirm('Êtes-vous sûr de vouloir quitter ce clan ?')) return;
+        const { error } = await clanClient.rpc('leave_clan', { clan_id: clanId });
+        if (error) {
+            showToast('Erreur: ' + error.message, 'error');
+            return;
+        }
+        showToast('Vous avez quitté le clan', 'success');
+        setTimeout(() => window.location.href = 'clans.html', 1500);
+    }
 
 
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    const bg = type === 'error' ? 'rgba(220, 53, 69, 0.95)' : 'rgba(25, 135, 84, 0.95)';
-    toast.style.cssText = [
-        'position:fixed',
-        'bottom:20px',
-        'left:50%', 'transform:translateX(-50%)',
-        `background:${bg}`,
-        'color:#fff',
-        'padding:10px 16px',
-        'border-radius:8px',
-        'box-shadow:0 6px 20px rgba(0,0,0,0.2)',
-        'z-index:9999',
-        'font-weight:600',
-        'max-width:80%', 'text-align:center'
-    ].join(';');
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.transition = 'opacity 250ms ease';
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    }, 2500);
-}
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        const bg = type === 'error' ? 'rgba(220, 53, 69, 0.95)' : 'rgba(25, 135, 84, 0.95)';
+        toast.style.cssText = [
+            'position:fixed',
+            'bottom:20px',
+            'left:50%', 'transform:translateX(-50%)',
+            `background:${bg}`,
+            'color:#fff',
+            'padding:10px 16px',
+            'border-radius:8px',
+            'box-shadow:0 6px 20px rgba(0,0,0,0.2)',
+            'z-index:9999',
+            'font-weight:600',
+            'max-width:80%', 'text-align:center'
+        ].join(';');
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.transition = 'opacity 250ms ease';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    }
 
-document.addEventListener('DOMContentLoaded', initClanPage);
+    document.addEventListener('DOMContentLoaded', initClanPage);
