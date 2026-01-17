@@ -202,6 +202,13 @@ function sortClans(stats) {
 function displayRanking(stats) {
     const tbody = document.getElementById('rankingBody');
 
+    console.log('📊 Affichage du classement:', stats.length, 'clans');
+
+    if (!stats || stats.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="muted" style="text-align: center; padding: 20px;">Aucun clan avec des points</td></tr>';
+        return;
+    }
+
     tbody.innerHTML = stats.map((clan, index) => {
         const rank = index + 1;
         let rankClass = 'rank-other';

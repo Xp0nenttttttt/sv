@@ -439,6 +439,7 @@ window.addEventListener('storage', async function (e) {
 
 // Charger le meilleur clan
 async function loadTopClan() {
+    console.log('🛡️ Chargement du meilleur clan...');
     try {
         // Attendre que supabaseClient soit disponible
         let attempts = 0;
@@ -447,7 +448,12 @@ async function loadTopClan() {
             attempts++;
         }
 
-        if (typeof supabaseClient === 'undefined') return;
+        if (typeof supabaseClient === 'undefined') {
+            console.log('❌ supabaseClient non disponible');
+            return;
+        }
+
+        console.log('✅ supabaseClient disponible');
 
         // Initialiser le stockage
         if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
@@ -461,13 +467,20 @@ async function loadTopClan() {
             storageAttempts++;
         }
 
-        if (!universalStorage) return;
+        if (!universalStorage) {
+            console.log('❌ universalStorage non disponible');
+            return;
+        }
+
+        console.log('✅ universalStorage disponible');
 
         // Récupérer tous les clans
         const { data: clans } = await supabaseClient.from('clans').select('*');
+        console.log('📋 Clans trouvés:', clans?.length || 0);
         if (!clans || clans.length === 0) return;
 
         const allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+        console.log('📊 Records chargés:', allRecords.length);
         const allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
 
         // Calculer les stats
