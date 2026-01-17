@@ -234,12 +234,17 @@ async function loadClanLevels(clanId) {
         });
     }
 
+    console.log('👥 Membres du clan:', memberIds);
+    console.log('📋 Profils chargés:', profilesMap);
+
     // Charger les records acceptés via universalStorage
     let allRecords = [];
     if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
         allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
         allRecords = allRecords.filter(r => r.status === 'accepted');
     }
+
+    console.log('🏆 Total records acceptés:', allRecords.length);
 
     // Charger les niveaux acceptés
     let allLevels = [];
@@ -248,9 +253,21 @@ async function loadClanLevels(clanId) {
         allLevels = allLevels.filter(l => l.status === 'accepted');
     }
 
+    console.log('📊 Total niveaux acceptés:', allLevels.length);
+
     // Filtrer les records des membres du clan
     const memberUsernames = Object.values(profilesMap);
-    const clanRecords = allRecords.filter(r => memberUsernames.includes(r.player));
+    console.log('🔍 Usernames des membres:', memberUsernames);
+
+    const clanRecords = allRecords.filter(r => {
+        const match = memberUsernames.includes(r.player);
+        if (match) {
+            console.log('✅ Record trouvé pour membre:', r.player, 'sur niveau', r.levelId);
+        }
+        return match;
+    });
+
+    console.log('🎯 Records du clan:', clanRecords.length);
 
     // Grouper par niveau
     const levelMap = {};
