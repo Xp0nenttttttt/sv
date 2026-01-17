@@ -289,7 +289,7 @@ class LevelDetailsManager {
             easy: 'easy.webp'
         }[key] || 'easy.webp';
 
-        const isMythic = (badge || '').toLowerCase() === 'mythic';
+        const isMythic = (badge || '').toLowerCase() === '_mythic';
         let file = filename;
         if (isMythic) {
             const lastDot = filename.lastIndexOf('.');
