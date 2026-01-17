@@ -85,40 +85,49 @@ document.addEventListener("DOMContentLoaded", () => {
     function animate() {
         ctx.clearRect(0, 0, w, h);
 
-        particles.forEach(p => {
+        particles.forEach((p, i) => {
             p.x += p.dx;
             p.y += p.dy;
 
-            // rebond écran
-            if (p.x < 0 || p.x > w) p.dx *= -1;
-            if (p.y < 0 || p.y > h) p.dy *= -1;
-
-            // interaction souris
-            if (mouse.x && mouse.y) {
-                const dx = mouse.x - p.x;
-                const dy = mouse.y - p.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < mouse.radius) {
-                    const force = (mouse.radius - dist) / mouse.radius;
-                    p.x -= dx * force * 0.03;
-                    p.y -= dy * force * 0.03;
-                    p.r = p.baseR + 2;
-                } else {
-                    p.r = p.baseR;
-                }
+            if (p.life !== undefined) {
+                p.life--;
+                p.r *= 0.96;
+                if (p.life <= 0) particles.splice(i, 1);
             }
 
-            p.hue += 0.3;
-
+            // dessin
             ctx.beginPath();
-            ctx.fillStyle = `hsla(${p.hue}, 100%, 70%, 0.8)`;
+            ctx.fillStyle = `hsla(${p.hue},100%,70%,0.9)`;
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fill();
         });
+        const card = document.getElementById("topClanCard");
+        card.classList.add("top-victory");
+
+        const rect = card.getBoundingClientRect();
+        victoryExplosion(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2
+        );
+
 
         requestAnimationFrame(animate);
     }
 
     animate();
 });
+function victoryExplosion(x, y) {
+    const count = 40;
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x,
+            y,
+            r: Math.random() * 3 + 2,
+            baseR: Math.random() * 2 + 1,
+            dx: (Math.random() - 0.5) * 6,
+            dy: (Math.random() - 0.5) * 6,
+            hue: Math.random() * 360,
+            life: 60
+        });
+    }
+}
