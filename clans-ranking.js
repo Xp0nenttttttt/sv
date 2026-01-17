@@ -101,7 +101,14 @@ async function loadClanRanking() {
             const levelPointsMap = {};
             clanRecords.forEach(record => {
                 if (!levelPointsMap[record.levelId]) {
-                    levelPointsMap[record.levelId] = record.points || 0;
+                    // Trouver le niveau correspondant
+                    const level = allLevels.find(l => String(l.id) === String(record.levelId));
+                    let points = 0;
+                    if (level && level.approvedRank) {
+                        // Calculer les points en fonction du rang (rank 1 = 100 points, rank 2 = 90 points, etc)
+                        points = Math.max(100 - (level.approvedRank - 1) * 5, 10);
+                    }
+                    levelPointsMap[record.levelId] = points;
                 }
             });
 
