@@ -184,6 +184,22 @@ $$;
 
 grant execute on function public.leave_clan(uuid) to authenticated;
 
+-- Trigger: Prevent users from creating multiple clans
+create or replace function public.prevent_multiple_clans()
+returns trigger as $$
+begin
+    if (select count(*) from public.clans where owner_id = new.owner_id) > 0 then
+        raise exception 'User can only own one clan';
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+create trigger trigger_prevent_multiple_clans
+before insert on public.clans
+for each row
+execute function public.prevent_multiple_clans();
+
 -- Cleanup expired invites: function + daily pg_cron schedule
 create or replace function public.cleanup_expired_clan_invites()
 returns void

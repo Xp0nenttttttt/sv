@@ -37,9 +37,27 @@ async function refreshSessionUI() {
     logoutBtn.style.display = isLogged ? 'inline-block' : 'none';
     loginBtn.style.display = isLogged ? 'none' : 'inline-block';
     signupBtn.style.display = isLogged ? 'none' : 'inline-block';
-    createForm.style.display = isLogged ? 'block' : 'none';
-    hint.textContent = isLogged ? 'Connecté' : 'Connectez-vous pour créer un clan.';
-    status.textContent = isLogged ? `Connecté en tant que ${currentSession.user.email}` : '';
+
+    if (isLogged) {
+        status.textContent = `Connecté en tant que ${currentSession.user.email}`;
+        // Check if user already owns a clan
+        const { data: ownedClan, error } = await clansClient
+            .from('clans')
+            .select('id')
+            .eq('owner_id', currentSession.user.id)
+            .maybeSingle();
+        if (ownedClan) {
+            createForm.style.display = 'none';
+            hint.textContent = 'Vous possédez déjà un clan. Vous ne pouvez en créer qu\'un seul.';
+        } else {
+            createForm.style.display = 'block';
+            hint.textContent = 'Connecté';
+        }
+    } else {
+        status.textContent = '';
+        createForm.style.display = 'none';
+        hint.textContent = 'Connectez-vous pour créer un clan.';
+    }
     errorEl.textContent = '';
 }
 
