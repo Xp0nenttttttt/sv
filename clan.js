@@ -45,12 +45,31 @@ async function initClanPage() {
 
     await loadClan(clanId);
     await loadMembers(clanId);
+    await loadClanLevels(clanId);
 
     const inviteToken = getParam('invite');
     if (inviteToken && currentSession) {
         await acceptInvite(inviteToken, clanId);
         await loadMembers(clanId);
     }
+}
+
+function switchTab(tabName) {
+    // Cacher tous les contenus
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+
+    // Désactiver tous les boutons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Afficher le contenu sélectionné
+    document.getElementById(`tab-${tabName}`).style.display = 'block';
+
+    // Activer le bouton
+    event.target.classList.add('active');
 }
 
 async function loadClan(clanId) {
@@ -184,6 +203,105 @@ async function adminDeleteClan(clanId) {
     setTimeout(() => window.location.href = 'clans.html', 1500);
 }
 
+async function loadClanLevels(clanId) {
+    const levelsList = document.getElementById('levelsList');
+    levelsList.innerHTML = '<p class="muted">Chargement...</p>';
+
+    // Récupérer les membres du clan
+    const { data: members, error: membersError } = await clanClient
+        .from('clan_members')
+        .select('user_id')
+        .eq('clan_id', clanId);
+
+    if (membersError || !members || members.length === 0) {
+        levelsList.innerHTML = '<p class="muted">Aucun membre dans ce clan</p>';
+        return;
+    }
+
+    // Récupérer les profils des membres pour avoir leurs usernames
+    const memberIds = members.map(m => m.user_id);
+    const { data: profiles } = await clanClient
+        .from('profiles')
+        .select('id, username')
+        .in('id', memberIds);
+
+    const profilesMap = {};
+    if (profiles) {
+        profiles.forEach(p => {
+            profilesMap[p.id] = p.username;
+        });
+    }
+
+    // Charger les records acceptés via universalStorage
+    let allRecords = [];
+    if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+        allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+        allRecords = allRecords.filter(r => r.status === 'accepted');
+    }
+
+    // Charger les niveaux acceptés
+    let allLevels = [];
+    if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+        allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
+        allLevels = allLevels.filter(l => l.status === 'accepted');
+    }
+
+    // Filtrer les records des membres du clan
+    const memberUsernames = Object.values(profilesMap);
+    const clanRecords = allRecords.filter(r => memberUsernames.includes(r.player));
+
+    // Grouper par niveau
+    const levelMap = {};
+    clanRecords.forEach(record => {
+        const levelId = record.levelId;
+        if (!levelMap[levelId]) {
+            levelMap[levelId] = {
+                records: [],
+                level: allLevels.find(l => String(l.id) === String(levelId))
+            };
+        }
+        levelMap[levelId].records.push(record);
+    });
+
+    // Afficher les niveaux
+    const levelEntries = Object.values(levelMap).filter(entry => entry.level);
+
+    if (levelEntries.length === 0) {
+        levelsList.innerHTML = '<p class="muted">Aucun niveau complété par les membres du clan</p>';
+        return;
+    }
+
+    // Trier par rang du niveau
+    levelEntries.sort((a, b) => (a.level.approvedRank || 999) - (b.level.approvedRank || 999));
+
+    levelsList.innerHTML = levelEntries.map(entry => {
+        // Trier les records par date pour trouver le premier
+        const sortedRecords = entry.records.sort((a, b) =>
+            new Date(a.submittedAt) - new Date(b.submittedAt)
+        );
+        const firstClear = sortedRecords[0];
+        const completionCount = entry.records.length;
+
+        return `
+            <div class="level-item">
+                <div>
+                    <div class="level-name">
+                        <a href="level-details.html?id=${entry.level.id}" style="color: #9bb4ff; text-decoration: none;">
+                            #${entry.level.approvedRank || '?'} - ${entry.level.levelName || 'Niveau inconnu'}
+                        </a>
+                    </div>
+                    <div class="first-clear">
+                        🥇 Premier clear: ${firstClear.player} 
+                        ${firstClear.percentage === 100 ? '(100%)' : `(${firstClear.percentage}%)`}
+                    </div>
+                </div>
+                <div class="muted">
+                    ${completionCount} membre${completionCount > 1 ? 's' : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
 async function leaveClan(clanId) {
     if (!confirm('Êtes-vous sûr de vouloir quitter ce clan ?')) return;

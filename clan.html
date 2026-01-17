@@ -78,6 +78,63 @@
         .btn-warning:hover {
             background: #f57c00;
         }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #9aa2b5;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #f2f4fb;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .level-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #262d3a;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .level-item:hover {
+            background: #2d3442;
+        }
+
+        .level-name {
+            font-weight: bold;
+            color: #9bb4ff;
+        }
+
+        .first-clear {
+            color: #7ee0a3;
+            font-size: 0.9em;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
@@ -95,10 +152,27 @@
     </header>
     <main class="page">
         <div class="card" id="clanInfo">Chargement...</div>
+
+        <!-- Onglets -->
         <div class="card">
-            <h3>Membres</h3>
-            <div id="memberList" class="member-list"></div>
+            <div style="display: flex; gap: 10px; border-bottom: 2px solid #2b3240; margin-bottom: 16px;">
+                <button class="tab-btn active" onclick="switchTab('members')">Membres</button>
+                <button class="tab-btn" onclick="switchTab('levels')">Niveaux complétés</button>
+            </div>
+
+            <!-- Contenu onglet Membres -->
+            <div id="tab-members" class="tab-content">
+                <h3>Membres</h3>
+                <div id="memberList" class="member-list"></div>
+            </div>
+
+            <!-- Contenu onglet Niveaux -->
+            <div id="tab-levels" class="tab-content" style="display: none;">
+                <h3>Niveaux complétés par le clan</h3>
+                <div id="levelsList"></div>
+            </div>
         </div>
+
         <div class="card" id="inviteCard" style="display:none;">
             <h3>Inviter</h3>
             <div class="invite-row">
