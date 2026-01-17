@@ -2,7 +2,8 @@ const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 
 let w, h, particles = [];
-
+const topClanCard = document.getElementById("topClanCard");
+topClanCard.style.display = "block";
 function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
@@ -116,8 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     animate();
 });
-const topClanCard = document.getElementById("topClanCard");
-topClanCard.style.display = "block";
+
 
 function victoryExplosion(x, y) {
     const count = 40;
