@@ -51,7 +51,7 @@ function mapSupabaseRowToLevel(row) {
         rank: rank,
         name: row.level_name || 'Niveau',
         creator: row.creator_name || 'Inconnu',
-        difficulty: row.approved_difficulty || 'Moyen',
+        difficulty: normalizeDifficulty(row.approved_difficulty),
         length: row.length || 'Short',
         points: calculatePoints(rank),
         author: row.author_name || row.creator_name || '',
@@ -87,7 +87,7 @@ async function loadAllLevels() {
                     rank: rank,
                     name: submission.levelName,
                     creator: submission.creatorName,
-                    difficulty: submission.approvedDifficulty || 'Moyen',
+                    difficulty: normalizeDifficulty(submission.approvedDifficulty),
                     length: submission.length,
                     points: calculatePoints(rank),
                     author: submission.authorName,
@@ -115,7 +115,7 @@ async function loadAllLevels() {
                 rank: rank,
                 name: submission.levelName,
                 creator: submission.creatorName,
-                difficulty: submission.approvedDifficulty || 'Moyen',
+                difficulty: normalizeDifficulty(submission.approvedDifficulty),
                 length: submission.length,
                 points: calculatePoints(rank),
                 author: submission.authorName,
@@ -145,7 +145,7 @@ async function loadAllLevels() {
                 rank: rank,
                 name: submission.levelName,
                 creator: submission.creatorName,
-                difficulty: submission.approvedDifficulty || 'Moyen',
+                difficulty: normalizeDifficulty(submission.approvedDifficulty),
                 length: submission.length,
                 points: calculatePoints(rank),
                 author: submission.authorName,
@@ -180,7 +180,7 @@ async function loadAllLevels() {
             rank: rank,
             name: submission.levelName,
             creator: submission.creatorName,
-            difficulty: submission.approvedDifficulty || 'Moyen',
+            difficulty: normalizeDifficulty(submission.approvedDifficulty),
             length: submission.length,
             points: calculatePoints(rank),
             author: submission.authorName,
@@ -204,6 +204,20 @@ const lengthFilter = document.getElementById('length-filter');
 const searchInput = document.getElementById('search-input');
 const levelCountElement = document.getElementById('levelCount');
 const recordCountElement = document.getElementById('recordCount');
+
+// Normalise une difficulté vers un libellé canonique
+function normalizeDifficulty(rawDifficulty) {
+    const normalized = (rawDifficulty || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+    if (normalized.includes('extreme')) return 'Extreme Demon';
+    if (normalized.includes('tres difficile') || normalized.includes('très difficile') || normalized.includes('insane')) return 'Insane Demon';
+    if (normalized.includes('difficile') || normalized.includes('hard')) return 'Hard Demon';
+    if (normalized.includes('moyen') || normalized.includes('medium')) return 'Medium Demon';
+    return 'Easy Demon';
+}
 
 // Retourne l'icône de difficulté (fallback sur easy)
 function getDifficultyIcon(difficulty) {
@@ -334,11 +348,13 @@ function updateDifficultySelectColor() {
     difficultySelect.className = ''; // Réinitialiser les classes
     const value = difficultySelect.value;
 
-    if (value === 'Extrême') {
+    if (value === 'Extreme Demon') {
         difficultySelect.classList.add('extreme');
-    } else if (value === 'Très Difficile' || value === 'Difficile') {
+    } else if (value === 'Insane Demon') {
+        difficultySelect.classList.add('insane');
+    } else if (value === 'Hard Demon') {
         difficultySelect.classList.add('hard');
-    } else if (value === 'Moyen' || value === 'Facile' || value === 'Très Facile') {
+    } else if (value === 'Medium Demon' || value === 'Easy Demon') {
         difficultySelect.classList.add('medium');
     }
 }

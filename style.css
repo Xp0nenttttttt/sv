@@ -132,6 +132,12 @@ main {
     border-color: #ff6b6b;
 }
 
+#difficulty-filter.insane {
+    background-color: #d9489b;
+    color: white;
+    border-color: #d9489b;
+}
+
 #difficulty-filter.hard {
     background-color: #ffa94d;
     color: white;

@@ -110,7 +110,7 @@ class LevelDetailsManager {
             rank: rank,
             name: row.level_name || 'Niveau',
             creator: row.creator_name || 'Inconnu',
-            difficulty: row.approved_difficulty || 'Moyen',
+            difficulty: this.normalizeDifficulty(row.approved_difficulty),
             length: row.length || 'Short',
             points: this.calculatePoints(rank),
             author: row.author_name || row.creator_name || '',
@@ -164,7 +164,7 @@ class LevelDetailsManager {
                     rank: rank,
                     name: s.levelName,
                     creator: s.creatorName,
-                    difficulty: s.approvedDifficulty || 'Moyen',
+                    difficulty: this.normalizeDifficulty(s.approvedDifficulty),
                     length: s.length,
                     points: this.calculatePoints(rank),
                     author: s.authorName,
@@ -250,6 +250,20 @@ class LevelDetailsManager {
                 <a href="index.html" class="btn-primary">Retour à la liste</a>
             </div>
         `;
+    }
+
+    // Normalise une difficulté vers un libellé canonique
+    normalizeDifficulty(rawDifficulty) {
+        const normalized = (rawDifficulty || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+
+        if (normalized.includes('extreme')) return 'Extreme Demon';
+        if (normalized.includes('tres difficile') || normalized.includes('très difficile') || normalized.includes('insane')) return 'Insane Demon';
+        if (normalized.includes('difficile') || normalized.includes('hard')) return 'Hard Demon';
+        if (normalized.includes('moyen') || normalized.includes('medium')) return 'Medium Demon';
+        return 'Easy Demon';
     }
 
     // Retourne l'icône de difficulté (fallback sur easy)
