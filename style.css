@@ -227,14 +227,20 @@ main {
 
 .badge-gif {
     position: absolute;
-    top: -32px;
-    right: -32px;
-    width: 200px;
-    height: 200px;
+    inset: -20px;
+    width: 160px;
+    height: 160px;
     object-fit: contain;
-    z-index: 2;
+    z-index: 0;
     pointer-events: none;
     mix-blend-mode: screen;
+    opacity: 0.85;
+}
+
+.badge-gif-chip {
+    inset: -12px;
+    width: 110px;
+    height: 110px;
 }
 
 .level-info {
@@ -405,7 +411,7 @@ main {
     justify-content: center;
     padding: 4px;
     border-radius: 10px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .difficulty-chip::before {
@@ -418,6 +424,8 @@ main {
 }
 
 .difficulty-icon {
+    position: relative;
+    z-index: 1;
     height: 50px;
     width: auto;
     display: inline-block;

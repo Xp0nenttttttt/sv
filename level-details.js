@@ -309,6 +309,7 @@ class LevelDetailsManager {
     renderLevelDetails() {
         const container = document.getElementById('levelDetails');
         const difficultyIcon = this.getDifficultyIcon(this.level.difficulty);
+        const badge = this.getBadgeGif(this.level.badge);
         const topParticles = this.level.rank === 1
             ? '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top1" width="200" height="200"></canvas>'
             : this.level.rank === 2
@@ -316,7 +317,6 @@ class LevelDetailsManager {
                 : this.level.rank === 3
                     ? '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="200" height="200"></canvas>'
                     : '';
-        const badge = this.getBadgeGif(this.level.badge);
 
         container.innerHTML = `
             <div class="level-header">
@@ -326,6 +326,7 @@ class LevelDetailsManager {
                         <h1>${this.level.name}</h1>
                         <div class="level-meta-large">
                             <span class="difficulty-chip difficulty-bg-${difficultyIcon.key}">
+                                ${badge ? `<img class="badge-gif badge-gif-chip" src="${badge.src}" alt="${badge.alt}">` : ''}
                                 <img src="${difficultyIcon.src}" alt="${difficultyIcon.alt}" class="difficulty-icon difficulty-icon-large">
                             </span>
                             <span class="length-badge">${this.level.length}</span>
@@ -341,7 +342,6 @@ class LevelDetailsManager {
                 ${this.level.image ? `
                     <div class="level-header-image">
                         ${topParticles}
-                        ${badge ? `<img class="badge-gif" src="${badge.src}" alt="${badge.alt}">` : ''}
                         <img src="${this.level.image}" alt="${this.level.name}">
                     </div>
                 ` : ''}
