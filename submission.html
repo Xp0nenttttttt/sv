@@ -32,45 +32,6 @@
             }
         }
 
-        async function checkUserSession() {
-            // Attendre que supabaseClient soit initialisé
-            let attempts = 0;
-            while (!window.supabaseClient && attempts < 100) {
-                await new Promise(resolve => setTimeout(resolve, 50));
-                attempts++;
-            }
-
-            if (!window.supabaseClient) {
-                console.error('❌ supabaseClient non initialisé');
-                showLoginRequired();
-                return;
-            }
-
-            const { data: { session } } = await window.supabaseClient.auth.getSession();
-
-            if (!session) {
-                console.log('❌ Pas de session utilisateur');
-                showLoginRequired();
-            } else {
-                console.log('✅ Utilisateur connecté:', session.user.email);
-            }
-        }
-
-        function showLoginRequired() {
-            const formContainer = document.querySelector('.submission-wrapper');
-            if (formContainer) {
-                formContainer.innerHTML = `
-                    <div style="text-align: center; padding: 40px;">
-                        <h2>🔒 Connexion requise</h2>
-                        <p style="margin: 20px 0;">Vous devez être connecté pour soumettre un niveau.</p>
-                        <a href="auth.html" class="btn-submit" style="display: inline-block; text-decoration: none;">
-                            Se connecter / S'inscrire
-                        </a>
-                    </div>
-                `;
-            }
-        }
-
         // Lancer l'initialisation
         initializeSubmission();
     </script>
@@ -235,9 +196,6 @@
             } else {
                 console.log('✅ Stockage prêt (', universalStorage.getCurrentAdapter(), ')');
             }
-
-            // Vérifier la session utilisateur une fois le DOM chargé
-            await checkUserSession();
         });
     </script>
     <script src="dark-mode.js"></script>
