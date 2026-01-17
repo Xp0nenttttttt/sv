@@ -399,7 +399,7 @@ async function loadClanVerifiedLevels(clanId) {
         });
     }
 
-    // Charger les submissions vérifiées (status === 'verified')
+    // Charger les submissions acceptées (niveaux vérifiés/approuvés)
     let allSubmissions = [];
     if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
         const rawSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
@@ -408,16 +408,16 @@ async function loadClanVerifiedLevels(clanId) {
             console.log('Statuts des niveaux:', rawSubmissions.map(s => ({ name: s.levelName, status: s.status })));
             console.log('Premier niveau complet:', rawSubmissions[0]);
         }
-        allSubmissions = rawSubmissions.filter(s => s.status === 'verified');
+        allSubmissions = rawSubmissions.filter(s => s.status === 'accepted');
     }
 
-    console.log('✅ Total niveaux vérifiés (status=verified):', allSubmissions.length);
+    console.log('✅ Total niveaux acceptés:', allSubmissions.length);
 
     // Filtrer les submissions des membres du clan
     const memberUsernames = Object.values(profilesMap);
     const clanSubmissions = allSubmissions.filter(s => memberUsernames.includes(s.authorName));
 
-    console.log('🎯 Submissions vérifiées du clan:', clanSubmissions.length);
+    console.log('🎯 Submissions acceptées du clan:', clanSubmissions.length);
 
     // Grouper par niveau
     const levelMap = {};
