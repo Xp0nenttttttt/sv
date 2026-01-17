@@ -200,8 +200,8 @@ async function loadAllLevels() {
 // Récupérer les éléments du DOM
 const levelsList = document.getElementById('levelsList');
 const difficultyFilter = document.getElementById('difficulty-filter');
-
 const lengthFilter = document.getElementById('length-filter');
+const tagFilter = document.getElementById('tag-filter');
 const searchInput = document.getElementById('search-input');
 const levelCountElement = document.getElementById('levelCount');
 const recordCountElement = document.getElementById('recordCount');
@@ -364,16 +364,18 @@ function renderLevels(filteredLevels) {
 function filterLevels() {
     const difficulty = difficultyFilter.value;
     const length = lengthFilter.value;
+    const tag = tagFilter.value;
     const searchTerm = searchInput.value.toLowerCase();
 
     const filtered = allLevels.filter(level => {
         const matchDifficulty = !difficulty || level.difficulty === difficulty;
         const matchLength = !length || level.length === length;
+        const matchTag = !tag || (level.tags && level.tags.includes(tag));
         const matchSearch = !searchTerm ||
             level.name.toLowerCase().includes(searchTerm) ||
             level.creator.toLowerCase().includes(searchTerm);
 
-        return matchDifficulty && matchLength && matchSearch;
+        return matchDifficulty && matchLength && matchTag && matchSearch;
     });
 
     renderLevels(filtered);
@@ -402,6 +404,7 @@ difficultyFilter.addEventListener('change', function () {
     updateDifficultySelectColor();
 });
 lengthFilter.addEventListener('change', filterLevels);
+tagFilter.addEventListener('change', filterLevels);
 searchInput.addEventListener('input', filterLevels);
 
 // Fonction pour obtenir l'emoji du tag
