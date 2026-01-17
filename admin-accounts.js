@@ -71,6 +71,9 @@ class AccountManager {
         // Charger tous les joueurs
         const allRecords = await this.recordManager.getSubmissions();
         const acceptedRecords = allRecords.filter(s => s.status === 'accepted');
+        const acceptedLevels = (await this.leaderboardManager.submissionManager.getSubmissions())
+            .filter(s => s.status === 'accepted');
+
         for (const record of acceptedRecords) {
             const key = record.player.toLowerCase();
             if (!accountsMap[key]) {
@@ -83,10 +86,7 @@ class AccountManager {
                 });
             }
 
-            const allSubmissions = await this.leaderboardManager.submissionManager.getSubmissions();
-            const level = allSubmissions
-                .filter(s => s.status === 'accepted')
-                .find(s => s.id === record.levelId);
+            const level = acceptedLevels.find(s => s.id === record.levelId);
 
             if (level) {
                 const points = this.leaderboardManager.calculateLevelPoints(level.approvedRank);
