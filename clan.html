@@ -62,6 +62,22 @@
             border-radius: 6px;
             font-size: 0.85em;
         }
+
+        .btn-danger {
+            background: #ff6b6b;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        .btn-warning {
+            background: #ff9800;
+        }
+
+        .btn-warning:hover {
+            background: #f57c00;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
@@ -91,7 +107,7 @@
             </div>
             <div id="inviteMsg" class="muted" style="margin-top:6px;"></div>
         </div>
-        <div class="card" id="clanActions"></div>
+        <div class="card" id="clanActions" style="display:none;"></div>
     </main>
     <script src="clan.js"></script>
 </body>

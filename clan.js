@@ -68,13 +68,15 @@ async function loadClan(clanId) {
     // Show action buttons (delete for owner, leave for members)
     const actionsDiv = document.getElementById('clanActions');
     if (currentSession && currentSession.user.id === data.owner_id) {
-        actionsDiv.innerHTML = '<button class="btn" id="deleteClanBtn" style="background:#ff6b6b;">🗑️ Supprimer le clan</button>';
+        actionsDiv.innerHTML = '<h3>Actions</h3><button class="btn btn-danger" id="deleteClanBtn">🗑️ Supprimer le clan</button>';
+        actionsDiv.style.display = 'block';
         document.getElementById('deleteClanBtn').onclick = () => deleteClan(clanId);
     } else if (currentSession) {
-        actionsDiv.innerHTML = '<button class="btn" id="leaveClanBtn" style="background:#ff9800;">Quitter le clan</button>';
+        actionsDiv.innerHTML = '<h3>Actions</h3><button class="btn btn-warning" id="leaveClanBtn">Quitter le clan</button>';
+        actionsDiv.style.display = 'block';
         document.getElementById('leaveClanBtn').onclick = () => leaveClan(clanId);
     } else {
-        actionsDiv.innerHTML = '';
+        actionsDiv.style.display = 'none';
     }
 }
 
