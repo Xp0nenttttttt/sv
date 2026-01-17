@@ -46,6 +46,7 @@ async function initClanPage() {
     await loadClan(clanId);
     await loadMembers(clanId);
     await loadClanLevels(clanId);
+    await loadClanVerifiedLevels(clanId);
 
     const inviteToken = getParam('invite');
     if (inviteToken && currentSession) {
@@ -343,6 +344,123 @@ async function loadClanLevels(clanId) {
                 </div>
                 <div class="muted">
                     ${completionCount} membre${completionCount > 1 ? 's' : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function loadClanVerifiedLevels(clanId) {
+    const verifiedLevelsList = document.getElementById('verifiedLevelsList');
+    if (!verifiedLevelsList) return;
+
+    verifiedLevelsList.innerHTML = '<p class="muted">Chargement...</p>';
+
+    // Initialiser le stockage si nécessaire
+    if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
+        await initializeSupabaseStorage();
+    }
+
+    // Attendre que universalStorage soit initialisé
+    let attempts = 0;
+    while (!universalStorage && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+
+    if (!universalStorage) {
+        console.error('❌ universalStorage non disponible');
+        verifiedLevelsList.innerHTML = '<p class="muted">Erreur de chargement des données</p>';
+        return;
+    }
+
+    // Récupérer les membres du clan
+    const { data: members, error: membersError } = await clanClient
+        .from('clan_members')
+        .select('user_id')
+        .eq('clan_id', clanId);
+
+    if (membersError || !members || members.length === 0) {
+        verifiedLevelsList.innerHTML = '<p class="muted">Aucun membre dans ce clan</p>';
+        return;
+    }
+
+    // Récupérer les profils des membres
+    const memberIds = members.map(m => m.user_id);
+    const { data: profiles } = await clanClient
+        .from('profiles')
+        .select('id, username')
+        .in('id', memberIds);
+
+    const profilesMap = {};
+    if (profiles) {
+        profiles.forEach(p => {
+            profilesMap[p.id] = p.username;
+        });
+    }
+
+    // Charger les submissions vérifiées (status === 'verified')
+    let allSubmissions = [];
+    if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+        const rawSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+        console.log('📦 Total niveaux bruts:', rawSubmissions.length);
+        allSubmissions = rawSubmissions.filter(s => s.status === 'verified');
+    }
+
+    console.log('✅ Total niveaux vérifiés:', allSubmissions.length);
+
+    // Filtrer les submissions des membres du clan
+    const memberUsernames = Object.values(profilesMap);
+    const clanSubmissions = allSubmissions.filter(s => memberUsernames.includes(s.authorName));
+
+    console.log('🎯 Submissions vérifiées du clan:', clanSubmissions.length);
+
+    // Grouper par niveau
+    const levelMap = {};
+    clanSubmissions.forEach(submission => {
+        const levelId = submission.id;
+        if (!levelMap[levelId]) {
+            levelMap[levelId] = {
+                submissions: [],
+                level: submission
+            };
+        }
+        levelMap[levelId].submissions.push(submission);
+    });
+
+    // Afficher les niveaux
+    const levelEntries = Object.values(levelMap);
+
+    if (levelEntries.length === 0) {
+        verifiedLevelsList.innerHTML = '<p class="muted">Aucun niveau vérifié par les membres du clan</p>';
+        return;
+    }
+
+    // Trier par rang du niveau
+    levelEntries.sort((a, b) => (a.level.approvedRank || 999) - (b.level.approvedRank || 999));
+
+    verifiedLevelsList.innerHTML = levelEntries.map(entry => {
+        // Trier les submissions par date pour trouver le premier auteur
+        const sortedSubmissions = entry.submissions.sort((a, b) =>
+            new Date(a.submittedAt) - new Date(b.submittedAt)
+        );
+        const firstAuthor = sortedSubmissions[0];
+        const submissionCount = entry.submissions.length;
+
+        return `
+            <div class="level-item">
+                <div>
+                    <div class="level-name">
+                        <a href="level-details.html?id=${entry.level.id}" style="color: #9bb4ff; text-decoration: none;">
+                            #${entry.level.approvedRank || '?'} - ${entry.level.levelName || 'Niveau inconnu'}
+                        </a>
+                    </div>
+                    <div class="first-clear">
+                        ✅ Premier auteur: ${firstAuthor.authorName}
+                    </div>
+                </div>
+                <div class="muted">
+                    ${submissionCount} soumission${submissionCount > 1 ? 's' : ''}
                 </div>
             </div>
         `;
