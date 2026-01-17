@@ -108,6 +108,36 @@ $$;
 
 grant execute on function public.accept_clan_invite(text) to authenticated;
 
+-- RPC: Upsert user profile (bypasses RLS by running as security definer)
+create or replace function public.upsert_profile(
+    p_username text,
+    p_country text,
+    p_avatar_url text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    v_user_id uuid := auth.uid();
+begin
+    if v_user_id is null then
+        raise exception 'Must be authenticated to update profile';
+    end if;
+    
+    insert into public.profiles (id, username, country, avatar_url)
+    values (v_user_id, p_username, p_country, p_avatar_url)
+    on conflict (id) do update
+    set username = p_username,
+        country = p_country,
+        avatar_url = p_avatar_url
+    where id = v_user_id;
+end;
+$$;
+
+grant execute on function public.upsert_profile(text, text, text) to authenticated;
+
 -- Cleanup expired invites: function + daily pg_cron schedule
 create or replace function public.cleanup_expired_clan_invites()
 returns void

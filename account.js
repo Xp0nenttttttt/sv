@@ -88,49 +88,20 @@ async function saveProfile() {
         showToast('Connectez-vous pour enregistrer votre profil', 'error');
         return;
     }
-    const payload = {
-        id: accountSession.user.id,
-        username: document.getElementById('username').value.trim(),
-        country: document.getElementById('country').value.trim(),
-        avatar_url: document.getElementById('avatar').value.trim()
-    };
-    // Try upsert; if forbidden, fallback to insert or update explicitly
-    let { error } = await accountClient
-        .from('profiles')
-        .upsert(payload, { onConflict: 'id', returning: 'minimal' });
+    const username = document.getElementById('username').value.trim();
+    const country = document.getElementById('country').value.trim();
+    const avatar_url = document.getElementById('avatar').value.trim();
+
+    // Use secure RPC to upsert profile (handles creation/update server-side)
+    const { error } = await accountClient.rpc('upsert_profile', {
+        p_username: username,
+        p_country: country,
+        p_avatar_url: avatar_url
+    });
+
     if (error) {
-        // Fallback: check if profile exists, then insert or update
-        const { data: existing, error: selectErr } = await accountClient
-            .from('profiles')
-            .select('id')
-            .eq('id', accountSession.user.id)
-            .maybeSingle();
-        if (selectErr) {
-            showToast('Erreur: ' + selectErr.message, 'error');
-            return;
-        }
-        if (!existing) {
-            const { error: insertErr } = await accountClient
-                .from('profiles')
-                .insert(payload, { returning: 'minimal' });
-            if (insertErr) {
-                showToast('Erreur: ' + insertErr.message, 'error');
-                return;
-            }
-        } else {
-            const { error: updateErr } = await accountClient
-                .from('profiles')
-                .update({
-                    username: payload.username,
-                    country: payload.country,
-                    avatar_url: payload.avatar_url
-                })
-                .eq('id', accountSession.user.id);
-            if (updateErr) {
-                showToast('Erreur: ' + updateErr.message, 'error');
-                return;
-            }
-        }
+        showToast('Erreur: ' + error.message, 'error');
+        return;
     }
     showToast('Profil enregistré avec succès', 'success');
 }
