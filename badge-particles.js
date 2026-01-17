@@ -42,30 +42,7 @@ class ParticleSystem {
                 twinkle: true,
                 shape: 'star'
             },
-            featured: {
-                count: 30,
-                color: ['#FFD700', '#FFA500', '#FFED4E'],
-                size: { min: 2, max: 4 },
-                speed: { min: 0.3, max: 0.8 },
-                twinkle: true,
-                shape: 'star'
-            },
-            epic: {
-                count: 35,
-                color: ['#9945FF', '#7928CA', '#B57EFF', '#E0B3FF'],
-                size: { min: 2, max: 5 },
-                speed: { min: 0.3, max: 0.9 },
-                twinkle: true,
-                shape: 'star'
-            },
-            mythic: {
-                count: 40,
-                color: ['#FF6B35', '#F7931E', '#FF8C42', '#FFA500'],
-                size: { min: 3, max: 6 },
-                speed: { min: 0.4, max: 1.0 },
-                twinkle: true,
-                shape: 'star'
-            }
+
         };
         return configs[type] || configs.featured;
     }
