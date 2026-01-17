@@ -7,6 +7,26 @@ class SubmissionManager {
         };
     }
 
+    // Sauvegarde locale fallback pour éviter de perdre les soumissions si Supabase n'est pas prêt
+    saveLocal(submissions) {
+        try {
+            localStorage.setItem(this.storageKey, JSON.stringify(submissions));
+        } catch (err) {
+            console.warn('⚠️ Impossible de sauvegarder en localStorage:', err.message);
+        }
+    }
+
+    // Lecture locale fallback
+    loadLocal() {
+        try {
+            const raw = localStorage.getItem(this.storageKey);
+            return raw ? JSON.parse(raw) : [];
+        } catch (err) {
+            console.warn('⚠️ Impossible de lire le localStorage:', err.message);
+            return [];
+        }
+    }
+
     // Ajouter une soumission
     async addSubmission(data) {
         const submissions = await this.getSubmissions();
@@ -30,7 +50,8 @@ class SubmissionManager {
         if (universalStorage) {
             await universalStorage.setData(this.storageKey, submissions);
         } else {
-            console.error('❌ Supabase non initialisé - soumission non sauvegardée');
+            console.error('❌ Supabase non initialisé - sauvegarde locale uniquement');
+            this.saveLocal(submissions);
         }
 
         return newSubmission;
@@ -47,15 +68,18 @@ class SubmissionManager {
 
         if (universalStorage && typeof universalStorage.getData === 'function') {
             try {
-                return (await universalStorage.getData(this.storageKey)) || [];
+                const data = (await universalStorage.getData(this.storageKey)) || [];
+                // Garder une copie locale en cache
+                this.saveLocal(data);
+                return data;
             } catch (err) {
-                console.warn('⚠️ Erreur Supabase, retour vide:', err.message);
-                return [];
+                console.warn('⚠️ Erreur Supabase, fallback localStorage:', err.message);
+                return this.loadLocal();
             }
         }
 
-        console.warn('⚠️ Supabase non initialisé après attente');
-        return [];
+        console.warn('⚠️ Supabase non initialisé après attente, usage du localStorage');
+        return this.loadLocal();
     }
 
     // Mettre à jour le statut d'une soumission
@@ -72,7 +96,8 @@ class SubmissionManager {
             if (universalStorage) {
                 await universalStorage.setData(this.storageKey, submissions);
             } else {
-                throw new Error('Supabase non initialisé');
+                console.error('❌ Supabase non initialisé - sauvegarde locale uniquement');
+                this.saveLocal(submissions);
             }
         }
         return submission;
@@ -85,7 +110,8 @@ class SubmissionManager {
         if (universalStorage) {
             await universalStorage.setData(this.storageKey, submissions);
         } else {
-            throw new Error('Supabase non initialisé');
+            console.error('❌ Supabase non initialisé - suppression locale uniquement');
+            this.saveLocal(submissions);
         }
     }
 
