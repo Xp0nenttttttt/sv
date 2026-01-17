@@ -6,8 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
     event.preventDefault();
+
+    // Vérifier que l'utilisateur est connecté
+    if (!window.submissionClient) {
+        alert('Client Supabase non initialisé');
+        return;
+    }
+
+    const { data: { session } } = await window.submissionClient.auth.getSession();
+
+    if (!session) {
+        alert('Vous devez être connecté pour soumettre un niveau.');
+        window.location.href = 'auth.html';
+        return;
+    }
 
     const formData = new FormData(document.getElementById('submissionForm'));
 
@@ -36,7 +50,9 @@ function handleSubmit(event) {
         proposedTop: parseInt(formData.get('proposedTop')),
         youtubeLink: youtubeLink,
         description: formData.get('description'),
-        tags: tags
+        tags: tags,
+        submittedBy: session.user.id,
+        submitterEmail: session.user.email
     };
 
     // Gérer l'image

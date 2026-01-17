@@ -535,13 +535,23 @@ class LevelDetailsManager {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
+            const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+            if (!session) {
+                alert('Vous devez être connecté pour soumettre un record.');
+                window.location.href = 'auth.html';
+                return;
+            }
+
             const recordData = {
                 player: document.getElementById('playerName').value.trim(),
                 playerCountry: document.getElementById('playerCountryRecord').value,
                 playerRegion: document.getElementById('playerRegionRecord').value.trim(),
-                percentage: document.getElementById('recordPercentage').value,
+                percentage: parseInt(document.getElementById('percentage').value),
                 videoLink: document.getElementById('videoLink').value.trim(),
-                device: document.getElementById('deviceType').value
+                device: document.getElementById('device').value,
+                submittedBy: session.user.id,
+                submitterEmail: session.user.email
             };
 
             // Validation
@@ -583,7 +593,22 @@ class LevelDetailsManager {
     }
 
     // Afficher/masquer le formulaire de record
-    toggleRecordForm() {
+    async toggleRecordForm() {
+        // Vérifier que l'utilisateur est connecté
+        if (!window.supabaseClient) {
+            alert('Vous devez être connecté pour soumettre un record.');
+            window.location.href = 'auth.html';
+            return;
+        }
+
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+        if (!session) {
+            alert('Vous devez être connecté pour soumettre un record.');
+            window.location.href = 'auth.html';
+            return;
+        }
+
         const form = document.getElementById('recordForm');
         const successMsg = document.getElementById('recordSuccessMsg');
         const errorMsg = document.getElementById('recordErrorMsg');
