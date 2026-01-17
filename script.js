@@ -414,7 +414,8 @@ function getTagEmoji(tag) {
         ship: '🚀',
         overall: '🏄',
         timing: '⏱️',
-        vitesse: '⚡'
+        vitesse: '⚡',
+        nong: '🎵',
     };
     return emojis[tag] || '🏷️';
 }
