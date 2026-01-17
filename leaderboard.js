@@ -55,6 +55,22 @@ async function renderCombinedLeaderboard() {
         });
     }
 
+    // Charger les avatars depuis Supabase profiles
+    const profilesCache = {};
+    if (window.supabaseClient) {
+        for (const entry of combined) {
+            const nameLower = entry.name.toLowerCase();
+            if (!profilesCache[nameLower]) {
+                const { data } = await window.supabaseClient
+                    .from('profiles')
+                    .select('username, avatar_url')
+                    .ilike('username', entry.name)
+                    .maybeSingle();
+                profilesCache[nameLower] = data;
+            }
+        }
+    }
+
     const container = document.getElementById('combinedLeaderboard');
 
     if (combined.length === 0) {
@@ -63,6 +79,12 @@ async function renderCombinedLeaderboard() {
     }
 
     container.innerHTML = combined.map((entry, index) => {
+        const profile = profilesCache[entry.name.toLowerCase()];
+        const avatarUrl = profile?.avatar_url || '';
+        const avatarHtml = avatarUrl
+            ? `<img src="${avatarUrl}" alt="avatar" style="width:40px; height:40px; border-radius:50%; object-fit:cover; margin-right:8px;">`
+            : '';
+
         if (entry.type === 'player') {
             return `
                 <div class="leaderboard-item">
@@ -70,8 +92,13 @@ async function renderCombinedLeaderboard() {
                         ${getMedalIcon(index)} #${index + 1}
                     </div>
                     <div class="player-info">
-                        <div class="player-name">🎮 ${escapeHtml(entry.name)}</div>
-                        ${entry.country ? `<div class="player-location">📍 ${escapeHtml(entry.country)}${entry.region ? ` - ${escapeHtml(entry.region)}` : ''}</div>` : ''}
+                        <div style="display:flex; align-items:center; margin-bottom:8px;">
+                            ${avatarHtml}
+                            <div>
+                                <div class="player-name">🎮 ${escapeHtml(entry.name)}</div>
+                                ${entry.country ? `<div class="player-location">📍 ${escapeHtml(entry.country)}${entry.region ? ` - ${escapeHtml(entry.region)}` : ''}</div>` : ''}
+                            </div>
+                        </div>
                         <div class="player-stats">
                             <span class="stat-badge">📊 ${entry.recordsCount} record${entry.recordsCount > 1 ? 's' : ''}</span>
                             <span class="stat-badge">📈 ${entry.maxPercentage}% max</span>
@@ -101,8 +128,13 @@ async function renderCombinedLeaderboard() {
                         ${getMedalIcon(index)} #${index + 1}
                     </div>
                     <div class="verifier-info">
-                        <div class="verifier-name">👤 ${escapeHtml(entry.name)}</div>
-                        ${entry.country ? `<div class="player-location">📍 ${escapeHtml(entry.country)}${entry.region ? ` - ${escapeHtml(entry.region)}` : ''}</div>` : ''}
+                        <div style="display:flex; align-items:center; margin-bottom:8px;">
+                            ${avatarHtml}
+                            <div>
+                                <div class="verifier-name">👤 ${escapeHtml(entry.name)}</div>
+                                ${entry.country ? `<div class="player-location">📍 ${escapeHtml(entry.country)}${entry.region ? ` - ${escapeHtml(entry.region)}` : ''}</div>` : ''}
+                            </div>
+                        </div>
                         <div class="verifier-stats">
                             <span class="stat-badge">🏆 ${entry.levelsVerified} niveau${entry.levelsVerified > 1 ? 'x' : ''} vérifié${entry.levelsVerified > 1 ? 's' : ''}</span>
                         </div>
@@ -131,8 +163,13 @@ async function renderCombinedLeaderboard() {
                         ${getMedalIcon(index)} #${index + 1}
                     </div>
                     <div class="both-info">
-                        <div class="both-name">👥 ${escapeHtml(entry.name)} <span class="badge-both">(Joueur & Vérif)</span></div>
-                        ${entry.country ? `<div class="player-location">📍 ${escapeHtml(entry.country)}${entry.region ? ` - ${escapeHtml(entry.region)}` : ''}</div>` : ''}
+                        <div style="display:flex; align-items:center; margin-bottom:8px;">
+                            ${avatarHtml}
+                            <div>
+                                <div class="both-name">👥 ${escapeHtml(entry.name)} <span class="badge-both">(Joueur & Vérif)</span></div>
+                                ${entry.country ? `<div class="player-location">📍 ${escapeHtml(entry.country)}${entry.region ? ` - ${escapeHtml(entry.region)}` : ''}</div>` : ''}
+                            </div>
+                        </div>
                         <div class="both-stats">
                             <span class="stat-badge">📊 ${entry.recordsCount} record${entry.recordsCount > 1 ? 's' : ''}</span>
                             <span class="stat-badge">🏆 ${entry.levelsVerified} niveau${entry.levelsVerified > 1 ? 'x' : ''} vérifié${entry.levelsVerified > 1 ? 's' : ''}</span>
