@@ -129,14 +129,60 @@ begin
     insert into public.profiles (id, username, country, avatar_url)
     values (v_user_id, p_username, p_country, p_avatar_url)
     on conflict (id) do update
-    set username = p_username,
-        country = p_country,
-        avatar_url = p_avatar_url
-    where id = v_user_id;
+    set username = excluded.username,
+        country = excluded.country,
+        avatar_url = excluded.avatar_url;
 end;
 $$;
 
 grant execute on function public.upsert_profile(text, text, text) to authenticated;
+
+-- RPC: Delete a clan (owner only)
+create or replace function public.delete_clan(clan_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    v_user_id uuid := auth.uid();
+begin
+    if v_user_id is null then
+        raise exception 'Must be authenticated to delete a clan';
+    end if;
+    
+    -- Check if user is the owner
+    if not exists (select 1 from public.clans where id = clan_id and owner_id = v_user_id) then
+        raise exception 'Only the clan owner can delete it';
+    end if;
+    
+    -- Delete the clan (will cascade to members and invites)
+    delete from public.clans where id = clan_id;
+end;
+$$;
+
+grant execute on function public.delete_clan(uuid) to authenticated;
+
+-- RPC: Leave a clan (user removes self from members)
+create or replace function public.leave_clan(clan_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    v_user_id uuid := auth.uid();
+begin
+    if v_user_id is null then
+        raise exception 'Must be authenticated to leave a clan';
+    end if;
+    
+    -- Remove user from clan members
+    delete from public.clan_members where clan_id = clan_id and user_id = v_user_id;
+end;
+$$;
+
+grant execute on function public.leave_clan(uuid) to authenticated;
 
 -- Cleanup expired invites: function + daily pg_cron schedule
 create or replace function public.cleanup_expired_clan_invites()

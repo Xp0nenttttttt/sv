@@ -64,6 +64,18 @@ async function loadClan(clanId) {
     } else {
         inviteCard.style.display = 'none';
     }
+
+    // Show action buttons (delete for owner, leave for members)
+    const actionsDiv = document.getElementById('clanActions');
+    if (currentSession && currentSession.user.id === data.owner_id) {
+        actionsDiv.innerHTML = '<button class="btn" id="deleteClanBtn" style="background:#ff6b6b;">🗑️ Supprimer le clan</button>';
+        document.getElementById('deleteClanBtn').onclick = () => deleteClan(clanId);
+    } else if (currentSession) {
+        actionsDiv.innerHTML = '<button class="btn" id="leaveClanBtn" style="background:#ff9800;">Quitter le clan</button>';
+        document.getElementById('leaveClanBtn').onclick = () => leaveClan(clanId);
+    } else {
+        actionsDiv.innerHTML = '';
+    }
 }
 
 async function loadProfile(userId) {
@@ -127,6 +139,29 @@ async function acceptInvite(token, clanId) {
     }
     showToast('Invitation acceptée. Vous avez rejoint le clan.', 'success');
 }
+
+async function deleteClan(clanId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce clan ? Cette action est irréversible.')) return;
+    const { error } = await clanClient.rpc('delete_clan', { clan_id: clanId });
+    if (error) {
+        showToast('Erreur: ' + error.message, 'error');
+        return;
+    }
+    showToast('Clan supprimé', 'success');
+    setTimeout(() => window.location.href = 'clans.html', 1500);
+}
+
+async function leaveClan(clanId) {
+    if (!confirm('Êtes-vous sûr de vouloir quitter ce clan ?')) return;
+    const { error } = await clanClient.rpc('leave_clan', { clan_id: clanId });
+    if (error) {
+        showToast('Erreur: ' + error.message, 'error');
+        return;
+    }
+    showToast('Vous avez quitté le clan', 'success');
+    setTimeout(() => window.location.href = 'clans.html', 1500);
+}
+
 
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
