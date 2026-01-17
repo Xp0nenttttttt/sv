@@ -32,6 +32,7 @@
 
                 // Initialiser le client d'authentification
                 submissionClient = window.supabaseClient;
+                window.submissionClient = submissionClient;
             } catch (err) {
                 console.error('❌ Erreur initialisation stockage:', err.message);
                 throw err;
@@ -39,14 +40,23 @@
         }
 
         async function checkUserSession() {
-            if (!submissionClient) {
+            // Attendre que submissionClient soit initialisé
+            let attempts = 0;
+            while (!window.submissionClient && attempts < 100) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                attempts++;
+            }
+
+            if (!window.submissionClient) {
+                console.error('❌ submissionClient non initialisé');
                 showLoginRequired();
                 return;
             }
 
-            const { data: { session } } = await submissionClient.auth.getSession();
+            const { data: { session } } = await window.submissionClient.auth.getSession();
 
             if (!session) {
+                console.log('❌ Pas de session utilisateur');
                 showLoginRequired();
             } else {
                 console.log('✅ Utilisateur connecté:', session.user.email);
@@ -220,9 +230,9 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('📝 Submission: DOMContentLoaded appelé');
 
-            // Attendre que le stockage soit initialisé
+            // Attendre que le stockage ET submissionClient soient initialisés
             let attempts = 0;
-            while (!universalStorage && attempts < 100) {
+            while ((!universalStorage || !window.submissionClient) && attempts < 100) {
                 await new Promise(resolve => setTimeout(resolve, 50));
                 attempts++;
             }
