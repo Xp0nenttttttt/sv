@@ -270,10 +270,18 @@ function renderLevels(filteredLevels) {
 
         let rankDisplay = '#' + level.rank;
         let containerClass = 'level-container';
+        let topParticles = '';
 
         if (level.rank === 1) {
             rankDisplay = '#' + level.rank;
             containerClass = 'top-1-container';
+            topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top1" width="160" height="160"></canvas>';
+        }
+        else if (level.rank === 2) {
+            topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top2" width="160" height="160"></canvas>';
+        }
+        else if (level.rank === 3) {
+            topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="160" height="160"></canvas>';
         }
 
         const badgeHTML = level.badge ? `<canvas class="badge-canvas level-badge" data-badge-type="${level.badge}" width="160" height="160"></canvas>` : '';
@@ -282,6 +290,7 @@ function renderLevels(filteredLevels) {
         levelCard.innerHTML = `
             <div class="${containerClass}">
                 <div class="image-wrapper">
+                    ${topParticles}
                     ${badgeHTML}
                     ${imageHTML}
                 </div>

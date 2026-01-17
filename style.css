@@ -683,3 +683,27 @@ footer {
         font-size: 0.9em;
     }
 }
+
+.image-wrapper {
+    position: relative;
+}
+
+.top-rank-canvas {
+    position: absolute;
+    inset: -10px;
+    width: 180px;
+    height: 180px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.level-header-image {
+    position: relative;
+}
+
+.level-header-image .top-rank-canvas {
+    inset: -20px;
+    width: 220px;
+    height: 220px;
+    z-index: 1;
+}

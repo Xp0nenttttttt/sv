@@ -298,6 +298,13 @@ class LevelDetailsManager {
     renderLevelDetails() {
         const container = document.getElementById('levelDetails');
         const difficultyIcon = this.getDifficultyIcon(this.level.difficulty);
+        const topParticles = this.level.rank === 1
+            ? '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top1" width="200" height="200"></canvas>'
+            : this.level.rank === 2
+                ? '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top2" width="200" height="200"></canvas>'
+                : this.level.rank === 3
+                    ? '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="200" height="200"></canvas>'
+                    : '';
 
         container.innerHTML = `
             <div class="level-header">
@@ -321,6 +328,7 @@ class LevelDetailsManager {
                 </div>
                 ${this.level.image ? `
                     <div class="level-header-image">
+                        ${topParticles}
                         <img src="${this.level.image}" alt="${this.level.name}">
                     </div>
                 ` : ''}

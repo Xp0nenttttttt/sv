@@ -18,6 +18,30 @@ class ParticleSystem {
 
     getConfig(type) {
         const configs = {
+            top1: {
+                count: 45,
+                color: ['#ffd700', '#fff4b0', '#ffeb66'],
+                size: { min: 3, max: 6 },
+                speed: { min: 0.35, max: 0.9 },
+                twinkle: true,
+                shape: 'star'
+            },
+            top2: {
+                count: 40,
+                color: ['#cfd8dc', '#b0bec5', '#eceff1'],
+                size: { min: 3, max: 6 },
+                speed: { min: 0.35, max: 0.9 },
+                twinkle: true,
+                shape: 'star'
+            },
+            top3: {
+                count: 38,
+                color: ['#d2a679', '#c48a5a', '#f2c094'],
+                size: { min: 3, max: 6 },
+                speed: { min: 0.35, max: 0.9 },
+                twinkle: true,
+                shape: 'star'
+            },
             featured: {
                 count: 30,
                 color: ['#FFD700', '#FFA500', '#FFED4E'],
@@ -168,7 +192,8 @@ class ParticleSystem {
 // Initialiser les particules pour tous les badges visibles
 function initBadgeParticles() {
     document.querySelectorAll('.badge-canvas').forEach(canvas => {
-        const type = canvas.dataset.badgeType;
+        const type = canvas.dataset.topRank;
+        // N'initialiser que pour les tops; le support badgeType reste possible si on ajoute data-top-rank plus tard
         if (type) {
             new ParticleSystem(canvas, type);
         }
