@@ -412,29 +412,9 @@ main {
     content: '';
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.35;
-    filter: blur(2px);
+    background: none;
+    opacity: 0;
     pointer-events: none;
-}
-
-.difficulty-bg-extreme::before {
-    background-image: url('image/mythic.gif');
-}
-
-.difficulty-bg-insane::before {
-    background-image: url('image/epic.gif');
-}
-
-.difficulty-bg-hard::before {
-    background-image: url('image/legendary.gif');
-}
-
-.difficulty-bg-medium::before,
-.difficulty-bg-easy::before {
-    background-image: none;
 }
 
 .difficulty-icon {
