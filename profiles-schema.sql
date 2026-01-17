@@ -200,6 +200,41 @@ before insert on public.clans
 for each row
 execute function public.prevent_multiple_clans();
 
+-- Admin users table
+create table if not exists public.admin_users (
+  id uuid primary key references auth.users on delete cascade,
+  created_at timestamp with time zone default now()
+);
+
+alter table public.admin_users enable row level security;
+create policy "Admin users are private" on public.admin_users for select using (false);
+
+-- RPC: Admin delete any clan
+create or replace function public.admin_delete_clan(clan_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+    v_user_id uuid := auth.uid();
+begin
+    if v_user_id is null then
+        raise exception 'Must be authenticated';
+    end if;
+    
+    -- Check if user is admin
+    if not exists (select 1 from public.admin_users where id = v_user_id) then
+        raise exception 'Admin access required';
+    end if;
+    
+    -- Delete the clan
+    delete from public.clans where id = clan_id;
+end;
+$$;
+
+grant execute on function public.admin_delete_clan(uuid) to authenticated;
+
 -- Cleanup expired invites: function + daily pg_cron schedule
 create or replace function public.cleanup_expired_clan_invites()
 returns void

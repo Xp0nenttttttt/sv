@@ -3,10 +3,24 @@ let clanClient = null;
 let currentSession = null;
 let currentClan = null;
 let profilesCache = {};
+let isAdmin = false;
 
 function getParam(name) {
     const params = new URLSearchParams(window.location.search);
     return params.get(name);
+}
+
+async function checkAdminStatus() {
+    if (!currentSession) {
+        isAdmin = false;
+        return;
+    }
+    const { data, error } = await clanClient
+        .from('admin_users')
+        .select('id')
+        .eq('id', currentSession.user.id)
+        .maybeSingle();
+    isAdmin = !!data && !error;
 }
 
 async function initClanPage() {
@@ -21,6 +35,7 @@ async function initClanPage() {
 
     const { data } = await clanClient.auth.getSession();
     currentSession = data.session || null;
+    await checkAdminStatus();
 
     const clanId = getParam('id');
     if (!clanId) {
@@ -65,9 +80,14 @@ async function loadClan(clanId) {
         inviteCard.style.display = 'none';
     }
 
-    // Show action buttons (delete for owner, leave for members)
+    // Show action buttons (delete for owner, leave for members, admin delete for admin)
     const actionsDiv = document.getElementById('clanActions');
-    if (currentSession && currentSession.user.id === data.owner_id) {
+
+    if (isAdmin) {
+        actionsDiv.innerHTML = '<h3>Actions Admin</h3><button class="btn btn-danger" id="adminDeleteClanBtn">🗑️ Supprimer ce clan (Admin)</button>';
+        actionsDiv.style.display = 'block';
+        document.getElementById('adminDeleteClanBtn').onclick = () => adminDeleteClan(clanId);
+    } else if (currentSession && currentSession.user.id === data.owner_id) {
         actionsDiv.innerHTML = '<h3>Actions</h3><button class="btn btn-danger" id="deleteClanBtn">🗑️ Supprimer le clan</button>';
         actionsDiv.style.display = 'block';
         document.getElementById('deleteClanBtn').onclick = () => deleteClan(clanId);
@@ -152,6 +172,18 @@ async function deleteClan(clanId) {
     showToast('Clan supprimé', 'success');
     setTimeout(() => window.location.href = 'clans.html', 1500);
 }
+
+async function adminDeleteClan(clanId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce clan ? Cette action est irréversible.')) return;
+    const { error } = await clanClient.rpc('admin_delete_clan', { clan_id: clanId });
+    if (error) {
+        showToast('Erreur: ' + error.message, 'error');
+        return;
+    }
+    showToast('Clan supprimé par admin', 'success');
+    setTimeout(() => window.location.href = 'clans.html', 1500);
+}
+
 
 async function leaveClan(clanId) {
     if (!confirm('Êtes-vous sûr de vouloir quitter ce clan ?')) return;
