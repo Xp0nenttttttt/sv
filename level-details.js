@@ -366,7 +366,12 @@ class LevelDetailsManager {
             <div class="level-info-grid">
                 <div class="info-card">
                     <div class="info-label">🎮 ID du niveau</div>
-                    <div class="info-value">${this.level.id}</div>
+                    <div class="info-value" style="display: flex; align-items: center; gap: 10px;">
+                        <span id="levelIdValue">${this.level.id}</span>
+                        <button onclick="levelDetailsManager.copyLevelId()" class="btn-copy" title="Copier l'ID">
+                            📋
+                        </button>
+                    </div>
                 </div>
                 <div class="info-card">
                     <div class="info-label">👤 Créateur</div>
@@ -601,6 +606,21 @@ class LevelDetailsManager {
             vitesse: '⚡'
         };
         return emojis[tag] || '🏷️';
+    }
+    // Copier l'ID du niveau dans le presse-papiers
+    copyLevelId() {
+        const levelId = this.level.id;
+        navigator.clipboard.writeText(levelId).then(() => {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 1500);
+        }).catch(err => {
+            console.error('Erreur copie ID:', err);
+            alert('ID: ' + levelId);
+        });
     }
 }
 
