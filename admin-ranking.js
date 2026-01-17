@@ -93,7 +93,7 @@ class RankingManager {
     updateBadge(levelId, badgeType, isSubmission = false) {
         const level = this.levels.find(l => l.id === levelId);
         if (level) {
-            level.badge = badgeType; // null, 'featured', 'epic', ou 'mythic'
+            level.badge = badgeType; // null, 'epic', 'legendary', ou 'mythic'
 
             if (isSubmission && level.originalData) {
                 const manager = new SubmissionManager();
@@ -246,8 +246,8 @@ function createRankingCard(level) {
                     onchange="updateRankingValue(${level.id}, 'badge', this.value, ${level.isSubmission ? 'true' : 'false'})"
                 >
                     <option value="" ${!level.badge ? 'selected' : ''}>Aucun</option>
-                    <option value="featured" ${level.badge === 'featured' ? 'selected' : ''}>⭐ Featured</option>
                     <option value="epic" ${level.badge === 'epic' ? 'selected' : ''}>✦ Epic</option>
+                    <option value="legendary" ${level.badge === 'legendary' ? 'selected' : ''}>⭐ Legendary</option>
                     <option value="mythic" ${level.badge === 'mythic' ? 'selected' : ''}>🔥 Mythic</option>
                 </select>
             </div>
