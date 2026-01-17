@@ -22,6 +22,7 @@ async function initSupabase() {
         }
 
         supabaseClient = supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.KEY);
+        window.supabaseClient = supabaseClient;
         console.log('✅ Supabase client initialisé');
         return supabaseClient;
     } catch (error) {
