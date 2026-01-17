@@ -37,3 +37,88 @@ function animate() {
     requestAnimationFrame(animate);
 }
 animate();
+document.addEventListener("DOMContentLoaded", () => {
+    const canvas = document.getElementById("particles");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    let w, h;
+
+    const mouse = {
+        x: null,
+        y: null,
+        radius: 120
+    };
+
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    window.addEventListener("mousemove", e => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+
+    window.addEventListener("mouseleave", () => {
+        mouse.x = null;
+        mouse.y = null;
+    });
+
+    const particles = [];
+    const COUNT = 90;
+
+    for (let i = 0; i < COUNT; i++) {
+        particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 2 + 1,
+            baseR: Math.random() * 2 + 1,
+            dx: (Math.random() - 0.5) * 0.6,
+            dy: (Math.random() - 0.5) * 0.6,
+            hue: Math.random() * 360
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, w, h);
+
+        particles.forEach(p => {
+            p.x += p.dx;
+            p.y += p.dy;
+
+            // rebond écran
+            if (p.x < 0 || p.x > w) p.dx *= -1;
+            if (p.y < 0 || p.y > h) p.dy *= -1;
+
+            // interaction souris
+            if (mouse.x && mouse.y) {
+                const dx = mouse.x - p.x;
+                const dy = mouse.y - p.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < mouse.radius) {
+                    const force = (mouse.radius - dist) / mouse.radius;
+                    p.x -= dx * force * 0.03;
+                    p.y -= dy * force * 0.03;
+                    p.r = p.baseR + 2;
+                } else {
+                    p.r = p.baseR;
+                }
+            }
+
+            p.hue += 0.3;
+
+            ctx.beginPath();
+            ctx.fillStyle = `hsla(${p.hue}, 100%, 70%, 0.8)`;
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+});
