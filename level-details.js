@@ -435,10 +435,6 @@ class LevelDetailsManager {
                     <h3>Soumettre un nouveau record</h3>
                     <p class="form-info">Votre soumission sera vérifiée par un administrateur avant d'être ajoutée.</p>
                     <form id="addRecordForm">
-                        <div class="form-group">
-                            <label for="playerName">Joueur *</label>
-                            <input type="text" id="playerName" placeholder="Nom du joueur" required>
-                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="playerCountryRecord">Pays *</label>
@@ -532,7 +528,7 @@ class LevelDetailsManager {
         const successMsg = document.getElementById('recordSuccessMsg');
         const errorMsg = document.getElementById('recordErrorMsg');
 
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const { data: { session } } = await window.supabaseClient.auth.getSession();
@@ -543,13 +539,27 @@ class LevelDetailsManager {
                 return;
             }
 
+            // Récupérer le username du profil utilisateur
+            const { data: profile } = await window.supabaseClient
+                .from('profiles')
+                .select('username')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            if (!profile || !profile.username) {
+                errorMsg.textContent = '❌ Erreur : Votre profil utilisateur n\'a pas de username. Veuillez le configurer.';
+                errorMsg.classList.remove('hidden');
+                successMsg.classList.add('hidden');
+                return;
+            }
+
             const recordData = {
-                player: document.getElementById('playerName').value.trim(),
+                player: profile.username,
                 playerCountry: document.getElementById('playerCountryRecord').value,
                 playerRegion: document.getElementById('playerRegionRecord').value.trim(),
-                percentage: parseInt(document.getElementById('percentage').value),
+                percentage: parseInt(document.getElementById('recordPercentage').value),
                 videoLink: document.getElementById('videoLink').value.trim(),
-                device: document.getElementById('device').value,
+                device: document.getElementById('deviceType').value,
                 submittedBy: session.user.id,
                 submitterEmail: session.user.email
             };

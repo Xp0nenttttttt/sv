@@ -30,6 +30,18 @@ async function handleSubmit(event) {
         return;
     }
 
+    // Récupérer le username du profil utilisateur
+    const { data: profile } = await window.supabaseClient
+        .from('profiles')
+        .select('username')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+    if (!profile || !profile.username) {
+        alert('Erreur : Votre profil utilisateur n\'a pas de username. Veuillez le configurer.');
+        return;
+    }
+
     const formData = new FormData(document.getElementById('submissionForm'));
 
     // Récupérer les tags sélectionnés
@@ -50,7 +62,7 @@ async function handleSubmit(event) {
         levelId: formData.get('levelId'),
         levelName: formData.get('levelName'),
         creatorName: formData.get('creatorName'),
-        authorName: formData.get('authorName'),
+        authorName: profile.username,
         playerCountry: formData.get('playerCountry'),
         playerRegion: formData.get('playerRegion') || '',
         length: formData.get('length'),
