@@ -122,15 +122,41 @@ async function loadClanRanking() {
                 totalPoints += points;
             });
 
-            console.log(`Clan ${clan.name} points:`, { levelPointsMap, totalPoints });
+            console.log(`Clan ${clan.name} points records:`, { levelPointsMap, totalPoints });
 
             // Compter les niveaux uniques complétés
             const completedLevels = Object.keys(levelPointsMap).length;
 
-            // Compter les niveaux soumis et acceptés
+            // Compter les niveaux soumis et acceptés + ajouter leurs points
             const clanLevels = allLevels.filter(l =>
                 l.status === 'accepted' && memberUsernames.includes(l.authorName)
             );
+
+            // Ajouter les points des niveaux vérifiés (soumis)
+            const verifiedLevelPointsMap = {};
+            clanLevels.forEach(level => {
+                if (!verifiedLevelPointsMap[level.id]) {
+                    let points = 0;
+                    if (level.approvedRank) {
+                        const rank = level.approvedRank;
+                        if (rank === 1) points = 150;
+                        else if (rank <= 10) points = 150 - (rank - 1) * 5;
+                        else if (rank <= 50) points = 100 - (rank - 10) * 2;
+                        else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
+                        else points = 10;
+                    }
+                    verifiedLevelPointsMap[level.id] = points;
+                }
+            });
+
+            let verifiedLevelPoints = 0;
+            Object.values(verifiedLevelPointsMap).forEach(points => {
+                verifiedLevelPoints += points;
+            });
+
+            totalPoints += verifiedLevelPoints;
+
+            console.log(`Clan ${clan.name} points verified:`, { verifiedLevelPointsMap, verifiedLevelPoints, totalPoints });
 
             clanStats.push({
                 id: clan.id,
