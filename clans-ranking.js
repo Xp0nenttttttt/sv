@@ -85,18 +85,26 @@ async function loadClanRanking() {
 
             const memberUsernames = profiles ? profiles.map(p => p.username) : [];
 
-            // Compter les points (records acceptés)
+            // Compter les points (records acceptés, sans doublons par niveau)
             const clanRecords = allRecords.filter(r =>
                 r.status === 'accepted' && memberUsernames.includes(r.player)
             );
 
-            let totalPoints = 0;
+            // Grouper par levelId et compter les points une seule fois par niveau
+            const levelPointsMap = {};
             clanRecords.forEach(record => {
-                totalPoints += record.points || 0;
+                if (!levelPointsMap[record.levelId]) {
+                    levelPointsMap[record.levelId] = record.points || 0;
+                }
+            });
+
+            let totalPoints = 0;
+            Object.values(levelPointsMap).forEach(points => {
+                totalPoints += points;
             });
 
             // Compter les niveaux uniques complétés
-            const completedLevels = new Set(clanRecords.map(r => r.levelId)).size;
+            const completedLevels = Object.keys(levelPointsMap).length;
 
             // Compter les niveaux soumis et acceptés
             const clanLevels = allLevels.filter(l =>
