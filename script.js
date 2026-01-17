@@ -248,6 +248,17 @@ function getDifficultyIcon(difficulty) {
     };
 }
 
+function getBadgeGif(badge) {
+    if (!badge) return null;
+    const mapping = {
+        mythic: { src: 'image/mythic.gif', alt: 'Mythic Badge' },
+        legendary: { src: 'image/legendary.gif', alt: 'Legendary Badge' },
+        epic: { src: 'image/epic.gif', alt: 'Epic Badge' },
+        featured: { src: 'image/epic.gif', alt: 'Featured Badge' }
+    };
+    return mapping[badge] || null;
+}
+
 // Fonction pour afficher les niveaux
 function renderLevels(filteredLevels) {
     levelsList.innerHTML = '';
@@ -284,7 +295,8 @@ function renderLevels(filteredLevels) {
             topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="160" height="160"></canvas>';
         }
 
-        const badgeHTML = level.badge ? `<canvas class="badge-canvas level-badge" data-badge-type="${level.badge}" width="160" height="160"></canvas>` : '';
+        const badge = getBadgeGif(level.badge);
+        const badgeHTML = badge ? `<img class="badge-gif" src="${badge.src}" alt="${badge.alt}">` : '';
         const difficultyIcon = getDifficultyIcon(level.difficulty);
 
         levelCard.innerHTML = `

@@ -294,6 +294,17 @@ class LevelDetailsManager {
         };
     }
 
+    getBadgeGif(badge) {
+        if (!badge) return null;
+        const mapping = {
+            mythic: { src: 'image/mythic.gif', alt: 'Mythic Badge' },
+            legendary: { src: 'image/legendary.gif', alt: 'Legendary Badge' },
+            epic: { src: 'image/epic.gif', alt: 'Epic Badge' },
+            featured: { src: 'image/epic.gif', alt: 'Featured Badge' }
+        };
+        return mapping[badge] || null;
+    }
+
     // Afficher les détails du niveau
     renderLevelDetails() {
         const container = document.getElementById('levelDetails');
@@ -305,6 +316,7 @@ class LevelDetailsManager {
                 : this.level.rank === 3
                     ? '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="200" height="200"></canvas>'
                     : '';
+        const badge = this.getBadgeGif(this.level.badge);
 
         container.innerHTML = `
             <div class="level-header">
@@ -329,6 +341,7 @@ class LevelDetailsManager {
                 ${this.level.image ? `
                     <div class="level-header-image">
                         ${topParticles}
+                        ${badge ? `<img class="badge-gif" src="${badge.src}" alt="${badge.alt}">` : ''}
                         <img src="${this.level.image}" alt="${this.level.name}">
                     </div>
                 ` : ''}
