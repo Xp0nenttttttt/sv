@@ -77,7 +77,8 @@ async function loadAllLevels() {
 
     // 1) Supabase via universalStorage (cache ou fetch)
     if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
-        const acceptedSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+        const allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+        const acceptedSubmissions = allSubmissions.filter(s => s.status === 'accepted');
 
         if (acceptedSubmissions.length > 0) {
             const submittedLevels = acceptedSubmissions.map((submission) => {
@@ -106,7 +107,7 @@ async function loadAllLevels() {
 
     // 2) JSON data (fallback multi-PC hors Supabase)
     if (typeof dataSyncManager !== 'undefined') {
-        const acceptedSubmissions = await dataSyncManager.loadLevels();
+        const acceptedSubmissions = (await dataSyncManager.loadLevels()).filter(s => s.status === 'accepted');
 
         const submittedLevels = acceptedSubmissions.map((submission) => {
             const rank = submission.approvedRank || (levels.length + 100);
