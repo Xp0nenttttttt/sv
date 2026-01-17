@@ -94,7 +94,8 @@ async function loadClanRanking() {
                 memberUsernames,
                 totalRecords: allRecords.length,
                 clanRecordsCount: clanRecords.length,
-                sampleRecord: clanRecords[0]
+                sampleRecord: clanRecords[0],
+                recordKeys: clanRecords[0] ? Object.keys(clanRecords[0]) : 'no record'
             });
 
             // Grouper par levelId et compter les points une seule fois par niveau
