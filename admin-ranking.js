@@ -314,6 +314,10 @@ function createRankingCard(level) {
                     <input type="checkbox" value="vitesse" ${level.tags && level.tags.includes('vitesse') ? 'checked' : ''} onchange="updateTags(${level.id}, ${level.isSubmission ? 'true' : 'false'})">
                     <span class="tag-preview vitesse">⚡ vitesse</span>
                 </label>
+                <label class="tag-checkbox">
+                    <input type="checkbox" value="nong" ${level.tags && level.tags.includes('nong') ? 'checked' : ''} onchange="updateTags(${level.id}, ${level.isSubmission ? 'true' : 'false'})">
+                    <span class="tag-preview nong">🎵 nong</span>
+                </label>
             </div>
         </div>
 
