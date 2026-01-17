@@ -196,7 +196,7 @@ class LeaderboardManager {
             }
 
             // Trouver le niveau
-            const level = allSubmissions.find(s => s.id === record.levelId);
+            const level = allSubmissions.find(s => String(s.id) === String(record.levelId));
 
             if (level) {
                 const points = this.calculateLevelPoints(level.approvedRank);
@@ -211,6 +211,11 @@ class LeaderboardManager {
                     points: points,
                     device: record.device,
                     rank: level.approvedRank
+                });
+            } else {
+                console.warn(`Niveau introuvable pour record: levelId=${record.levelId}, player=${player}`, {
+                    record,
+                    availableLevels: allSubmissions.map(s => ({ id: s.id, name: s.levelName }))
                 });
             }
         });
