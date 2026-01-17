@@ -114,6 +114,13 @@ async function saveProfile() {
         avatar_url = urlData.publicUrl;
     }
 
+    // Use secure RPC to upsert profile (handles creation/update server-side)
+    const { error } = await accountClient.rpc('upsert_profile', {
+        p_username: username,
+        p_country: country,
+        p_avatar_url: avatar_url
+    });
+
     if (error) {
         showToast('Erreur: ' + error.message, 'error');
         return;
