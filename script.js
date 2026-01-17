@@ -244,10 +244,15 @@ function getDifficultyIcon(difficulty, badge) {
     }[key] || 'easy.webp';
 
     let file = filename;
-    if ((badge || '').toLowerCase() === 'mythic') {
+    const badgeLower = (badge || '').toLowerCase();
+    if (badgeLower === 'mythic') {
         const parts = filename.split('.');
         parts.pop(); // Remove extension
         file = parts.join('.') + '_mythic.png'; // Force .png for mythic variants
+    } else if (badgeLower === 'legendary') {
+        const parts = filename.split('.');
+        parts.pop(); // Remove extension
+        file = parts.join('.') + '_legendary.png'; // Force .png for legendary variants
     }
 
     return {
