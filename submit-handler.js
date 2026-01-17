@@ -26,6 +26,7 @@ function handleSubmit(event) {
 
     // Créer l'objet de données
     const submissionData = {
+        levelId: formData.get('levelId'),
         levelName: formData.get('levelName'),
         creatorName: formData.get('creatorName'),
         authorName: formData.get('authorName'),
