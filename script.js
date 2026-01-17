@@ -574,3 +574,120 @@ async function loadTopClan() {
 if (document.getElementById('topClanCard')) {
     loadTopClan();
 }
+
+// Charger le meilleur joueur
+async function loadTopPlayer() {
+    console.log('⭐ Chargement du meilleur joueur...');
+    try {
+        // Attendre que supabaseClient soit disponible
+        let attempts = 0;
+        while (typeof supabaseClient === 'undefined' && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        if (typeof supabaseClient === 'undefined') {
+            console.log('❌ supabaseClient non disponible');
+            return;
+        }
+
+        // Initialiser le stockage
+        if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
+            await initializeSupabaseStorage();
+        }
+
+        // Attendre universalStorage
+        let storageAttempts = 0;
+        while (!universalStorage && storageAttempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            storageAttempts++;
+        }
+
+        if (!universalStorage) {
+            console.log('❌ universalStorage non disponible');
+            return;
+        }
+
+        console.log('✅ Chargement des données du leaderboard...');
+
+        const allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+        const allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
+
+        // Calculer les stats des joueurs
+        const playerStats = {};
+
+        // Records complétés
+        allRecords.filter(r => r.status === 'accepted').forEach(record => {
+            if (!playerStats[record.player]) {
+                playerStats[record.player] = { name: record.player, points: 0, levels: new Set(), records: 0 };
+            }
+
+            const level = allLevels.find(l => String(l.id) === String(record.levelId));
+            if (level && level.approvedRank && !playerStats[record.player].levels.has(record.levelId)) {
+                const rank = level.approvedRank;
+                let points = 0;
+                if (rank === 1) points = 150;
+                else if (rank <= 10) points = 150 - (rank - 1) * 5;
+                else if (rank <= 50) points = 100 - (rank - 10) * 2;
+                else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
+                else points = 10;
+
+                playerStats[record.player].points += points;
+                playerStats[record.player].levels.add(record.levelId);
+            }
+            playerStats[record.player].records++;
+        });
+
+        // Niveaux vérifiés
+        allLevels.filter(l => l.status === 'accepted').forEach(level => {
+            if (!playerStats[level.authorName]) {
+                playerStats[level.authorName] = { name: level.authorName, points: 0, levels: new Set(), records: 0 };
+            }
+
+            if (level.approvedRank) {
+                const rank = level.approvedRank;
+                let points = 0;
+                if (rank === 1) points = 150;
+                else if (rank <= 10) points = 150 - (rank - 1) * 5;
+                else if (rank <= 50) points = 100 - (rank - 10) * 2;
+                else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
+                else points = 10;
+
+                playerStats[level.authorName].points += points;
+            }
+        });
+
+        // Trouver le meilleur joueur
+        let topPlayer = null;
+        let maxPoints = 0;
+
+        Object.values(playerStats).forEach(player => {
+            if (player.points > maxPoints) {
+                maxPoints = player.points;
+                topPlayer = player;
+            }
+        });
+
+        if (topPlayer) {
+            console.log('🏆 Meilleur joueur trouvé:', topPlayer);
+            document.getElementById('topPlayerCard').style.display = 'block';
+            document.getElementById('topPlayerName').textContent = topPlayer.name;
+            document.getElementById('topPlayerStats').innerHTML = `
+                <span>🔥 Points : <strong>${topPlayer.points}</strong></span>
+                <span>🎯 Niveaux : <strong>${topPlayer.levels.size}</strong></span>
+                <span>🏆 Records : <strong>${topPlayer.records}</strong></span>
+            `;
+            document.getElementById('topPlayerCard').onclick = () => window.location.href = 'leaderboard.html';
+            document.getElementById('topPlayerCard').style.cursor = 'pointer';
+        } else {
+            console.log('❌ Aucun joueur trouvé avec des points');
+        }
+    } catch (error) {
+        console.error('Erreur chargement meilleur joueur:', error);
+    }
+}
+
+// Charger le meilleur joueur au démarrage
+if (document.getElementById('topPlayerCard')) {
+    loadTopPlayer();
+}

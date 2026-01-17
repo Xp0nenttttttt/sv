@@ -91,3 +91,16 @@ async function enableSupabaseStorage() {
     }
 }
 
+// Initialiser Supabase automatiquement au chargement
+if (typeof window !== 'undefined') {
+    // Attendre que la lib Supabase soit chargée
+    if (typeof supabase !== 'undefined') {
+        initSupabase();
+    } else {
+        window.addEventListener('load', () => {
+            if (typeof supabase !== 'undefined') {
+                initSupabase();
+            }
+        });
+    }
+}
