@@ -10,12 +10,12 @@ async function handleSubmit(event) {
     event.preventDefault();
 
     // Vérifier que l'utilisateur est connecté
-    if (!window.submissionClient) {
+    if (!window.supabaseClient) {
         alert('Client Supabase non initialisé');
         return;
     }
 
-    const { data: { session } } = await window.submissionClient.auth.getSession();
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
 
     if (!session) {
         alert('Vous devez être connecté pour soumettre un niveau.');
