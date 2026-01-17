@@ -120,7 +120,8 @@ as $$
 $$;
 
 -- Note: pg_cron is available in Supabase by default.
--- If needed, enable: CREATE EXTENSION IF NOT EXISTS pg_cron;
+-- Enable pg_cron if not already installed
+create extension if not exists pg_cron;
 -- Schedule daily cleanup at 03:00 UTC
 select cron.schedule(
   'cleanup_expired_clan_invites_daily',
