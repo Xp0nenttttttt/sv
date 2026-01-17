@@ -132,7 +132,28 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: fixed;
+            display: table !important;
+            table-layout: auto;
+        }
+
+        .ranking-table thead,
+        .ranking-table tbody,
+        .ranking-table th,
+        .ranking-table td,
+        .ranking-table tr {
+            display: table-cell !important;
+        }
+
+        .ranking-table thead {
+            display: table-header-group !important;
+        }
+
+        .ranking-table tbody {
+            display: table-row-group !important;
+        }
+
+        .ranking-table tr {
+            display: table-row !important;
         }
 
         .ranking-table th {
@@ -142,12 +163,14 @@
             font-weight: 600;
             border-bottom: 2px solid #667eea;
             word-wrap: break-word;
+            display: table-cell !important;
         }
 
         .ranking-table td {
             padding: 12px;
             border-bottom: 1px solid #2b3240;
             word-wrap: break-word;
+            display: table-cell !important;
         }
 
         .ranking-table tr:hover {
