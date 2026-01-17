@@ -8,6 +8,21 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="mobile-optimized.css">
+    <style>
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
 </head>
 <!-- Charger les adaptateurs de stockage (localStorage uniquement) -->
 <script src="storage-adapter.js"></script>
@@ -39,6 +54,29 @@
 
     <main>
         <div class="container">
+            <!-- Meilleur Clan -->
+            <div id="topClanCard" style="display: none; margin-bottom: 24px;">
+                <div
+                    style="position: relative; padding: 24px 28px; border-radius: 20px; background: linear-gradient(135deg, #ff0080, #7928ca, #2afadf); background-size: 300% 300%; animation: gradientMove 8s ease infinite; box-shadow: 0 0 40px rgba(255, 0, 128, 0.4), 0 0 80px rgba(42, 250, 223, 0.25); overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -18px; right: -18px; background: #ffd700; color: #000; font-size: 32px; font-weight: 900; width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);">
+                        #1</div>
+                    <div style="position: relative; z-index: 2;">
+                        <h3
+                            style="text-transform: uppercase; font-size: 12px; letter-spacing: 2px; opacity: 0.85; margin-bottom: 6px;">
+                            🛡️ Meilleur Clan</h3>
+                        <div id="topClanName"
+                            style="font-size: 28px; font-weight: 800; text-shadow: 0 0 20px rgba(255, 255, 255, 0.6); margin-bottom: 12px;">
+                            [TAG] Nom du Clan</div>
+                        <div id="topClanStats" style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 14px;">
+                            <span>🔥 Points : <strong>0</strong></span>
+                            <span>👥 Membres : <strong>0</strong></span>
+                            <span>🏆 Records : <strong>0</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Filtres -->
             <div class="filters">
                 <div class="filter-group">

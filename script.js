@@ -436,3 +436,125 @@ window.addEventListener('storage', async function (e) {
         filterLevels();
     }
 });
+
+// Charger le meilleur clan
+async function loadTopClan() {
+    try {
+        // Attendre que supabaseClient soit disponible
+        let attempts = 0;
+        while (typeof supabaseClient === 'undefined' && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        if (typeof supabaseClient === 'undefined') return;
+
+        // Initialiser le stockage
+        if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
+            await initializeSupabaseStorage();
+        }
+
+        // Attendre universalStorage
+        let storageAttempts = 0;
+        while (!universalStorage && storageAttempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            storageAttempts++;
+        }
+
+        if (!universalStorage) return;
+
+        // Récupérer tous les clans
+        const { data: clans } = await supabaseClient.from('clans').select('*');
+        if (!clans || clans.length === 0) return;
+
+        const allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+        const allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
+
+        // Calculer les stats
+        let topClan = null;
+        let maxPoints = 0;
+
+        for (const clan of clans) {
+            const { data: members } = await supabaseClient
+                .from('clan_members')
+                .select('user_id')
+                .eq('clan_id', clan.id);
+
+            if (!members || members.length === 0) continue;
+
+            const memberIds = members.map(m => m.user_id);
+            const { data: profiles } = await supabaseClient
+                .from('profiles')
+                .select('id, username')
+                .in('id', memberIds);
+
+            const memberUsernames = profiles ? profiles.map(p => p.username) : [];
+            const clanRecords = allRecords.filter(r => r.status === 'accepted' && memberUsernames.includes(r.player));
+
+            const levelPointsMap = {};
+            clanRecords.forEach(record => {
+                if (!levelPointsMap[record.levelId]) {
+                    const level = allLevels.find(l => String(l.id) === String(record.levelId));
+                    let points = 0;
+                    if (level && level.approvedRank) {
+                        const rank = level.approvedRank;
+                        if (rank === 1) points = 150;
+                        else if (rank <= 10) points = 150 - (rank - 1) * 5;
+                        else if (rank <= 50) points = 100 - (rank - 10) * 2;
+                        else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
+                        else points = 10;
+                    }
+                    levelPointsMap[record.levelId] = points;
+                }
+            });
+
+            let totalPoints = 0;
+            Object.values(levelPointsMap).forEach(points => totalPoints += points);
+
+            const clanLevels = allLevels.filter(l => l.status === 'accepted' && memberUsernames.includes(l.authorName));
+            clanLevels.forEach(level => {
+                if (level.approvedRank) {
+                    const rank = level.approvedRank;
+                    let points = 0;
+                    if (rank === 1) points = 150;
+                    else if (rank <= 10) points = 150 - (rank - 1) * 5;
+                    else if (rank <= 50) points = 100 - (rank - 10) * 2;
+                    else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
+                    else points = 10;
+                    totalPoints += points;
+                }
+            });
+
+            if (totalPoints > maxPoints) {
+                maxPoints = totalPoints;
+                topClan = {
+                    name: clan.name,
+                    tag: clan.tag,
+                    points: totalPoints,
+                    members: memberUsernames.length,
+                    records: clanRecords.length,
+                    id: clan.id
+                };
+            }
+        }
+
+        if (topClan) {
+            document.getElementById('topClanCard').style.display = 'block';
+            document.getElementById('topClanName').textContent = `${topClan.tag ? `[${topClan.tag}] ` : ''}${topClan.name}`;
+            document.getElementById('topClanStats').innerHTML = `
+                <span>🔥 Points : <strong>${topClan.points}</strong></span>
+                <span>👥 Membres : <strong>${topClan.members}</strong></span>
+                <span>🏆 Records : <strong>${topClan.records}</strong></span>
+            `;
+            document.getElementById('topClanCard').onclick = () => window.location.href = `clan.html?id=${topClan.id}`;
+            document.getElementById('topClanCard').style.cursor = 'pointer';
+        }
+    } catch (error) {
+        console.error('Erreur chargement meilleur clan:', error);
+    }
+}
+
+// Charger le meilleur clan au démarrage
+if (document.getElementById('topClanCard')) {
+    loadTopClan();
+}
