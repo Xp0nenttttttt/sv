@@ -236,12 +236,16 @@ async function loadClanLevels(clanId) {
 
     console.log('👥 Membres du clan:', memberIds);
     console.log('📋 Profils chargés:', profilesMap);
+    console.log('🔧 universalStorage disponible?', typeof universalStorage !== 'undefined');
 
     // Charger les records acceptés via universalStorage
     let allRecords = [];
     if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
         const rawRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
-        console.log('📦 Total records bruts:', rawRecords.length, rawRecords.map(r => ({ player: r.player, status: r.status })));
+        console.log('📦 Total records bruts:', rawRecords.length);
+        if (rawRecords.length > 0) {
+            console.log('Exemples de records:', rawRecords.slice(0, 3).map(r => ({ player: r.player, status: r.status, level: r.levelId })));
+        }
         allRecords = rawRecords.filter(r => r.status === 'accepted');
     }
 
@@ -251,7 +255,10 @@ async function loadClanLevels(clanId) {
     let allLevels = [];
     if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
         const rawLevels = await universalStorage.getData('svChallengeSubmissions') || [];
-        console.log('📦 Total niveaux bruts:', rawLevels.length, rawLevels.map(l => ({ name: l.levelName, status: l.status })));
+        console.log('📦 Total niveaux bruts:', rawLevels.length);
+        if (rawLevels.length > 0) {
+            console.log('Exemples de niveaux:', rawLevels.slice(0, 3).map(l => ({ name: l.levelName, status: l.status })));
+        }
         allLevels = rawLevels.filter(l => l.status === 'accepted');
     }
 
