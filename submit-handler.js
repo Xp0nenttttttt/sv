@@ -9,9 +9,16 @@ document.addEventListener('DOMContentLoaded', () => {
 async function handleSubmit(event) {
     event.preventDefault();
 
+    // Attendre que supabaseClient soit initialisé
+    let attempts = 0;
+    while (!window.supabaseClient && attempts < 100) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        attempts++;
+    }
+
     // Vérifier que l'utilisateur est connecté
     if (!window.supabaseClient) {
-        alert('Client Supabase non initialisé');
+        alert('Client Supabase non initialisé. Veuillez recharger la page.');
         return;
     }
 
