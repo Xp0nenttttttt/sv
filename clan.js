@@ -209,6 +209,11 @@ async function loadClanLevels(clanId) {
     const levelsList = document.getElementById('levelsList');
     levelsList.innerHTML = '<p class="muted">Chargement...</p>';
 
+    // Initialiser le stockage si nécessaire
+    if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
+        await initializeSupabaseStorage();
+    }
+
     // Attendre que universalStorage soit initialisé
     let attempts = 0;
     while (!universalStorage && attempts < 50) {
