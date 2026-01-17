@@ -102,35 +102,14 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fill();
         });
-        const card = document.getElementById("topClanCard");
-        card.classList.add("top-victory");
 
-        const rect = card.getBoundingClientRect();
-        victoryExplosion(
-            rect.left + rect.width / 2,
-            rect.top + rect.height / 2
-        );
 
 
         requestAnimationFrame(animate);
+
+
+        animate();
+
+
     }
-
-    animate();
-});
-
-
-function victoryExplosion(x, y) {
-    const count = 40;
-    for (let i = 0; i < count; i++) {
-        particles.push({
-            x,
-            y,
-            r: Math.random() * 3 + 2,
-            baseR: Math.random() * 2 + 1,
-            dx: (Math.random() - 0.5) * 6,
-            dy: (Math.random() - 0.5) * 6,
-            hue: Math.random() * 360,
-            life: 60
-        });
-    }
-}
+})
