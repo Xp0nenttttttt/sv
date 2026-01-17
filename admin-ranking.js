@@ -1,6 +1,20 @@
 // Admin Ranking Manager
 const ADMIN_PASSWORD = 'SV2026';
 
+// Normalise une difficulté vers les paliers Demon canoniques
+function normalizeDifficulty(rawDifficulty) {
+    const normalized = (rawDifficulty || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+    if (normalized.includes('extreme')) return 'Extreme Demon';
+    if (normalized.includes('tres difficile') || normalized.includes('très difficile') || normalized.includes('insane')) return 'Insane Demon';
+    if (normalized.includes('difficile') || normalized.includes('hard')) return 'Hard Demon';
+    if (normalized.includes('moyen') || normalized.includes('medium')) return 'Medium Demon';
+    return 'Easy Demon';
+}
+
 class RankingManager {
     constructor() {
         this.levels = [];
@@ -13,20 +27,26 @@ class RankingManager {
         const allSubmissions = await manager.getSubmissions();
         const acceptedSubmissions = allSubmissions
             .filter(s => s.status === 'accepted')
-            .map(s => ({
-                id: s.id,
-                name: s.levelName,
-                creator: s.creatorName,
-                author: s.authorName,
-                difficulty: s.approvedDifficulty || 'Moyen',
-                length: s.length,
-                rank: s.approvedRank || 999,
-                image: s.imageBase64 || s.image,
-                tags: s.tags || [],
-                badge: s.badge || null,
-                isSubmission: true,
-                originalData: s
-            }));
+            .map(s => {
+                const normalizedDifficulty = normalizeDifficulty(s.approvedDifficulty);
+                return {
+                    id: s.id,
+                    name: s.levelName,
+                    creator: s.creatorName,
+                    author: s.authorName,
+                    difficulty: normalizedDifficulty,
+                    length: s.length,
+                    rank: s.approvedRank || 999,
+                    image: s.imageBase64 || s.image,
+                    tags: s.tags || [],
+                    badge: s.badge || null,
+                    isSubmission: true,
+                    originalData: {
+                        ...s,
+                        approvedDifficulty: normalizedDifficulty
+                    }
+                };
+            });
 
         // Trier par rang
         this.levels = acceptedSubmissions.sort((a, b) => a.rank - b.rank);
@@ -39,7 +59,7 @@ class RankingManager {
 
             if (isSubmission && level.originalData) {
                 const manager = new SubmissionManager();
-                manager.updateSubmissionStatus(levelId, 'accepted', newRank, level.originalData.approvedDifficulty)
+                manager.updateSubmissionStatus(levelId, 'accepted', newRank, level.difficulty)
                     .catch(err => console.error('Erreur updateSubmissionStatus:', err));
             }
 
@@ -63,6 +83,7 @@ class RankingManager {
 
             if (isSubmission && level.originalData) {
                 const manager = new SubmissionManager();
+                level.originalData.approvedDifficulty = newDifficulty;
                 manager.updateSubmissionStatus(levelId, 'accepted', level.rank, newDifficulty)
                     .catch(err => console.error('Erreur updateSubmissionStatus:', err));
             }
@@ -210,12 +231,11 @@ function createRankingCard(level) {
                     class="difficulty-select"
                     onchange="updateRankingValue(${level.id}, 'difficulty', this.value, ${level.isSubmission ? 'true' : 'false'}); updateSelectColor(this);"
                 >
-                    <option value="Très Facile" ${level.difficulty === 'Très Facile' ? 'selected' : ''}>Très Facile</option>
-                    <option value="Facile" ${level.difficulty === 'Facile' ? 'selected' : ''}>Facile</option>
-                    <option value="Moyen" ${level.difficulty === 'Moyen' ? 'selected' : ''}>Moyen</option>
-                    <option value="Difficile" ${level.difficulty === 'Difficile' ? 'selected' : ''}>Difficile</option>
-                    <option value="Très Difficile" ${level.difficulty === 'Très Difficile' ? 'selected' : ''}>Très Difficile</option>
-                    <option value="Extrême" ${level.difficulty === 'Extrême' ? 'selected' : ''}>Extrême</option>
+                    <option value="Easy Demon" ${level.difficulty === 'Easy Demon' ? 'selected' : ''}>Easy Demon</option>
+                    <option value="Medium Demon" ${level.difficulty === 'Medium Demon' ? 'selected' : ''}>Medium Demon</option>
+                    <option value="Hard Demon" ${level.difficulty === 'Hard Demon' ? 'selected' : ''}>Hard Demon</option>
+                    <option value="Insane Demon" ${level.difficulty === 'Insane Demon' ? 'selected' : ''}>Insane Demon</option>
+                    <option value="Extreme Demon" ${level.difficulty === 'Extreme Demon' ? 'selected' : ''}>Extreme Demon</option>
                 </select>
             </div>
 
@@ -293,11 +313,13 @@ function updateSelectColor(select) {
     const value = select.value;
     select.className = 'difficulty-select';
 
-    if (value === 'Extrême') {
+    if (value === 'Extreme Demon') {
         select.classList.add('extreme');
-    } else if (value === 'Très Difficile' || value === 'Difficile') {
+    } else if (value === 'Insane Demon') {
+        select.classList.add('insane');
+    } else if (value === 'Hard Demon') {
         select.classList.add('hard');
-    } else if (value === 'Moyen' || value === 'Facile' || value === 'Très Facile') {
+    } else if (value === 'Medium Demon' || value === 'Easy Demon') {
         select.classList.add('medium');
     }
 }

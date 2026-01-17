@@ -485,6 +485,17 @@
     color: white;
 }
 
+.difficulty-select.insane {
+    background: #d9489b !important;
+    color: white !important;
+    border-color: #c03182 !important;
+}
+
+.difficulty-select.insane option {
+    background: #d9489b;
+    color: white;
+}
+
 .difficulty-select.hard {
     background: #ffa94d !important;
     color: white !important;
