@@ -110,6 +110,26 @@ class RankingManager {
         }
     }
 
+    updateLength(levelId, length, isSubmission = false) {
+        const level = this.levels.find(l => l.id === levelId);
+        if (level) {
+            level.length = length;
+
+            if (isSubmission && level.originalData) {
+                const manager = new SubmissionManager();
+                manager.getSubmissions().then(submissions => {
+                    const idx = submissions.findIndex(s => s.id === levelId);
+                    if (idx !== -1) {
+                        submissions[idx].length = length;
+                        manager.storageKey && universalStorage &&
+                            universalStorage.setData(manager.storageKey, submissions);
+                    }
+                });
+                level.originalData.length = length;
+            }
+        }
+    }
+
     updateTags(levelId, tags, isSubmission = false) {
         const level = this.levels.find(l => l.id === levelId);
         if (level) {
@@ -254,7 +274,16 @@ function createRankingCard(level) {
 
             <div class="detail-group">
                 <label>Longueur</label>
-                <span class="length-display">${level.length}</span>
+                <select 
+                    class="length-select"
+                    onchange="updateRankingValue(${level.id}, 'length', this.value, ${level.isSubmission ? 'true' : 'false'})"
+                >
+                    <option value="Tiny" ${level.length === 'Tiny' ? 'selected' : ''}>Tiny</option>
+                    <option value="Short" ${level.length === 'Short' ? 'selected' : ''}>Short</option>
+                    <option value="Medium" ${level.length === 'Medium' ? 'selected' : ''}>Medium</option>
+                    <option value="Long" ${level.length === 'Long' ? 'selected' : ''}>Long</option>
+                    <option value="XL" ${level.length === 'XL' ? 'selected' : ''}>XL</option>
+                </select>
             </div>
         </div>
 
@@ -331,6 +360,8 @@ function updateRankingValue(levelId, field, value, isSubmission) {
         rankingManager.updateDifficulty(levelId, value, isSubmission);
     } else if (field === 'badge') {
         rankingManager.updateBadge(levelId, value || null, isSubmission);
+    } else if (field === 'length') {
+        rankingManager.updateLength(levelId, value, isSubmission);
     }
     renderRankingList();
 }
