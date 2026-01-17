@@ -364,8 +364,10 @@ function renderLevels(filteredLevels) {
 function filterLevels() {
     const difficulty = difficultyFilter.value;
     const length = lengthFilter.value;
-    const tag = tagFilter.value;
+    const tag = tagFilter ? tagFilter.value : '';
     const searchTerm = searchInput.value.toLowerCase();
+
+    console.log('Filtrage:', { difficulty, length, tag, searchTerm });
 
     const filtered = allLevels.filter(level => {
         const matchDifficulty = !difficulty || level.difficulty === difficulty;
@@ -375,9 +377,14 @@ function filterLevels() {
             level.name.toLowerCase().includes(searchTerm) ||
             level.creator.toLowerCase().includes(searchTerm);
 
+        if (tag && matchTag) {
+            console.log('Niveau avec tag:', level.name, level.tags);
+        }
+
         return matchDifficulty && matchLength && matchTag && matchSearch;
     });
 
+    console.log('Niveaux filtrés:', filtered.length);
     renderLevels(filtered);
 }
 
