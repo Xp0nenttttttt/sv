@@ -2,20 +2,20 @@ let clanClient = null;
 let sortBy = 'points';
 
 async function initClanRanking() {
-    // Attendre que supabaseClient soit disponible
+    // Attendre que supabaseClient global soit disponible
     let attempts = 0;
-    while (!window.supabaseClient && attempts < 50) {
+    while (typeof supabaseClient === 'undefined' && attempts < 50) {
         await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
     }
 
-    if (!window.supabaseClient) {
+    if (typeof supabaseClient === 'undefined') {
         document.getElementById('rankingBody').innerHTML =
             '<tr><td colspan="6" class="muted" style="text-align: center;">Erreur: Supabase non disponible</td></tr>';
         return;
     }
 
-    clanClient = window.supabaseClient;
+    clanClient = supabaseClient;
 
     // Initialiser le stockage
     if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
@@ -23,10 +23,10 @@ async function initClanRanking() {
     }
 
     // Attendre universalStorage
-    let attempts = 0;
-    while (!universalStorage && attempts < 50) {
+    let storageAttempts = 0;
+    while (!universalStorage && storageAttempts < 50) {
         await new Promise(resolve => setTimeout(resolve, 100));
-        attempts++;
+        storageAttempts++;
     }
 
     if (!universalStorage) {
