@@ -85,7 +85,7 @@ async function loadProfile() {
 
 async function saveProfile() {
     if (!accountSession) {
-        document.getElementById('profileMsg').textContent = 'Connectez-vous pour enregistrer votre profil';
+        showToast('Connectez-vous pour enregistrer votre profil', 'error');
         return;
     }
     const payload = {
@@ -94,15 +94,72 @@ async function saveProfile() {
         country: document.getElementById('country').value.trim(),
         avatar_url: document.getElementById('avatar').value.trim()
     };
-    const { error } = await accountClient
+    // Try upsert; if forbidden, fallback to insert or update explicitly
+    let { error } = await accountClient
         .from('profiles')
         .upsert(payload, { onConflict: 'id', returning: 'minimal' });
     if (error) {
-        document.getElementById('profileMsg').textContent = 'Erreur: ' + error.message;
-        return;
+        // Fallback: check if profile exists, then insert or update
+        const { data: existing, error: selectErr } = await accountClient
+            .from('profiles')
+            .select('id')
+            .eq('id', accountSession.user.id)
+            .maybeSingle();
+        if (selectErr) {
+            showToast('Erreur: ' + selectErr.message, 'error');
+            return;
+        }
+        if (!existing) {
+            const { error: insertErr } = await accountClient
+                .from('profiles')
+                .insert(payload, { returning: 'minimal' });
+            if (insertErr) {
+                showToast('Erreur: ' + insertErr.message, 'error');
+                return;
+            }
+        } else {
+            const { error: updateErr } = await accountClient
+                .from('profiles')
+                .update({
+                    username: payload.username,
+                    country: payload.country,
+                    avatar_url: payload.avatar_url
+                })
+                .eq('id', accountSession.user.id);
+            if (updateErr) {
+                showToast('Erreur: ' + updateErr.message, 'error');
+                return;
+            }
+        }
     }
-    document.getElementById('profileMsg').textContent = 'Profil enregistré';
+    showToast('Profil enregistré avec succès', 'success');
 }
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    const bg = type === 'error' ? 'rgba(220, 53, 69, 0.95)' : 'rgba(25, 135, 84, 0.95)';
+    toast.style.cssText = [
+        'position:fixed',
+        'bottom:20px',
+        'left:50%', 'transform:translateX(-50%)',
+        `background:${bg}`,
+        'color:#fff',
+        'padding:10px 16px',
+        'border-radius:8px',
+        'box-shadow:0 6px 20px rgba(0,0,0,0.2)',
+        'z-index:9999',
+        'font-weight:600',
+        'max-width:80%', 'text-align:center'
+    ].join(';');
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.transition = 'opacity 250ms ease';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loginBtn').addEventListener('click', handleLogin);
