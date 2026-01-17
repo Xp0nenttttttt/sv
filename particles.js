@@ -116,6 +116,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     animate();
 });
+const topClanCard = document.getElementById("topClanCard");
+topClanCard.style.display = "block";
+
 function victoryExplosion(x, y) {
     const count = 40;
     for (let i = 0; i < count; i++) {
