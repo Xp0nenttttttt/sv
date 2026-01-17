@@ -54,7 +54,7 @@ async function initClanPage() {
     }
 }
 
-function switchTab(tabName) {
+function switchTab(tabName, event) {
     // Cacher tous les contenus
     document.querySelectorAll('.tab-content').forEach(content => {
         content.style.display = 'none';
@@ -68,8 +68,10 @@ function switchTab(tabName) {
     // Afficher le contenu sélectionné
     document.getElementById(`tab-${tabName}`).style.display = 'block';
 
-    // Activer le bouton
-    event.target.classList.add('active');
+    // Activer le bouton cliqué
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
 }
 
 async function loadClan(clanId) {
