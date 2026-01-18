@@ -283,10 +283,14 @@ function renderLevels(filteredLevels) {
 
     filteredLevels.forEach(level => {
         const levelCard = document.createElement('div');
-        let cardClass = 'level-card';
+
+        const badge = getBadgeGif(level.badge);
+        const difficultyIcon = getDifficultyIcon(level.difficulty, level.badge);
+
+        let cardClass = 'level-card difficulty-' + difficultyIcon.key;
 
         if (level.rank === 1) {
-            cardClass += ' top-1';
+            cardClass += ' top-1 top-1-rank';
         } else if (level.rank === 2 || level.rank === 3) {
             cardClass += ' top-2-3';
         } else if (level.rank === 4 || level.rank === 5) {
@@ -299,13 +303,11 @@ function renderLevels(filteredLevels) {
 
         let rankDisplay = '#' + level.rank;
         let containerClass = 'level-container';
-        let cardClass = `difficulty-${difficultyIcon.key}`;
         let topParticles = '';
 
         if (level.rank === 1) {
             rankDisplay = '#' + level.rank;
             containerClass = 'top-1-container';
-            cardClass += ' top-1-rank';
             topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top1" width="160" height="160"></canvas>';
         }
         else if (level.rank === 2) {
@@ -314,11 +316,6 @@ function renderLevels(filteredLevels) {
         else if (level.rank === 3) {
             topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="160" height="160"></canvas>';
         }
-
-        const badge = getBadgeGif(level.badge);
-        const difficultyIcon = getDifficultyIcon(level.difficulty, level.badge);
-
-        levelCard.classList.add(...cardClass.split(' '));
 
         levelCard.innerHTML = `
             <div class="${containerClass}">
