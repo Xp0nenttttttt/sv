@@ -3,21 +3,35 @@
     inset: 0;
     z-index: 99999;
     pointer-events: none;
-    background:
-        radial-gradient(circle at var(--tx, 50%) var(--ty, 50%),
-            rgba(42, 250, 223, 0.9),
-            rgba(5, 0, 20, 0.95) 60%);
     opacity: 0;
-    transform: scale(1.2);
-    transition:
-        opacity 0.5s ease,
-        transform 0.5s ease;
+    background:
+        linear-gradient(120deg,
+            transparent 0%,
+            rgba(42, 250, 223, 0.25) 40%,
+            rgba(255, 0, 128, 0.35) 50%,
+            rgba(42, 250, 223, 0.25) 60%,
+            transparent 100%);
+    background-size: 300% 300%;
+    background-position: 100% 50%;
 }
 
 #page-transition.active {
     opacity: 1;
-    transform: scale(1);
+    animation: waveSweep 0.7s ease forwards;
 }
+
+@keyframes waveSweep {
+    0% {
+        background-position: 100% 50%;
+        opacity: 1;
+    }
+
+    100% {
+        background-position: 0% 50%;
+        opacity: 1;
+    }
+}
+
 
 
 

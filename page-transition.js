@@ -13,17 +13,13 @@ window.addEventListener("DOMContentLoaded", () => {
         ) {
             link.addEventListener("click", e => {
                 e.preventDefault();
-
-                const x = e.clientX;
-                const y = e.clientY;
-
-                transition.style.setProperty("--tx", `${x}px`);
-                transition.style.setProperty("--ty", `${y}px`);
+                transition.classList.remove("active"); // reset
+                void transition.offsetWidth; // force reflow
                 transition.classList.add("active");
 
                 setTimeout(() => {
                     window.location.href = url;
-                }, 500);
+                }, 650);
             });
         }
     });
