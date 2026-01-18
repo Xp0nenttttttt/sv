@@ -332,18 +332,18 @@ main {
 
 /* Badge gif positioning for index page (horizontal compact cards) */
 .home-page .badge-gif-chip {
-    top: -45px;
-    left: -28px;
-    width: 120px;
-    height: 120px;
+    top: -40px;
+    left: -25px;
+    width: 140px;
+    height: 140px;
 }
 
 /* Badge gif positioning for level-details page */
 .level-details-page .badge-gif-chip {
-    top: -55px;
-    left: -32px;
-    width: 140px;
-    height: 140px;
+    top: -50px;
+    left: -25px;
+    width: 160px;
+    height: 160px;
 }
 
 .level-info {
