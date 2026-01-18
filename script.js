@@ -211,6 +211,38 @@ const searchInput = document.getElementById('search-input');
 const levelCountElement = document.getElementById('levelCount');
 const recordCountElement = document.getElementById('recordCount');
 
+// Met à jour le compteur de records acceptés
+async function updateRecordCount() {
+    if (!recordCountElement) return;
+
+    try {
+        // S'assurer que le stockage est prêt
+        if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
+            await initializeSupabaseStorage();
+        }
+
+        let attempts = 0;
+        while (!universalStorage && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        let acceptedCount = 0;
+
+        if (universalStorage && typeof universalStorage.getData === 'function') {
+            const allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+            acceptedCount = allRecords.filter(r => r.status === 'accepted').length;
+        } else if (typeof dataSyncManager !== 'undefined' && typeof dataSyncManager.loadRecords === 'function') {
+            const syncRecords = await dataSyncManager.loadRecords();
+            acceptedCount = (syncRecords || []).filter(r => r.status === 'accepted').length;
+        }
+
+        recordCountElement.textContent = acceptedCount;
+    } catch (err) {
+        console.error('Erreur mise à jour du compteur de records:', err);
+    }
+}
+
 // Normalise une difficulté vers un libellé canonique
 function normalizeDifficulty(rawDifficulty) {
     const normalized = (rawDifficulty || '')
@@ -454,6 +486,9 @@ async function initializeLevels() {
     allLevels = await loadAllLevels();
     renderLevels(allLevels);
     filterLevels();
+
+    // Mettre à jour le compteur de records
+    await updateRecordCount();
 }
 
 
