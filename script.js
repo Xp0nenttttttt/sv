@@ -19,7 +19,7 @@ async function fetchLevelsFromSupabase() {
     }
 
     const endpoint = `${SUPABASE_CONFIG.URL}/rest/v1/levels` +
-        '?select=id,level_name,creator_name,approved_rank,approved_difficulty,length,tags,status,image_url,image_base64,imageUrl,imageBase64,proposed_top,badge,description,submitted_at,accepted_at,author_name';
+        '?select=id,level_name,creator_name,approved_rank,approved_difficulty,length,tags,status,image_url,image_base64,imageUrl,imageBase64,proposed_top,badge,description,submitted_at,accepted_at,author_name,verifier_name';
 
     try {
         const res = await fetch(endpoint, {
@@ -63,7 +63,8 @@ function mapSupabaseRowToLevel(row) {
         badge: row.badge || null,
         description: row.description || '',
         submittedAt: row.submitted_at || row.submittedAt,
-        acceptedAt: row.accepted_at || row.acceptedAt
+        acceptedAt: row.accepted_at || row.acceptedAt,
+        verifier: row.verifier_name || null
     };
 }
 
@@ -334,6 +335,7 @@ function renderLevels(filteredLevels) {
                     ` : ''}
                     <div class="level-details">
                         <div><strong>Créateur:</strong> ${level.creator}</div>
+                        ${level.verifier ? `<div><strong>Vérificateur:</strong> ${level.verifier}</div>` : ''}
                         <div><strong>Points:</strong> <span class="points">${level.points}</span> pts</div>
                     </div>
                 </div>
