@@ -131,89 +131,124 @@
                     </svg> Admin</a>
 
             </div>
-            <div class="stats">
-                <div class="stat">
-                    <span class="stat-number" id="levelCount">0</span>
-                    <span class="stat-label">Niveaux</span>
-                </div>
-            </div>
         </div>
     </header>
 
     <main>
-        <div class="container">
-            <!-- Meilleur Clan -->
-            <div id="topClanCard" class="reveal-top highlight-card is-clan" style="display: none;">
-                <div class="highlight-badge">#1</div>
-                <div class="highlight-body">
-                    <h3 class="highlight-label">🛡️ Meilleur Clan</h3>
-                    <div id="topClanName" class="highlight-title">[TAG] Nom du Clan</div>
-                    <div id="topClanStats" class="highlight-stats">
-                        <span>🔥 Points : <strong>0</strong></span>
-                        <span>👥 Membres : <strong>0</strong></span>
-                        <span>🏆 Records : <strong>0</strong></span>
+        <div class="page-layout">
+            <!-- Sidebar gauche -->
+            <aside class="sidebar">
+                <!-- Stats -->
+                <div class="sidebar-stats">
+                    <div class="stat-box">
+                        <span class="stat-number" id="levelCount">0</span>
+                        <span class="stat-label">Niveaux</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number" id="recordCount">0</span>
+                        <span class="stat-label">Records</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Meilleur Joueur -->
-            <div id="topPlayerCard" class="reveal-top highlight-card is-player" style="display: none;">
-                <div class="highlight-badge">#1</div>
-                <div class="highlight-body">
-                    <h3 class="highlight-label">⭐ Meilleur Joueur</h3>
-                    <div id="topPlayerName" class="highlight-title">Joueur</div>
-                    <div id="topPlayerStats" class="highlight-stats">
-                        <span>🔥 Points : <strong>0</strong></span>
-                        <span>🎯 Niveaux : <strong>0</strong></span>
-                        <span>🏆 Records : <strong>0</strong></span>
+                <!-- Action buttons -->
+                <div class="sidebar-actions">
+                    <a href="leaderboard.html" class="sidebar-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                            <path d="M4 22h16"></path>
+                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                        </svg>
+                        <span>Classements</span>
+                    </a>
+                    <a href="submission.html" class="sidebar-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z">
+                            </path>
+                            <path d="m21.854 2.147-10.94 10.939"></path>
+                        </svg>
+                        <span>Soumettre</span>
+                    </a>
+                </div>
+                <!-- Meilleur Joueur -->
+                <div id="topPlayerCard" class="reveal-top sidebar-card is-player" style="display: none;">
+                    <div class="card-badge">#1</div>
+                    <div class="card-body">
+                        <h3 class="card-label">⭐ Meilleur Joueur</h3>
+                        <div id="topPlayerName" class="card-title">Joueur</div>
+                        <div id="topPlayerStats" class="card-stats">
+                            <span>🔥 <strong>0</strong> pts</span>
+                            <span>🎯 <strong>0</strong> niv.</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Filtres -->
-            <div class="filters">
-                <div class="filter-group">
-                    <label for="difficulty-filter">Difficulté:</label>
-                    <select id="difficulty-filter">
-                        <option value="">Tous</option>
-                        <option value="Extreme Demon">Extreme Demon</option>
-                        <option value="Insane Demon">Insane Demon</option>
-                        <option value="Hard Demon">Hard Demon</option>
-                        <option value="Medium Demon">Medium Demon</option>
-                        <option value="Easy Demon">Easy Demon</option>
-                    </select>
+                <!-- Meilleur Clan -->
+                <div id="topClanCard" class="reveal-top sidebar-card is-clan" style="display: none;">
+                    <div class="card-badge">#1</div>
+                    <div class="card-body">
+                        <h3 class="card-label">🛡️ Meilleur Clan</h3>
+                        <div id="topClanName" class="card-title">[TAG] Clan</div>
+                        <div id="topClanStats" class="card-stats">
+                            <span>🔥 <strong>0</strong> pts</span>
+                            <span>👥 <strong>0</strong> mbr</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label for="length-filter">Longueur:</label>
-                    <select id="length-filter">
-                        <option value="">Tous</option>
-                        <option value="Tiny">Tiny</option>
-                        <option value="Short">Short</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Long">Long</option>
-                        <option value="XL">XL</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="tag-filter">Tag:</label>
-                    <select id="tag-filter">
-                        <option value="">Tous</option>
-                        <option value="wave">🌊 Wave</option>
-                        <option value="ship">🚀 Ship</option>
-                        <option value="overall">🏄 Overall</option>
-                        <option value="timing">⏱️ Timing</option>
-                        <option value="vitesse">⚡ Vitesse</option>
-                        <option value="nong">🎵 Nong</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <input type="text" id="search-input" placeholder="Rechercher un niveau...">
-                </div>
-            </div>
+            </aside>
 
-            <!-- Liste des niveaux -->
-            <div class="levels-list" id="levelsList">
-                <!-- Les niveaux seront générés par JavaScript -->
+            <!-- Contenu principal -->
+            <div class="main-content">
+                <!-- Filtres -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="difficulty-filter">Difficulté:</label>
+                        <select id="difficulty-filter">
+                            <option value="">Tous</option>
+                            <option value="Extreme Demon">Extreme Demon</option>
+                            <option value="Insane Demon">Insane Demon</option>
+                            <option value="Hard Demon">Hard Demon</option>
+                            <option value="Medium Demon">Medium Demon</option>
+                            <option value="Easy Demon">Easy Demon</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="length-filter">Longueur:</label>
+                        <select id="length-filter">
+                            <option value="">Tous</option>
+                            <option value="Tiny">Tiny</option>
+                            <option value="Short">Short</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Long">Long</option>
+                            <option value="XL">XL</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="tag-filter">Tag:</label>
+                        <select id="tag-filter">
+                            <option value="">Tous</option>
+                            <option value="wave">🌊 Wave</option>
+                            <option value="ship">🚀 Ship</option>
+                            <option value="overall">🏄 Overall</option>
+                            <option value="timing">⏱️ Timing</option>
+                            <option value="vitesse">⚡ Vitesse</option>
+                            <option value="nong">🎵 Nong</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <input type="text" id="search-input" placeholder="Rechercher un niveau...">
+                    </div>
+                </div>
+
+                <!-- Liste des niveaux -->
+                <div class="levels-list" id="levelsList">
+                    <!-- Les niveaux seront générés par JavaScript -->
+                </div>
             </div>
         </div>
         <!-- 
