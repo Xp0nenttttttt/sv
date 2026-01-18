@@ -92,9 +92,21 @@ header::after {
     font-weight: 700;
 }
 
+.sv-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .sv-logo .list {
     font-weight: 600;
     opacity: 0.9;
+}
+
+.sv-logo .sv-mark {
+    width: 22px;
+    height: 22px;
+    display: block;
 }
 
 .header-links {
