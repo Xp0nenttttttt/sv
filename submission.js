@@ -89,7 +89,10 @@ class SubmissionManager {
         if (submission) {
             submission.status = status;
             if (status === 'accepted') {
-                submission.acceptedAt = new Date().toISOString();
+                // Ne mettre à jour acceptedAt que si elle n'existe pas déjà
+                if (!submission.acceptedAt) {
+                    submission.acceptedAt = new Date().toISOString();
+                }
                 submission.approvedRank = approvedRank;
                 submission.approvedDifficulty = difficulty;
             }

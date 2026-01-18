@@ -76,7 +76,10 @@ class RecordSubmissionManager {
         const submission = submissions.find(s => s.id === submissionId);
         if (submission) {
             submission.status = 'accepted';
-            submission.acceptedAt = new Date().toISOString();
+            // Ne mettre à jour acceptedAt que si elle n'existe pas déjà
+            if (!submission.acceptedAt) {
+                submission.acceptedAt = new Date().toISOString();
+            }
             if (universalStorage) {
                 await universalStorage.setData(this.storageKey, submissions);
             } else {
