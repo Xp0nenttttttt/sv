@@ -448,7 +448,7 @@ async function initializeLevels() {
     renderLevels(allLevels);
     filterLevels();
 }
-});
+
 
 // Charger le meilleur clan
 async function loadTopClan() {
