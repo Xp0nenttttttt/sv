@@ -341,7 +341,7 @@ main {
 /* Badge gif positioning for level-details page */
 .level-details-page .badge-gif-chip {
     top: -60px;
-    left: -32px;
+    left: -36px;
     width: 160px;
     height: 160px;
 }
