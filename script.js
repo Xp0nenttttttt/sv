@@ -337,15 +337,17 @@ function renderLevels(filteredLevels) {
                         </span>
                         <span>${level.length}</span>
                     </div>
-                    ${level.tags && level.tags.length > 0 ? `
-                        <div class="level-tags">
-                            ${level.tags.map(tag => `<span class="tag-badge ${tag}">${getTagEmoji(tag)} ${tag}</span>`).join('')}
-                        </div>
-                    ` : ''}
+                    <div class="tags-points-row">
+                        ${level.tags && level.tags.length > 0 ? `
+                            <div class="level-tags">
+                                ${level.tags.map(tag => `<span class="tag-badge ${tag}">${getTagEmoji(tag)} ${tag}</span>`).join('')}
+                            </div>
+                        ` : '<div class="level-tags"></div>'}
+                        <div class="points-chip">${level.points} pts</div>
+                    </div>
                     <div class="level-details">
                         <div><strong>Créateur:</strong> ${level.creator}</div>
                         ${level.verifier ? `<div><strong>Verifier:</strong> ${level.verifier}</div>` : ''}
-                        <div><strong>Points:</strong> <span class="points">${level.points}</span> pts</div>
                     </div>
                 </div>
             </div>

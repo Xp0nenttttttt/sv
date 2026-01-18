@@ -552,13 +552,41 @@ main {
     border-left: 5px solid #00b0ff !important;
 }
 
+/* Tags + points alignment */
+.tags-points-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.tags-points-row .level-tags {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.points-chip {
+    font-weight: 800;
+    font-size: 1.2rem;
+    padding: 6px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #f5f7fb;
+    white-space: nowrap;
+}
+
 /* Cadre RGB animé pour le top 1 - override la difficulté */
 .level-card.top-1-rank {
     animation: rgb-border 3s ease-in-out infinite !important;
 }
 
 /* Points en RGB pour le top 1 */
-.level-card.top-1-rank .level-details .points {
+.level-card.top-1-rank .level-details .points,
+.level-card.top-1-rank .points-chip {
     animation: rgb-text 3s ease-in-out infinite !important;
 }
 
