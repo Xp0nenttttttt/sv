@@ -520,43 +520,59 @@ main {
     width: 100%;
 }
 
+/* Bordure de base pour les cartes */
+.level-card {
+    border: 2px solid #2b3240 !important;
+    border-left: 5px solid #2b3240 !important;
+}
+
 /* Bordures par difficulté - avec spécificité pour override les styles top-1/2-3/4-5 */
 .level-card.difficulty-extreme {
     border-color: #ff1744 !important;
+    border-left-color: #ff1744 !important;
 }
 
 .level-card.difficulty-insane {
     border-color: #ff6d1f !important;
+    border-left-color: #ff6d1f !important;
 }
 
 .level-card.difficulty-hard {
     border-color: #ffd600 !important;
+    border-left-color: #ffd600 !important;
 }
 
 .level-card.difficulty-medium {
     border-color: #00e676 !important;
+    border-left-color: #00e676 !important;
 }
 
 .level-card.difficulty-easy {
     border-color: #00b0ff !important;
+    border-left-color: #00b0ff !important;
 }
 
 /* Cadre RGB animé pour le top 1 - override la difficulté */
 .level-card.top-1-rank {
+    border-color: #ff1744 !important;
+    border-left-color: #ff1744 !important;
     animation: rgb-border 3s ease-in-out infinite;
 }
 
 @keyframes rgb-border {
     0% {
         border-color: #ff1744;
+        border-left-color: #ff1744;
     }
 
     50% {
         border-color: #00e5ff;
+        border-left-color: #00e5ff;
     }
 
     100% {
         border-color: #ff1744;
+        border-left-color: #ff1744;
     }
 }
 
