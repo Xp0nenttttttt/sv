@@ -161,10 +161,6 @@ main {
     display: flex;
     flex-direction: column;
     gap: 18px;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 0 0 8px;
 }
 
 .highlight-card {
