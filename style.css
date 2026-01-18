@@ -34,6 +34,21 @@
     }
 }
 
+#page-transition.enter {
+    opacity: 1;
+    animation: waveReveal 0.8s ease forwards;
+}
+
+@keyframes waveReveal {
+    from {
+        background-position: 0% 50%;
+    }
+
+    to {
+        background-position: 100% 50%;
+    }
+}
+
 
 
 
