@@ -286,16 +286,17 @@ function renderLevels(filteredLevels) {
 
         const badge = getBadgeGif(level.badge);
         const difficultyIcon = getDifficultyIcon(level.difficulty, level.badge);
+        const rankNumber = Number(level.rank); // normalise pour éviter les chaînes "1"
 
         let cardClass = 'level-card';
 
-        if (level.rank === 1) {
+        if (rankNumber === 1) {
             cardClass += ' top-1 top-1-rank';
         } else {
             cardClass += ' difficulty-' + difficultyIcon.key;
-            if (level.rank === 2 || level.rank === 3) {
+            if (rankNumber === 2 || rankNumber === 3) {
                 cardClass += ' top-2-3';
-            } else if (level.rank === 4 || level.rank === 5) {
+            } else if (rankNumber === 4 || rankNumber === 5) {
                 cardClass += ' top-4-5';
             }
         }
@@ -304,19 +305,19 @@ function renderLevels(filteredLevels) {
 
         const imageHTML = level.image ? `<img src="${level.image}" alt="${level.name}" class="level-image">` : '';
 
-        let rankDisplay = '#' + level.rank;
+        let rankDisplay = '#' + rankNumber;
         let containerClass = 'level-container';
         let topParticles = '';
 
-        if (level.rank === 1) {
-            rankDisplay = '#' + level.rank;
+        if (rankNumber === 1) {
+            rankDisplay = '#' + rankNumber;
             containerClass = 'top-1-container';
             topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top1" width="160" height="160"></canvas>';
         }
-        else if (level.rank === 2) {
+        else if (rankNumber === 2) {
             topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top2" width="160" height="160"></canvas>';
         }
-        else if (level.rank === 3) {
+        else if (rankNumber === 3) {
             topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="160" height="160"></canvas>';
         }
 

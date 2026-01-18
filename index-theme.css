@@ -557,6 +557,11 @@ main {
     animation: rgb-border 3s ease-in-out infinite !important;
 }
 
+/* Points en RGB pour le top 1 */
+.level-card.top-1-rank .level-details .points {
+    animation: rgb-text 3s ease-in-out infinite !important;
+}
+
 @keyframes rgb-border {
     0% {
         border-color: #ff1744;
@@ -571,6 +576,20 @@ main {
     100% {
         border-color: #ff1744;
         border-left-color: #ff1744;
+    }
+}
+
+@keyframes rgb-text {
+    0% {
+        color: #ff1744;
+    }
+
+    50% {
+        color: #00e5ff;
+    }
+
+    100% {
+        color: #ff1744;
     }
 }
 
