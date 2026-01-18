@@ -131,7 +131,8 @@
 
 .info-card {
     background: #151a2e;
-    border: 1px solid #1f2436;
+    border: 2px solid #1f2436;
+    border-radius: 10px;
     color: #e5e7eb;
     box-shadow: none;
 }
