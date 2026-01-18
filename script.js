@@ -287,14 +287,17 @@ function renderLevels(filteredLevels) {
         const badge = getBadgeGif(level.badge);
         const difficultyIcon = getDifficultyIcon(level.difficulty, level.badge);
 
-        let cardClass = 'level-card difficulty-' + difficultyIcon.key;
+        let cardClass = 'level-card';
 
         if (level.rank === 1) {
             cardClass += ' top-1 top-1-rank';
-        } else if (level.rank === 2 || level.rank === 3) {
-            cardClass += ' top-2-3';
-        } else if (level.rank === 4 || level.rank === 5) {
-            cardClass += ' top-4-5';
+        } else {
+            cardClass += ' difficulty-' + difficultyIcon.key;
+            if (level.rank === 2 || level.rank === 3) {
+                cardClass += ' top-2-3';
+            } else if (level.rank === 4 || level.rank === 5) {
+                cardClass += ' top-4-5';
+            }
         }
 
         levelCard.className = cardClass;
