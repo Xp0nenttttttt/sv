@@ -554,9 +554,7 @@ main {
 
 /* Cadre RGB animé pour le top 1 - override la difficulté */
 .level-card.top-1-rank {
-    border-color: #ff1744 !important;
-    border-left-color: #ff1744 !important;
-    animation: rgb-border 3s ease-in-out infinite;
+    animation: rgb-border 3s ease-in-out infinite !important;
 }
 
 @keyframes rgb-border {
