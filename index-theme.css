@@ -522,8 +522,8 @@ main {
 
 /* Bordure de base pour les cartes */
 .level-card {
-    border: 2px solid #2b3240 !important;
-    border-left: 5px solid #2b3240 !important;
+    border: 2px solid #2b3240;
+    border-left: 5px solid #2b3240;
 }
 
 /* Bordures par difficulté - avec spécificité pour override les styles top-1/2-3/4-5 */
