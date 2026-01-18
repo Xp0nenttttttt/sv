@@ -201,7 +201,7 @@
 }
 
 .music-section {
-    background: white;
+    background: #151a2e;
     padding: 30px;
     border-radius: 10px;
     margin-bottom: 30px;
@@ -210,7 +210,7 @@
 
 .music-section h2 {
     margin-top: 0;
-    color: #333;
+    color: #e5e7eb;
 }
 
 .music-placeholder {
@@ -232,7 +232,7 @@
 }
 
 .records-section {
-    background: white;
+    background: #151a2e;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -247,20 +247,20 @@
 
 .records-header h2 {
     margin: 0;
-    color: #333;
+    color: #e5e7eb;
 }
 
 .record-form {
-    background: #f9f9f9;
+    background: #151a2e;
     padding: 25px;
     border-radius: 10px;
     margin-bottom: 25px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #1f2436;
 }
 
 .record-form h3 {
     margin-top: 0;
-    color: #333;
+    color: #e5e7eb;
 }
 
 .record-form .form-group {
@@ -271,7 +271,7 @@
     display: block;
     margin-bottom: 5px;
     font-weight: 600;
-    color: #333;
+    color: #e5e7eb;
 }
 
 .record-form input,
