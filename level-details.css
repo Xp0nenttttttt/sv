@@ -1,22 +1,69 @@
 /* Level Details Page Styles */
+.level-details-page {
+    background: #0b0d14;
+    color: #e5e7eb;
+}
+
+.record-card {
+    background: #121628;
+    border: 1px solid #1f2436;
+    box-shadow: none;
+}
+
+.record-card:hover {
+    background: #151a2e;
+}
+
+.record-form {
+    background: #101422;
+    border: 1px solid #1f2436;
+}
+
+.record-form input,
+.record-form select {
+    background: #0f1220;
+    color: #e5e7eb;
+    border: 1px solid #1f2436;
+}
+
+.record-form input:focus,
+.record-form select:focus {
+    border-color: #3b82f6;
+}
+
+.btn-video,
+.btn-primary {
+    background: #1c2036;
+    color: #fff;
+}
+
+.btn-video:hover,
+.btn-primary:hover {
+    background: #2a2f4a;
+}
+
+.level-details-page main {
+    background: transparent;
+}
 
 .level-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 15px;
-    padding: 40px;
-    margin-bottom: 30px;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 30px;
-    align-items: center;
+    background: linear-gradient(180deg, #141826, #101422);
+    border: 1px solid #1f2436;
+    border-radius: 14px;
+    box-shadow: none;
+    color: #e5e7eb;
 }
+
 
 .level-header-content {
     display: flex;
     gap: 20px;
     align-items: center;
+}
+
+.level-rank-large {
+    background: #1c2036;
+    color: #fff;
 }
 
 .level-rank-large {
@@ -82,18 +129,42 @@
 }
 
 .info-card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    border: 2px solid #f0f0f0;
-    transition: all 0.3s;
+    background: #121628;
+    border: 1px solid #1f2436;
+    color: #e5e7eb;
+    box-shadow: none;
+}
+
+.info-label {
+    color: #9ca3af;
+}
+
+.info-value {
+    color: #ffffff;
+}
+
+.info-card:hover {
+    background: #151a2e;
 }
 
 .info-card:hover {
     border-color: #667eea;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.description-section,
+.music-section,
+.records-section {
+    background: #121628;
+    border: 1px solid #1f2436;
+    color: #e5e7eb;
+    box-shadow: none;
+}
+
+.description-section h2,
+.music-section h2,
+.records-section h2 {
+    color: #ffffff;
 }
 
 .info-label {
