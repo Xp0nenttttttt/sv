@@ -571,7 +571,6 @@ main {
 
 .level-card:hover {
     transform: translateX(4px);
-    border-color: rgba(77, 225, 255, 0.35);
     box-shadow: var(--glow-strong);
 }
 
