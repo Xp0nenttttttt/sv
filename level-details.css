@@ -122,7 +122,7 @@
 }
 
 .level-info-grid {
-    background: #000000;
+    background: #151a2e;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
