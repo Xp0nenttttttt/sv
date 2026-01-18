@@ -19,7 +19,7 @@ async function fetchLevelsFromSupabase() {
     }
 
     const endpoint = `${SUPABASE_CONFIG.URL}/rest/v1/levels` +
-        '?select=id,level_name,creator_name,approved_rank,approved_difficulty,length,tags,status,image_url,image_base64,imageUrl,imageBase64,proposed_top,badge,description,submitted_at,accepted_at,author_name,verifier_name';
+        '?select=id,level_name,creator_name,approved_rank,approved_difficulty,length,tags,status,image_url,image_base64,imageUrl,imageBase64,proposed_top,badge,description,submitted_at,accepted_at,author_name';
 
     try {
         const res = await fetch(endpoint, {
@@ -64,7 +64,7 @@ function mapSupabaseRowToLevel(row) {
         description: row.description || '',
         submittedAt: row.submitted_at || row.submittedAt,
         acceptedAt: row.accepted_at || row.acceptedAt,
-        verifier: row.verifier_name || null
+        verifier: row.author_name || null
     };
 }
 
@@ -99,7 +99,7 @@ async function loadAllLevels() {
                     proposedTop: submission.proposedTop,
                     tags: submission.tags || [],
                     badge: submission.badge || null,
-                    verifier: submission.verifierName || null
+                    verifier: submission.authorName || null
                 };
             });
 
@@ -128,7 +128,7 @@ async function loadAllLevels() {
                 proposedTop: submission.proposedTop,
                 tags: submission.tags || [],
                 badge: submission.badge || null,
-                verifier: submission.verifierName || null
+                verifier: submission.authorName || null
             };
         });
 
@@ -159,7 +159,7 @@ async function loadAllLevels() {
                 proposedTop: submission.proposedTop,
                 tags: submission.tags || [],
                 badge: submission.badge || null,
-                verifier: submission.verifierName || null
+                verifier: submission.authorName || null
             };
         });
 
@@ -195,7 +195,7 @@ async function loadAllLevels() {
             proposedTop: submission.proposedTop,
             tags: submission.tags || [],
             badge: submission.badge || null,
-            verifier: submission.verifierName || null
+            verifier: submission.authorName || null
         };
     });
 
