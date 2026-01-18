@@ -582,9 +582,14 @@ main {
     color: #f57f17;
 }
 
+.tag-badge.nong {
+    background: #ffc4fa;
+    color: #f517e3;
+}
+
 .difficulty-extreme,
 .difficulty-extrême {
-    background: #ff6b6b !important;
+    background: #171731 !important;
     color: white !important;
     border: none !important;
 }
@@ -592,7 +597,7 @@ main {
 .difficulty-hard,
 .difficulty-difficile,
 .difficulty-très.difficile {
-    background: #ffa94d !important;
+    background: #141730 !important;
     color: white !important;
     border: none !important;
 }
@@ -601,7 +606,7 @@ main {
 .difficulty-moyen,
 .difficulty-facile,
 .difficulty-très.facile {
-    background: #74c0fc !important;
+    background: #141730 !important;
     color: white !important;
     border: none !important;
 }
