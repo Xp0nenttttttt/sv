@@ -98,7 +98,8 @@ async function loadAllLevels() {
                     isSubmitted: true,
                     proposedTop: submission.proposedTop,
                     tags: submission.tags || [],
-                    badge: submission.badge || null
+                    badge: submission.badge || null,
+                    verifier: submission.verifierName || null
                 };
             });
 
@@ -126,193 +127,186 @@ async function loadAllLevels() {
                 isSubmitted: true,
                 proposedTop: submission.proposedTop,
                 tags: submission.tags || [],
-                badge: submission.badge || null
-            };
-        });
+                badge: submission.badge || null,
+                verifier: submission.verifierName || null
+        const manager = new SubmissionManager();
+                const acceptedSubmissions = manager.getAcceptedSubmissions();
 
-        if (submittedLevels.length > 0) {
+                const submittedLevels = acceptedSubmissions.map((submission) => {
+                    const rank = submission.approvedRank || (levels.length + 100);
+                    return {
+                        id: submission.id,
+                        rank: rank,
+                        name: submission.levelName,
+                        creator: submission.creatorName,
+                        difficulty: normalizeDifficulty(submission.approvedDifficulty),
+                        length: submission.length,
+                        points: calculatePoints(rank),
+                        author: submission.authorName,
+                        image: submission.imageBase64 || submission.imageUrl,
+                        submittedBy: submission.authorName,
+                        isSubmitted: true,
+                        proposedTop: submission.proposedTop,
+                        tags: submission.tags || [],
+                        badge: submission.badge || null,
+                        verifier: submission.verifierName || null
+                    };
+                });
+
+                return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
+            }
+
+            // Fallback: utiliser l'adaptateur universel si SubmissionManager n'est pas présent
+            const submissionManagerStandalone = {
+                storageKey: 'svChallengeSubmissions',
+                getAcceptedSubmissions: async function () {
+                    const data = await universalStorage.getData(this.storageKey);
+                    const submissions = data || [];
+                    return submissions.filter(s => s.status === 'accepted');
+                }
+            };
+
+            const acceptedSubmissions = await submissionManagerStandalone.getAcceptedSubmissions();
+
+            const submittedLevels = acceptedSubmissions.map((submission) => {
+                const rank = submission.approvedRank || (levels.length + 100);
+                return {
+                    id: submission.id,
+                    rank: rank,
+                    name: submission.levelName,
+                    creator: submission.creatorName,
+                    difficulty: normalizeDifficulty(submission.approvedDifficulty),
+                    length: submission.length,
+                    points: calculatePoints(rank),
+                    author: submission.authorName,
+                    image: submission.imageBase64 || submission.imageUrl,
+                    submittedBy: submission.authorName,
+                    isSubmitted: true,
+                    proposedTop: submission.proposedTop,
+                    tags: submission.tags || [],
+                    badge: submission.badge || null,
+                    verifier: submission.verifierName || null
+                };
+            });
+
             return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
         }
-    }
-
-    // 3) Fallback localStorage direct
-    if (typeof SubmissionManager !== 'undefined') {
-        const manager = new SubmissionManager();
-        const acceptedSubmissions = manager.getAcceptedSubmissions();
-
-        const submittedLevels = acceptedSubmissions.map((submission) => {
-            const rank = submission.approvedRank || (levels.length + 100);
-            return {
-                id: submission.id,
-                rank: rank,
-                name: submission.levelName,
-                creator: submission.creatorName,
-                difficulty: normalizeDifficulty(submission.approvedDifficulty),
-                length: submission.length,
-                points: calculatePoints(rank),
-                author: submission.authorName,
-                image: submission.imageBase64 || submission.imageUrl,
-                submittedBy: submission.authorName,
-                isSubmitted: true,
-                proposedTop: submission.proposedTop,
-                tags: submission.tags || [],
-                badge: submission.badge || null
-            };
-        });
-
-        return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
-    }
-
-    // Fallback: utiliser l'adaptateur universel si SubmissionManager n'est pas présent
-    const submissionManagerStandalone = {
-        storageKey: 'svChallengeSubmissions',
-        getAcceptedSubmissions: async function () {
-            const data = await universalStorage.getData(this.storageKey);
-            const submissions = data || [];
-            return submissions.filter(s => s.status === 'accepted');
-        }
-    };
-
-    const acceptedSubmissions = await submissionManagerStandalone.getAcceptedSubmissions();
-
-    const submittedLevels = acceptedSubmissions.map((submission) => {
-        const rank = submission.approvedRank || (levels.length + 100);
-        return {
-            id: submission.id,
-            rank: rank,
-            name: submission.levelName,
-            creator: submission.creatorName,
-            difficulty: normalizeDifficulty(submission.approvedDifficulty),
-            length: submission.length,
-            points: calculatePoints(rank),
-            author: submission.authorName,
-            image: submission.imageBase64 || submission.imageUrl,
-            submittedBy: submission.authorName,
-            isSubmitted: true,
-            proposedTop: submission.proposedTop,
-            tags: submission.tags || [],
-            badge: submission.badge || null
-        };
-    });
-
-    return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
-}
 
 // Récupérer les éléments du DOM
 const levelsList = document.getElementById('levelsList');
-const difficultyFilter = document.getElementById('difficulty-filter');
-const lengthFilter = document.getElementById('length-filter');
-const tagFilter = document.getElementById('tag-filter');
-const searchInput = document.getElementById('search-input');
-const levelCountElement = document.getElementById('levelCount');
-const recordCountElement = document.getElementById('recordCount');
+        const difficultyFilter = document.getElementById('difficulty-filter');
+        const lengthFilter = document.getElementById('length-filter');
+        const tagFilter = document.getElementById('tag-filter');
+        const searchInput = document.getElementById('search-input');
+        const levelCountElement = document.getElementById('levelCount');
+        const recordCountElement = document.getElementById('recordCount');
 
-// Normalise une difficulté vers un libellé canonique
-function normalizeDifficulty(rawDifficulty) {
-    const normalized = (rawDifficulty || '')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase();
+        // Normalise une difficulté vers un libellé canonique
+        function normalizeDifficulty(rawDifficulty) {
+            const normalized = (rawDifficulty || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase();
 
-    if (normalized.includes('extreme')) return 'Extreme Demon';
-    if (normalized.includes('tres difficile') || normalized.includes('très difficile') || normalized.includes('insane')) return 'Insane Demon';
-    if (normalized.includes('difficile') || normalized.includes('hard')) return 'Hard Demon';
-    if (normalized.includes('moyen') || normalized.includes('medium')) return 'Medium Demon';
-    return 'Easy Demon';
-}
-
-// Retourne l'icône de difficulté (fallback sur easy)
-function getDifficultyIcon(difficulty, badge) {
-    const normalized = (difficulty || '')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .trim();
-
-    // Test strict pour éviter les confusions (extreme avant hard, insane avant difficile)
-    const key = normalized.includes('extreme') ? 'extreme'
-        : normalized.includes('insane') || normalized.includes('tres difficile') ? 'insane'
-            : normalized.includes('hard') || (normalized.includes('difficile') && !normalized.includes('tres')) ? 'hard'
-                : normalized.includes('medium') || normalized.includes('moyen') ? 'medium'
-                    : 'easy';
-
-    const filename = {
-        extreme: 'extreme.webp',
-        insane: 'insane.png',
-        hard: 'hard.webp',
-        medium: 'medium.webp',
-        easy: 'easy.webp'
-    }[key] || 'easy.webp';
-
-    let file = filename;
-    const badgeLower = (badge || '').toLowerCase();
-    if (badgeLower === 'mythic') {
-        const parts = filename.split('.');
-        parts.pop(); // Remove extension
-        file = parts.join('.') + '_mythic.png'; // Force .png for mythic variants
-    } else if (badgeLower === 'legendary') {
-        const parts = filename.split('.');
-        parts.pop(); // Remove extension
-        file = parts.join('.') + '_legendary.png'; // Force .png for legendary variants
-    }
-
-    return {
-        src: `image/${file}`,
-        alt: `${difficulty || key} Demon`,
-        key
-    };
-}
-
-function getBadgeGif(badge) {
-    if (!badge) return null;
-    const mapping = {
-        mythic: { src: 'image/mythic.gif', alt: 'Mythic Badge' },
-        legendary: { src: 'image/legendary.gif', alt: 'Legendary Badge' },
-        epic: { src: 'image/epic.gif', alt: 'Epic Badge' },
-    };
-    return mapping[badge] || null;
-}
-
-// Fonction pour afficher les niveaux
-function renderLevels(filteredLevels) {
-    levelsList.innerHTML = '';
-
-    filteredLevels.forEach(level => {
-        const levelCard = document.createElement('div');
-        let cardClass = 'level-card';
-
-        if (level.rank === 1) {
-            cardClass += ' top-1';
-        } else if (level.rank === 2 || level.rank === 3) {
-            cardClass += ' top-2-3';
-        } else if (level.rank === 4 || level.rank === 5) {
-            cardClass += ' top-4-5';
+            if (normalized.includes('extreme')) return 'Extreme Demon';
+            if (normalized.includes('tres difficile') || normalized.includes('très difficile') || normalized.includes('insane')) return 'Insane Demon';
+            if (normalized.includes('difficile') || normalized.includes('hard')) return 'Hard Demon';
+            if (normalized.includes('moyen') || normalized.includes('medium')) return 'Medium Demon';
+            return 'Easy Demon';
         }
 
-        levelCard.className = cardClass;
+        // Retourne l'icône de difficulté (fallback sur easy)
+        function getDifficultyIcon(difficulty, badge) {
+            const normalized = (difficulty || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim();
 
-        const imageHTML = level.image ? `<img src="${level.image}" alt="${level.name}" class="level-image">` : '';
+            // Test strict pour éviter les confusions (extreme avant hard, insane avant difficile)
+            const key = normalized.includes('extreme') ? 'extreme'
+                : normalized.includes('insane') || normalized.includes('tres difficile') ? 'insane'
+                    : normalized.includes('hard') || (normalized.includes('difficile') && !normalized.includes('tres')) ? 'hard'
+                        : normalized.includes('medium') || normalized.includes('moyen') ? 'medium'
+                            : 'easy';
 
-        let rankDisplay = '#' + level.rank;
-        let containerClass = 'level-container';
-        let topParticles = '';
+            const filename = {
+                extreme: 'extreme.webp',
+                insane: 'insane.png',
+                hard: 'hard.webp',
+                medium: 'medium.webp',
+                easy: 'easy.webp'
+            }[key] || 'easy.webp';
 
-        if (level.rank === 1) {
-            rankDisplay = '#' + level.rank;
-            containerClass = 'top-1-container';
-            topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top1" width="160" height="160"></canvas>';
+            let file = filename;
+            const badgeLower = (badge || '').toLowerCase();
+            if (badgeLower === 'mythic') {
+                const parts = filename.split('.');
+                parts.pop(); // Remove extension
+                file = parts.join('.') + '_mythic.png'; // Force .png for mythic variants
+            } else if (badgeLower === 'legendary') {
+                const parts = filename.split('.');
+                parts.pop(); // Remove extension
+                file = parts.join('.') + '_legendary.png'; // Force .png for legendary variants
+            }
+
+            return {
+                src: `image/${file}`,
+                alt: `${difficulty || key} Demon`,
+                key
+            };
         }
-        else if (level.rank === 2) {
-            topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top2" width="160" height="160"></canvas>';
-        }
-        else if (level.rank === 3) {
-            topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="160" height="160"></canvas>';
+
+        function getBadgeGif(badge) {
+            if (!badge) return null;
+            const mapping = {
+                mythic: { src: 'image/mythic.gif', alt: 'Mythic Badge' },
+                legendary: { src: 'image/legendary.gif', alt: 'Legendary Badge' },
+                epic: { src: 'image/epic.gif', alt: 'Epic Badge' },
+            };
+            return mapping[badge] || null;
         }
 
-        const badge = getBadgeGif(level.badge);
-        const difficultyIcon = getDifficultyIcon(level.difficulty, level.badge);
+        // Fonction pour afficher les niveaux
+        function renderLevels(filteredLevels) {
+            levelsList.innerHTML = '';
 
-        levelCard.innerHTML = `
+            filteredLevels.forEach(level => {
+                const levelCard = document.createElement('div');
+                let cardClass = 'level-card';
+
+                if (level.rank === 1) {
+                    cardClass += ' top-1';
+                } else if (level.rank === 2 || level.rank === 3) {
+                    cardClass += ' top-2-3';
+                } else if (level.rank === 4 || level.rank === 5) {
+                    cardClass += ' top-4-5';
+                }
+
+                levelCard.className = cardClass;
+
+                const imageHTML = level.image ? `<img src="${level.image}" alt="${level.name}" class="level-image">` : '';
+
+                let rankDisplay = '#' + level.rank;
+                let containerClass = 'level-container';
+                let topParticles = '';
+
+                if (level.rank === 1) {
+                    rankDisplay = '#' + level.rank;
+                    containerClass = 'top-1-container';
+                    topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top1" width="160" height="160"></canvas>';
+                }
+                else if (level.rank === 2) {
+                    topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top2" width="160" height="160"></canvas>';
+                }
+                else if (level.rank === 3) {
+                    topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top3" width="160" height="160"></canvas>';
+                }
+
+                const badge = getBadgeGif(level.badge);
+                const difficultyIcon = getDifficultyIcon(level.difficulty, level.badge);
+
+                levelCard.innerHTML = `
             <div class="${containerClass}">
                 <div class="image-wrapper">
                     ${topParticles}
@@ -342,365 +336,365 @@ function renderLevels(filteredLevels) {
             </div>
         `;
 
-        // Rendre la carte cliquable
-        levelCard.style.cursor = 'pointer';
-        levelCard.addEventListener('click', () => {
-            window.location.href = `level-details.html?id=${level.id}`;
+                // Rendre la carte cliquable
+                levelCard.style.cursor = 'pointer';
+                levelCard.addEventListener('click', () => {
+                    window.location.href = `level-details.html?id=${level.id}`;
+                });
+
+                levelsList.appendChild(levelCard);
+            });
+
+            // Mettre à jour les stats
+            levelCountElement.textContent = filteredLevels.length;
+
+            // Initialiser les particules après le rendu
+            setTimeout(() => {
+                if (typeof initBadgeParticles === 'function') {
+                    initBadgeParticles();
+                }
+            }, 100);
+        }
+
+        // Fonction pour filtrer les niveaux
+        function filterLevels() {
+            const difficulty = difficultyFilter.value;
+            const length = lengthFilter.value;
+            const tag = tagFilter ? tagFilter.value : '';
+            const searchTerm = searchInput.value.toLowerCase();
+
+            console.log('Filtrage:', { difficulty, length, tag, searchTerm });
+
+            const filtered = allLevels.filter(level => {
+                const matchDifficulty = !difficulty || level.difficulty === difficulty;
+                const matchLength = !length || level.length === length;
+                const matchTag = !tag || (level.tags && level.tags.includes(tag));
+                const matchSearch = !searchTerm ||
+                    level.name.toLowerCase().includes(searchTerm) ||
+                    level.creator.toLowerCase().includes(searchTerm);
+
+                if (tag && matchTag) {
+                    console.log('Niveau avec tag:', level.name, level.tags);
+                }
+
+                return matchDifficulty && matchLength && matchTag && matchSearch;
+            });
+
+            console.log('Niveaux filtrés:', filtered.length);
+            renderLevels(filtered);
+        }
+
+        // Fonction pour colorer le select de difficulté
+        function updateDifficultySelectColor() {
+            const difficultySelect = document.getElementById('difficulty-filter');
+            difficultySelect.className = ''; // Réinitialiser les classes
+            const value = difficultySelect.value;
+
+            if (value === 'Extreme Demon') {
+                difficultySelect.classList.add('extreme');
+            } else if (value === 'Insane Demon') {
+                difficultySelect.classList.add('insane');
+            } else if (value === 'Hard Demon') {
+                difficultySelect.classList.add('hard');
+            } else if (value === 'Medium Demon' || value === 'Easy Demon') {
+                difficultySelect.classList.add('medium');
+            }
+        }
+
+        // Event listeners
+        difficultyFilter.addEventListener('change', function () {
+            filterLevels();
+            updateDifficultySelectColor();
+        });
+        lengthFilter.addEventListener('change', filterLevels);
+        tagFilter.addEventListener('change', filterLevels);
+        searchInput.addEventListener('input', filterLevels);
+
+        // Fonction pour obtenir l'emoji du tag
+        function getTagEmoji(tag) {
+            const emojis = {
+                wave: '🌊',
+                ship: '🚀',
+                overall: '🏄',
+                timing: '⏱️',
+                vitesse: '⚡',
+                nong: '🎵',
+            };
+            return emojis[tag] || '🏷️';
+        }
+
+        // Affichage initial avec les niveaux chargés
+        let allLevels = [];
+
+        async function initializeLevels() {
+            allLevels = await loadAllLevels();
+            renderLevels(allLevels);
+            updateDifficultySelectColor();
+        }
+
+        // Ne pas charger automatiquement - sera appelé après activation Supabase
+        // initializeLevels();
+
+        // Ajouter un écouteur pour recharger quand les soumissions changent
+        window.addEventListener('storage', async function (e) {
+            if (e.key === 'svChallengeSubmissions') {
+                allLevels = await loadAllLevels();
+                renderLevels(allLevels);
+                filterLevels();
+            }
         });
 
-        levelsList.appendChild(levelCard);
-    });
+        // Charger le meilleur clan
+        async function loadTopClan() {
+            console.log('🛡️ Chargement du meilleur clan...');
+            try {
+                // Attendre que supabaseClient soit disponible
+                let attempts = 0;
+                while (typeof supabaseClient === 'undefined' && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
 
-    // Mettre à jour les stats
-    levelCountElement.textContent = filteredLevels.length;
+                if (typeof supabaseClient === 'undefined') {
+                    console.log('❌ supabaseClient non disponible');
+                    return;
+                }
 
-    // Initialiser les particules après le rendu
-    setTimeout(() => {
-        if (typeof initBadgeParticles === 'function') {
-            initBadgeParticles();
-        }
-    }, 100);
-}
+                console.log('✅ supabaseClient disponible');
 
-// Fonction pour filtrer les niveaux
-function filterLevels() {
-    const difficulty = difficultyFilter.value;
-    const length = lengthFilter.value;
-    const tag = tagFilter ? tagFilter.value : '';
-    const searchTerm = searchInput.value.toLowerCase();
+                // Initialiser le stockage
+                if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
+                    await initializeSupabaseStorage();
+                }
 
-    console.log('Filtrage:', { difficulty, length, tag, searchTerm });
+                // Attendre universalStorage
+                let storageAttempts = 0;
+                while (!universalStorage && storageAttempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    storageAttempts++;
+                }
 
-    const filtered = allLevels.filter(level => {
-        const matchDifficulty = !difficulty || level.difficulty === difficulty;
-        const matchLength = !length || level.length === length;
-        const matchTag = !tag || (level.tags && level.tags.includes(tag));
-        const matchSearch = !searchTerm ||
-            level.name.toLowerCase().includes(searchTerm) ||
-            level.creator.toLowerCase().includes(searchTerm);
+                if (!universalStorage) {
+                    console.log('❌ universalStorage non disponible');
+                    return;
+                }
 
-        if (tag && matchTag) {
-            console.log('Niveau avec tag:', level.name, level.tags);
-        }
+                console.log('✅ universalStorage disponible');
 
-        return matchDifficulty && matchLength && matchTag && matchSearch;
-    });
+                // Récupérer tous les clans
+                const { data: clans } = await supabaseClient.from('clans').select('*');
+                console.log('📋 Clans trouvés:', clans?.length || 0);
+                if (!clans || clans.length === 0) return;
 
-    console.log('Niveaux filtrés:', filtered.length);
-    renderLevels(filtered);
-}
+                const allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+                console.log('📊 Records chargés:', allRecords.length);
+                const allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
 
-// Fonction pour colorer le select de difficulté
-function updateDifficultySelectColor() {
-    const difficultySelect = document.getElementById('difficulty-filter');
-    difficultySelect.className = ''; // Réinitialiser les classes
-    const value = difficultySelect.value;
+                // Calculer les stats
+                let topClan = null;
+                let maxPoints = 0;
 
-    if (value === 'Extreme Demon') {
-        difficultySelect.classList.add('extreme');
-    } else if (value === 'Insane Demon') {
-        difficultySelect.classList.add('insane');
-    } else if (value === 'Hard Demon') {
-        difficultySelect.classList.add('hard');
-    } else if (value === 'Medium Demon' || value === 'Easy Demon') {
-        difficultySelect.classList.add('medium');
-    }
-}
+                for (const clan of clans) {
+                    const { data: members } = await supabaseClient
+                        .from('clan_members')
+                        .select('user_id')
+                        .eq('clan_id', clan.id);
 
-// Event listeners
-difficultyFilter.addEventListener('change', function () {
-    filterLevels();
-    updateDifficultySelectColor();
-});
-lengthFilter.addEventListener('change', filterLevels);
-tagFilter.addEventListener('change', filterLevels);
-searchInput.addEventListener('input', filterLevels);
+                    if (!members || members.length === 0) continue;
 
-// Fonction pour obtenir l'emoji du tag
-function getTagEmoji(tag) {
-    const emojis = {
-        wave: '🌊',
-        ship: '🚀',
-        overall: '🏄',
-        timing: '⏱️',
-        vitesse: '⚡',
-        nong: '🎵',
-    };
-    return emojis[tag] || '🏷️';
-}
+                    const memberIds = members.map(m => m.user_id);
+                    const { data: profiles } = await supabaseClient
+                        .from('profiles')
+                        .select('id, username')
+                        .in('id', memberIds);
 
-// Affichage initial avec les niveaux chargés
-let allLevels = [];
+                    const memberUsernames = profiles ? profiles.map(p => p.username) : [];
+                    const clanRecords = allRecords.filter(r => r.status === 'accepted' && memberUsernames.includes(r.player));
 
-async function initializeLevels() {
-    allLevels = await loadAllLevels();
-    renderLevels(allLevels);
-    updateDifficultySelectColor();
-}
+                    const levelPointsMap = {};
+                    clanRecords.forEach(record => {
+                        if (!levelPointsMap[record.levelId]) {
+                            const level = allLevels.find(l => String(l.id) === String(record.levelId));
+                            let points = 0;
+                            if (level && level.approvedRank) {
+                                const rank = level.approvedRank;
+                                if (rank === 1) points = 150;
+                                else if (rank <= 10) points = 150 - (rank - 1) * 5;
+                                else if (rank <= 50) points = 100 - (rank - 10) * 2;
+                                else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
+                                else points = 10;
+                            }
+                            levelPointsMap[record.levelId] = points;
+                        }
+                    });
 
-// Ne pas charger automatiquement - sera appelé après activation Supabase
-// initializeLevels();
+                    let totalPoints = 0;
+                    Object.values(levelPointsMap).forEach(points => totalPoints += points);
 
-// Ajouter un écouteur pour recharger quand les soumissions changent
-window.addEventListener('storage', async function (e) {
-    if (e.key === 'svChallengeSubmissions') {
-        allLevels = await loadAllLevels();
-        renderLevels(allLevels);
-        filterLevels();
-    }
-});
+                    const clanLevels = allLevels.filter(l => l.status === 'accepted' && memberUsernames.includes(l.authorName));
+                    clanLevels.forEach(level => {
+                        if (level.approvedRank) {
+                            const rank = level.approvedRank;
+                            let points = 0;
+                            if (rank === 1) points = 150;
+                            else if (rank <= 10) points = 150 - (rank - 1) * 5;
+                            else if (rank <= 50) points = 100 - (rank - 10) * 2;
+                            else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
+                            else points = 10;
+                            totalPoints += points;
+                        }
+                    });
 
-// Charger le meilleur clan
-async function loadTopClan() {
-    console.log('🛡️ Chargement du meilleur clan...');
-    try {
-        // Attendre que supabaseClient soit disponible
-        let attempts = 0;
-        while (typeof supabaseClient === 'undefined' && attempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            attempts++;
-        }
+                    if (totalPoints > maxPoints) {
+                        maxPoints = totalPoints;
+                        topClan = {
+                            name: clan.name,
+                            tag: clan.tag,
+                            points: totalPoints,
+                            members: memberUsernames.length,
+                            records: clanRecords.length,
+                            id: clan.id
+                        };
+                    }
+                }
 
-        if (typeof supabaseClient === 'undefined') {
-            console.log('❌ supabaseClient non disponible');
-            return;
-        }
-
-        console.log('✅ supabaseClient disponible');
-
-        // Initialiser le stockage
-        if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
-            await initializeSupabaseStorage();
-        }
-
-        // Attendre universalStorage
-        let storageAttempts = 0;
-        while (!universalStorage && storageAttempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            storageAttempts++;
-        }
-
-        if (!universalStorage) {
-            console.log('❌ universalStorage non disponible');
-            return;
+                if (topClan) {
+                    console.log('🏆 Meilleur clan trouvé:', topClan);
+                    document.getElementById('topClanCard').style.display = 'block';
+                    document.getElementById('topClanName').textContent = `${topClan.tag ? `[${topClan.tag}] ` : ''}${topClan.name}`;
+                    document.getElementById('topClanStats').innerHTML = `
+                <span>🔥 Points : <strong>${topClan.points}</strong></span>
+                <span>👥 Membres : <strong>${topClan.members}</strong></span>
+                <span>🏆 Records : <strong>${topClan.records}</strong></span>
+            `;
+                    document.getElementById('topClanCard').onclick = () => window.location.href = `clan.html?id=${topClan.id}`;
+                    document.getElementById('topClanCard').style.cursor = 'pointer';
+                } else {
+                    console.log('❌ Aucun clan trouvé avec des points');
+                }
+            } catch (error) {
+                console.error('Erreur chargement meilleur clan:', error);
+            }
         }
 
-        console.log('✅ universalStorage disponible');
+        // Charger le meilleur clan au démarrage
+        if (document.getElementById('topClanCard')) {
+            loadTopClan();
+        }
 
-        // Récupérer tous les clans
-        const { data: clans } = await supabaseClient.from('clans').select('*');
-        console.log('📋 Clans trouvés:', clans?.length || 0);
-        if (!clans || clans.length === 0) return;
+        // Charger le meilleur joueur
+        async function loadTopPlayer() {
+            console.log('⭐ Chargement du meilleur joueur...');
+            try {
+                // Attendre que supabaseClient soit disponible
+                let attempts = 0;
+                while (typeof supabaseClient === 'undefined' && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
 
-        const allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
-        console.log('📊 Records chargés:', allRecords.length);
-        const allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
+                if (typeof supabaseClient === 'undefined') {
+                    console.log('❌ supabaseClient non disponible');
+                    return;
+                }
 
-        // Calculer les stats
-        let topClan = null;
-        let maxPoints = 0;
+                // Initialiser le stockage
+                if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
+                    await initializeSupabaseStorage();
+                }
 
-        for (const clan of clans) {
-            const { data: members } = await supabaseClient
-                .from('clan_members')
-                .select('user_id')
-                .eq('clan_id', clan.id);
+                // Attendre universalStorage
+                let storageAttempts = 0;
+                while (!universalStorage && storageAttempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    storageAttempts++;
+                }
 
-            if (!members || members.length === 0) continue;
+                if (!universalStorage) {
+                    console.log('❌ universalStorage non disponible');
+                    return;
+                }
 
-            const memberIds = members.map(m => m.user_id);
-            const { data: profiles } = await supabaseClient
-                .from('profiles')
-                .select('id, username')
-                .in('id', memberIds);
+                console.log('✅ Chargement des données du leaderboard...');
 
-            const memberUsernames = profiles ? profiles.map(p => p.username) : [];
-            const clanRecords = allRecords.filter(r => r.status === 'accepted' && memberUsernames.includes(r.player));
+                const allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
+                const allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
 
-            const levelPointsMap = {};
-            clanRecords.forEach(record => {
-                if (!levelPointsMap[record.levelId]) {
+                // Calculer les stats des joueurs
+                const playerStats = {};
+
+                // Records complétés
+                allRecords.filter(r => r.status === 'accepted').forEach(record => {
+                    if (!playerStats[record.player]) {
+                        playerStats[record.player] = { name: record.player, points: 0, levels: new Set(), records: 0 };
+                    }
+
                     const level = allLevels.find(l => String(l.id) === String(record.levelId));
-                    let points = 0;
-                    if (level && level.approvedRank) {
+                    if (level && level.approvedRank && !playerStats[record.player].levels.has(record.levelId)) {
                         const rank = level.approvedRank;
+                        let points = 0;
                         if (rank === 1) points = 150;
                         else if (rank <= 10) points = 150 - (rank - 1) * 5;
                         else if (rank <= 50) points = 100 - (rank - 10) * 2;
                         else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
                         else points = 10;
+
+                        playerStats[record.player].points += points;
+                        playerStats[record.player].levels.add(record.levelId);
                     }
-                    levelPointsMap[record.levelId] = points;
-                }
-            });
+                    playerStats[record.player].records++;
+                });
 
-            let totalPoints = 0;
-            Object.values(levelPointsMap).forEach(points => totalPoints += points);
+                // Niveaux vérifiés
+                allLevels.filter(l => l.status === 'accepted').forEach(level => {
+                    if (!playerStats[level.authorName]) {
+                        playerStats[level.authorName] = { name: level.authorName, points: 0, levels: new Set(), records: 0 };
+                    }
 
-            const clanLevels = allLevels.filter(l => l.status === 'accepted' && memberUsernames.includes(l.authorName));
-            clanLevels.forEach(level => {
-                if (level.approvedRank) {
-                    const rank = level.approvedRank;
-                    let points = 0;
-                    if (rank === 1) points = 150;
-                    else if (rank <= 10) points = 150 - (rank - 1) * 5;
-                    else if (rank <= 50) points = 100 - (rank - 10) * 2;
-                    else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
-                    else points = 10;
-                    totalPoints += points;
-                }
-            });
+                    if (level.approvedRank) {
+                        const rank = level.approvedRank;
+                        let points = 0;
+                        if (rank === 1) points = 150;
+                        else if (rank <= 10) points = 150 - (rank - 1) * 5;
+                        else if (rank <= 50) points = 100 - (rank - 10) * 2;
+                        else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
+                        else points = 10;
 
-            if (totalPoints > maxPoints) {
-                maxPoints = totalPoints;
-                topClan = {
-                    name: clan.name,
-                    tag: clan.tag,
-                    points: totalPoints,
-                    members: memberUsernames.length,
-                    records: clanRecords.length,
-                    id: clan.id
-                };
-            }
-        }
+                        playerStats[level.authorName].points += points;
+                    }
+                });
 
-        if (topClan) {
-            console.log('🏆 Meilleur clan trouvé:', topClan);
-            document.getElementById('topClanCard').style.display = 'block';
-            document.getElementById('topClanName').textContent = `${topClan.tag ? `[${topClan.tag}] ` : ''}${topClan.name}`;
-            document.getElementById('topClanStats').innerHTML = `
-                <span>🔥 Points : <strong>${topClan.points}</strong></span>
-                <span>👥 Membres : <strong>${topClan.members}</strong></span>
-                <span>🏆 Records : <strong>${topClan.records}</strong></span>
-            `;
-            document.getElementById('topClanCard').onclick = () => window.location.href = `clan.html?id=${topClan.id}`;
-            document.getElementById('topClanCard').style.cursor = 'pointer';
-        } else {
-            console.log('❌ Aucun clan trouvé avec des points');
-        }
-    } catch (error) {
-        console.error('Erreur chargement meilleur clan:', error);
-    }
-}
+                // Trouver le meilleur joueur
+                let topPlayer = null;
+                let maxPoints = 0;
 
-// Charger le meilleur clan au démarrage
-if (document.getElementById('topClanCard')) {
-    loadTopClan();
-}
+                Object.values(playerStats).forEach(player => {
+                    if (player.points > maxPoints) {
+                        maxPoints = player.points;
+                        topPlayer = player;
+                    }
+                });
 
-// Charger le meilleur joueur
-async function loadTopPlayer() {
-    console.log('⭐ Chargement du meilleur joueur...');
-    try {
-        // Attendre que supabaseClient soit disponible
-        let attempts = 0;
-        while (typeof supabaseClient === 'undefined' && attempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            attempts++;
-        }
-
-        if (typeof supabaseClient === 'undefined') {
-            console.log('❌ supabaseClient non disponible');
-            return;
-        }
-
-        // Initialiser le stockage
-        if (typeof initializeSupabaseStorage === 'function' && !universalStorage) {
-            await initializeSupabaseStorage();
-        }
-
-        // Attendre universalStorage
-        let storageAttempts = 0;
-        while (!universalStorage && storageAttempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            storageAttempts++;
-        }
-
-        if (!universalStorage) {
-            console.log('❌ universalStorage non disponible');
-            return;
-        }
-
-        console.log('✅ Chargement des données du leaderboard...');
-
-        const allRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
-        const allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
-
-        // Calculer les stats des joueurs
-        const playerStats = {};
-
-        // Records complétés
-        allRecords.filter(r => r.status === 'accepted').forEach(record => {
-            if (!playerStats[record.player]) {
-                playerStats[record.player] = { name: record.player, points: 0, levels: new Set(), records: 0 };
-            }
-
-            const level = allLevels.find(l => String(l.id) === String(record.levelId));
-            if (level && level.approvedRank && !playerStats[record.player].levels.has(record.levelId)) {
-                const rank = level.approvedRank;
-                let points = 0;
-                if (rank === 1) points = 150;
-                else if (rank <= 10) points = 150 - (rank - 1) * 5;
-                else if (rank <= 50) points = 100 - (rank - 10) * 2;
-                else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
-                else points = 10;
-
-                playerStats[record.player].points += points;
-                playerStats[record.player].levels.add(record.levelId);
-            }
-            playerStats[record.player].records++;
-        });
-
-        // Niveaux vérifiés
-        allLevels.filter(l => l.status === 'accepted').forEach(level => {
-            if (!playerStats[level.authorName]) {
-                playerStats[level.authorName] = { name: level.authorName, points: 0, levels: new Set(), records: 0 };
-            }
-
-            if (level.approvedRank) {
-                const rank = level.approvedRank;
-                let points = 0;
-                if (rank === 1) points = 150;
-                else if (rank <= 10) points = 150 - (rank - 1) * 5;
-                else if (rank <= 50) points = 100 - (rank - 10) * 2;
-                else if (rank <= 100) points = 20 - Math.floor((rank - 50) / 10);
-                else points = 10;
-
-                playerStats[level.authorName].points += points;
-            }
-        });
-
-        // Trouver le meilleur joueur
-        let topPlayer = null;
-        let maxPoints = 0;
-
-        Object.values(playerStats).forEach(player => {
-            if (player.points > maxPoints) {
-                maxPoints = player.points;
-                topPlayer = player;
-            }
-        });
-
-        if (topPlayer) {
-            console.log('🏆 Meilleur joueur trouvé:', topPlayer);
-            document.getElementById('topPlayerCard').style.display = 'block';
-            document.getElementById('topPlayerName').textContent = topPlayer.name;
-            document.getElementById('topPlayerStats').innerHTML = `
+                if (topPlayer) {
+                    console.log('🏆 Meilleur joueur trouvé:', topPlayer);
+                    document.getElementById('topPlayerCard').style.display = 'block';
+                    document.getElementById('topPlayerName').textContent = topPlayer.name;
+                    document.getElementById('topPlayerStats').innerHTML = `
                 <span>🔥 Points : <strong>${topPlayer.points}</strong></span>
                 <span>🎯 Niveaux : <strong>${topPlayer.levels.size}</strong></span>
                 <span>🏆 Records : <strong>${topPlayer.records}</strong></span>
             `;
-            document.getElementById('topPlayerCard').onclick = () => window.location.href = 'leaderboard.html';
-            document.getElementById('topPlayerCard').style.cursor = 'pointer';
-        } else {
-            console.log('❌ Aucun joueur trouvé avec des points');
+                    document.getElementById('topPlayerCard').onclick = () => window.location.href = 'leaderboard.html';
+                    document.getElementById('topPlayerCard').style.cursor = 'pointer';
+                } else {
+                    console.log('❌ Aucun joueur trouvé avec des points');
+                }
+            } catch (error) {
+                console.error('Erreur chargement meilleur joueur:', error);
+            }
         }
-    } catch (error) {
-        console.error('Erreur chargement meilleur joueur:', error);
-    }
-}
 
-// Charger le meilleur joueur au démarrage
-if (document.getElementById('topPlayerCard')) {
-    loadTopPlayer();
-}
+        // Charger le meilleur joueur au démarrage
+        if (document.getElementById('topPlayerCard')) {
+            loadTopPlayer();
+        }
