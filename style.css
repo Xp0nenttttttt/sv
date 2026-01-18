@@ -332,8 +332,8 @@ main {
 
 /* Badge gif positioning for index page (horizontal compact cards) */
 .home-page .badge-gif-chip {
-    top: -40px;
-    left: -25px;
+    top: -43px;
+    left: -27px;
     width: 140px;
     height: 140px;
 }
