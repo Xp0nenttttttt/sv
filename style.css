@@ -1,19 +1,25 @@
 #page-transition {
     position: fixed;
     inset: 0;
-    background:
-        radial-gradient(circle at center, #0ff, #050014 70%);
-    z-index: 9999;
+    z-index: 99999;
     pointer-events: none;
+    background:
+        radial-gradient(circle at var(--tx, 50%) var(--ty, 50%),
+            rgba(42, 250, 223, 0.9),
+            rgba(5, 0, 20, 0.95) 60%);
     opacity: 0;
     transform: scale(1.2);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition:
+        opacity 0.5s ease,
+        transform 0.5s ease;
 }
 
 #page-transition.active {
     opacity: 1;
     transform: scale(1);
 }
+
+
 
 
 * {
