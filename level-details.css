@@ -137,6 +137,7 @@
     border-radius: 10px;
     color: #e5e7eb;
     box-shadow: none;
+    justify-items: center;
 }
 
 .info-label {
