@@ -1,4 +1,10 @@
 const starCanvas = document.getElementById("starCanvas");
+if (!starCanvas) {
+    // Canvas n'existe que sur la page d'accueil
+    // Les autres pages n'ont pas besoin des particules du logo
+    export { };
+}
+
 const starCtx = starCanvas.getContext("2d");
 const header = document.querySelector("header");
 

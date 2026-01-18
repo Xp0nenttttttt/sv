@@ -129,7 +129,17 @@ async function loadAllLevels() {
                 tags: submission.tags || [],
                 badge: submission.badge || null,
                 verifier: submission.verifierName || null
-        const manager = new SubmissionManager();
+                };
+            });
+
+            if (submittedLevels.length > 0) {
+                return [...levels, ...submittedLevels].sort((a, b) => a.rank - b.rank);
+            }
+        }
+
+        // 3) Fallback localStorage direct
+        if (typeof SubmissionManager !== 'undefined') {
+            const manager = new SubmissionManager();
                 const acceptedSubmissions = manager.getAcceptedSubmissions();
 
                 const submittedLevels = acceptedSubmissions.map((submission) => {
