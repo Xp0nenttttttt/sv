@@ -299,11 +299,13 @@ function renderLevels(filteredLevels) {
 
         let rankDisplay = '#' + level.rank;
         let containerClass = 'level-container';
+        let cardClass = `difficulty-${difficultyIcon.key}`;
         let topParticles = '';
 
         if (level.rank === 1) {
             rankDisplay = '#' + level.rank;
             containerClass = 'top-1-container';
+            cardClass += ' top-1-rank';
             topParticles = '<canvas class="badge-canvas top-rank-canvas" data-top-rank="top1" width="160" height="160"></canvas>';
         }
         else if (level.rank === 2) {
@@ -315,6 +317,8 @@ function renderLevels(filteredLevels) {
 
         const badge = getBadgeGif(level.badge);
         const difficultyIcon = getDifficultyIcon(level.difficulty, level.badge);
+
+        levelCard.classList.add(...cardClass.split(' '));
 
         levelCard.innerHTML = `
             <div class="${containerClass}">
@@ -339,7 +343,7 @@ function renderLevels(filteredLevels) {
                     ` : ''}
                     <div class="level-details">
                         <div><strong>Créateur:</strong> ${level.creator}</div>
-                        ${level.verifier ? `<div><strong>Vérificateur:</strong> ${level.verifier}</div>` : ''}
+                        ${level.verifier ? `<div><strong>Verifier:</strong> ${level.verifier}</div>` : ''}
                         <div><strong>Points:</strong> <span class="points">${level.points}</span> pts</div>
                     </div>
                 </div>

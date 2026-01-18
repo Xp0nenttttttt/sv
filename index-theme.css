@@ -513,11 +513,55 @@ main {
     padding: 12px 16px;
     border-radius: var(--radius-md);
     background: linear-gradient(145deg, rgba(15, 20, 48, 0.95), rgba(9, 12, 30, 0.94));
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     overflow: hidden;
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     width: 100%;
+}
+
+/* Bordures par difficulté */
+.level-card.difficulty-extreme {
+    border-color: #ff1744;
+}
+
+.level-card.difficulty-insane {
+    border-color: #ff6d1f;
+}
+
+.level-card.difficulty-hard {
+    border-color: #ffd600;
+}
+
+.level-card.difficulty-medium {
+    border-color: #00e676;
+}
+
+.level-card.difficulty-easy {
+    border-color: #00b0ff;
+}
+
+/* Cadre RGB animé pour le top 1 */
+.level-card.top-1-rank {
+    animation: rgb-border 3s ease-in-out infinite;
+    border-color: #ff1744;
+}
+
+@keyframes rgb-border {
+    0% {
+        border-color: #ff1744;
+        box-shadow: 0 0 20px rgba(255, 23, 68, 0.6), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    50% {
+        border-color: #00e5ff;
+        box-shadow: 0 0 20px rgba(0, 229, 255, 0.6), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    100% {
+        border-color: #ff1744;
+        box-shadow: 0 0 20px rgba(255, 23, 68, 0.6), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
 }
 
 .level-card::before {
