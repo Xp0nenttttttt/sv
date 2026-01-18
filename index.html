@@ -15,6 +15,64 @@
     <link rel="stylesheet" href="index-theme.css">
 </head>
 <!-- Charger les adaptateurs de stockage (localStorage uniquement) -->
+<style>
+    body {
+        background: #0b0d14;
+        color: #e5e7eb;
+
+        background: linear-gradient(180deg, #0b0d14, #0e1020);
+    }
+
+    header {
+        background: #0f1220;
+        box-shadow: none;
+        border-bottom: 1px solid #1f2436;
+    }
+
+    .search-bar,
+    .filter-group {
+        background: #121628;
+        border: 1px solid #1f2436;
+        box-shadow: none;
+    }
+
+    .search-bar input {
+        background: transparent;
+        color: #e5e7eb;
+    }
+
+    .search-bar:hover {
+        border-color: #2a2f4a;
+    }
+
+    .level-card {
+        background: linear-gradient(180deg, #141826, #101422);
+        border: 1px solid #1f2436;
+        border-radius: 14px;
+        box-shadow: none;
+        transition: background 0.15s ease;
+    }
+
+    .level-card:hover {
+        background: #181c2e;
+    }
+
+    .rank-badge {
+        background: #e74c3c;
+        /* exemple */
+        color: #fff;
+        font-weight: 700;
+        border-radius: 6px;
+        box-shadow: none;
+    }
+
+    .tag {
+        background: #1c2036;
+        border-radius: 999px;
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="storage-adapter.js"></script>
 <script src="supabase-config.js"></script>
