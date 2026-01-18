@@ -253,6 +253,100 @@ main {
     box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
 }
 
+/* Filters (Dark theme refinement) */
+.filters {
+    background: #121628;
+    border: 1px solid #1f2436;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.filter-group {
+    background: #0f1324;
+    border: 1px solid #1f2436;
+    border-radius: 10px;
+    padding: 12px;
+    gap: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.filter-group:hover {
+    border-color: #2a2f4a;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.filter-group label {
+    color: #9aa3c7;
+}
+
+.filter-group select,
+.filter-group input {
+    background: #0b0f1e;
+    color: #e5e7eb;
+    border: 1px solid #1f2436;
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.filter-group select:hover,
+.filter-group input:hover {
+    border-color: #2a2f4a;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+    border-color: #5ea1ff;
+    box-shadow: 0 0 0 3px rgba(94, 161, 255, 0.18);
+}
+
+/* Difficulty select color mapping */
+#difficulty-filter.extreme {
+    background-color: rgba(255, 23, 68, 0.18);
+    border-color: #ff1744;
+    color: #ffdfe3;
+}
+
+#difficulty-filter.insane {
+    background-color: rgba(255, 109, 31, 0.18);
+    border-color: #ff6d1f;
+    color: #ffe4d3;
+}
+
+#difficulty-filter.hard {
+    background-color: rgba(255, 214, 0, 0.18);
+    border-color: #ffd600;
+    color: #fff7cf;
+}
+
+#difficulty-filter.medium {
+    background-color: rgba(0, 230, 118, 0.18);
+    border-color: #00e676;
+    color: #dbffe9;
+}
+
+#difficulty-filter.easy {
+    background-color: rgba(0, 176, 255, 0.18);
+    border-color: #00b0ff;
+    color: #daf3ff;
+}
+
+/* Inline search bar (if present) */
+.search-bar {
+    background: #121628;
+    border: 1px solid #1f2436;
+    border-radius: 10px;
+    padding: 8px 12px;
+}
+
+.search-bar input {
+    background: transparent;
+    color: #e5e7eb;
+}
+
+.search-bar:hover {
+    border-color: #2a2f4a;
+}
+
 /* Levels List */
 .levels-list {
     display: grid;
