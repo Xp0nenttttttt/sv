@@ -1,5 +1,26 @@
 #page-transition {
     position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 9999;
+}
+
+#page-transition.active {
+    opacity: 1;
+}
+
+#page-transition.enter {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#page-transition {
+    position: fixed;
     inset: 0;
     z-index: 99999;
     pointer-events: none;
