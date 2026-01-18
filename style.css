@@ -366,9 +366,6 @@ main {
 
 /* Top 1 Special Style */
 .level-card.top-1 {
-    border: 3px solid #b58c0a;
-    border-left: 5px solid #d6ad1a;
-    background: linear-gradient(135deg, #2d2615 0%, #1b1610 100%);
     box-shadow: 0 8px 25px rgba(214, 173, 26, 0.35);
 }
 
@@ -389,27 +386,19 @@ main {
 
 /* Top 2-3 Style (Silver/Argent) */
 .level-card.top-2-3 {
-    border: 2px solid #9ea4b3;
-    border-left: 5px solid #bcc3d4;
-    background: linear-gradient(135deg, #2b2f38 0%, #1f222a 100%);
     box-shadow: 0 6px 20px rgba(188, 195, 212, 0.28);
 }
 
 .level-card.top-2-3:hover {
-    border-left-color: #a8a8a8;
     box-shadow: 0 8px 25px rgba(192, 192, 192, 0.4);
 }
 
 /* Top 4-5 Style (Bronze) */
 .level-card.top-4-5 {
-    border: 2px solid #a86a2d;
-    border-left: 5px solid #c07d3a;
-    background: linear-gradient(135deg, #2b2118 0%, #1c150f 100%);
     box-shadow: 0 6px 20px rgba(192, 125, 58, 0.28);
 }
 
 .level-card.top-4-5:hover {
-    border-left-color: #b8722d;
     box-shadow: 0 8px 25px rgba(205, 127, 50, 0.4);
 }
 
