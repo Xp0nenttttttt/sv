@@ -1,4 +1,5 @@
 // account-details.js
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const username = getUserFromUrl();
@@ -12,11 +13,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('✅ Supabase activé (page compte)');
         }
 
-        // Précharger les données
-        await universalStorage.getData('svChallengeSubmissions');
-        await universalStorage.getData('svChallengeRecordSubmissions');
+        // Précharger
+        const allLevels =
+            await universalStorage.getData('svChallengeSubmissions') || [];
 
-        const data = await fetchAccountData(username);
+        const data = await fetchAccountData(username, allLevels);
         renderAccountDetails(data, username);
 
     } catch (err) {
@@ -33,7 +34,7 @@ function getUserFromUrl() {
 
 // ──────────────────────────────
 // Data
-async function fetchAccountData(username) {
+async function fetchAccountData(username, allLevels) {
     const [players, verifiers] = await Promise.all([
         leaderboardManager.getPlayersLeaderboard(),
         leaderboardManager.getVerifiersLeaderboard()
@@ -47,60 +48,54 @@ async function fetchAccountData(username) {
         v.name && v.name.toLowerCase() === username.toLowerCase()
     );
 
-    const submissions =
-        await universalStorage.getData('svChallengeSubmissions') || [];
-
-    // ✅ Niveaux créés ACCEPTÉS uniquement
-    const allLevels =
-        await universalStorage.getData('svChallengeSubmissions') || [];
-
-    // On garde seulement les niveaux acceptés
-    const acceptedLevels = allLevels.filter(lvl =>
-        lvl.status === 'accepted'
+    // 🔒 niveaux acceptés uniquement
+    const acceptedLevels = allLevels.filter(
+        lvl => lvl.status === 'accepted'
     );
+
+    // ✅ NIVEAUX CRÉÉS
     const createdLevels = acceptedLevels
         .filter(lvl =>
-            lvl.creator &&
-            lvl.creator.toLowerCase() === username.toLowerCase()
+            lvl.authorName &&
+            lvl.authorName.toLowerCase() === username.toLowerCase()
         )
         .map(lvl => ({
             levelId: lvl.id,
-            levelName: lvl.levelName || lvl.name || 'Niveau inconnu',
-            approvedRank: lvl.rank ?? '-'
+            levelName: lvl.levelName,
+            rank: lvl.approvedRank,
+            difficulty: lvl.approvedDifficulty
         }));
 
-
-
-    // ✅ Niveaux battus
+    // ✅ NIVEAUX BATTUS
     const beatenLevels = player?.records
         ? player.records.map(r => {
-            const level = acceptedLevels.find(l => l.id === r.levelId);
+            const level = acceptedLevels.find(
+                l => String(l.id) === String(r.levelId)
+            );
             return {
                 levelId: r.levelId,
-                levelName: level?.name || r.levelName || 'Niveau inconnu',
-                rank: r.rank,
+                levelName: level?.levelName || 'Niveau inconnu',
+                rank: level?.approvedRank ?? r.rank,
                 points: r.points,
                 percentage: r.percentage
             };
         })
         : [];
 
-
-
-    // ✅ Niveaux vérifiés
+    // ✅ NIVEAUX VÉRIFIÉS
     const verifiedLevels = verifier?.levels
         ? verifier.levels.map(v => {
-            const level = acceptedLevels.find(l => l.id === v.levelId);
+            const level = acceptedLevels.find(
+                l => String(l.id) === String(v.levelId)
+            );
             return {
                 levelId: v.levelId,
-                levelName: level?.name || 'Niveau inconnu',
-                rank: v.rank,
+                levelName: level?.levelName || 'Niveau inconnu',
+                rank: level?.approvedRank,
                 points: v.points
             };
         })
         : [];
-
-
 
     return { player, verifier, createdLevels, beatenLevels, verifiedLevels };
 }
@@ -110,7 +105,8 @@ async function fetchAccountData(username) {
 function renderAccountDetails(data, username) {
     const { player, verifier, createdLevels, beatenLevels, verifiedLevels } = data;
 
-    document.getElementById('account-title').textContent = `Compte : ${username}`;
+    document.getElementById('account-title').textContent =
+        `Compte : ${username}`;
 
     const infoDiv = document.getElementById('account-info');
     infoDiv.innerHTML = '';
@@ -129,17 +125,23 @@ function renderAccountDetails(data, username) {
         `;
     }
 
-    renderList('created-levels-list', createdLevels,
-        l => `${l.levelName} (Rank ${l.approvedRank || '-'})`,
+    renderList(
+        'created-levels-list',
+        createdLevels,
+        l => `${l.levelName} (Rank ${l.rank})`,
         'Aucun niveau créé'
     );
 
-    renderList('beaten-levels-list', beatenLevels,
+    renderList(
+        'beaten-levels-list',
+        beatenLevels,
         r => `${r.levelName} (Rank ${r.rank}) - ${r.points} pts - ${r.percentage}%`,
         'Aucun niveau battu'
     );
 
-    renderList('verifications-list', verifiedLevels,
+    renderList(
+        'verifications-list',
+        verifiedLevels,
         l => `${l.levelName} (Rank ${l.rank}) - ${l.points} pts`,
         'Aucun niveau vérifié'
     );
@@ -151,7 +153,7 @@ function renderList(id, items, formatter, emptyText) {
     const el = document.getElementById(id);
     el.innerHTML = '';
 
-    if (items.length === 0) {
+    if (!items || items.length === 0) {
         el.innerHTML = `<li>${emptyText}</li>`;
         return;
     }
@@ -160,4 +162,3 @@ function renderList(id, items, formatter, emptyText) {
         el.innerHTML += `<li>${formatter(item)}</li>`;
     });
 }
-console.log(acceptedLevels[0]);
