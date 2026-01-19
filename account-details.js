@@ -170,6 +170,8 @@ async function fetchUserClan(username) {
 // Render
 function renderAccountDetails(data, username, profile, clan) {
     const { player, verifier, createdLevels, beatenLevels, verifiedLevels } = data;
+
+    // 🎖️ BADGE
     const badgeContainer = document.getElementById('rank-badges');
     badgeContainer.innerHTML = '';
 
@@ -181,28 +183,24 @@ function renderAccountDetails(data, username, profile, clan) {
         badgeContainer.innerHTML = `<span class="top3-badge">TOP 3</span>`;
     }
 
+    // 👤 TITRE
     const title = document.getElementById('account-title');
-
     title.innerHTML = `
-    ${data.isTop1 ? `<span class="top1-badge">TOP 1</span>` : ''}
-    ${data.isTop2 ? `<span class="top2-badge">TOP 2</span>` : ''}
-    ${data.isTop3 ? `<span class="top3-badge">TOP 3</span>` : ''}
+        <span class="account-name">
+            ${clan?.tag ? `<span class="clan-tag">[${clan.tag}]</span>` : ''}
+            ${username}
+        </span>
 
-    <span class="account-name">
-        ${clan?.tag ? `<span class="clan-tag">[${clan.tag}]</span>` : ''}
-        ${username}
-    </span>
+        ${profile?.avatar_url ? `
+            <img
+                src="${profile.avatar_url}"
+                alt="Avatar ${username}"
+                class="account-avatar"
+            />
+        ` : ''}
+    `;
 
-    ${profile?.avatar_url ? `
-        <img
-            src="${profile.avatar_url}"
-            alt="Avatar ${username}"
-            class="account-avatar"
-        />
-    ` : ''}
-`;
-
-
+    // ℹ️ INFOS
     const infoDiv = document.getElementById('account-info');
     infoDiv.innerHTML = '';
 
@@ -220,28 +218,22 @@ function renderAccountDetails(data, username, profile, clan) {
         `;
     }
 
-    renderList(
-        'created-levels-list',
-        createdLevels,
+    renderList('created-levels-list', createdLevels,
         l => `${l.levelName} (Top ${l.rank})`,
         'Aucun niveau créé'
     );
 
-    renderList(
-        'beaten-levels-list',
-        beatenLevels,
+    renderList('beaten-levels-list', beatenLevels,
         r => `${r.levelName} (Top ${r.rank}) - ${r.points} pts - ${r.percentage}%`,
         'Aucun niveau battu'
     );
 
-    renderList(
-        'verifications-list',
-        verifiedLevels,
+    renderList('verifications-list', verifiedLevels,
         l => `${l.levelName} (Top ${l.rank}) - ${l.points} pts`,
         'Aucun niveau vérifié'
     );
-    renderStats(createdLevels.length, beatenLevels.length, verifiedLevels.length);
 
+    renderStats(createdLevels.length, beatenLevels.length, verifiedLevels.length);
 }
 
 // ──────────────────────────────
