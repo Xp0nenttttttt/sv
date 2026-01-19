@@ -67,7 +67,9 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="creatorName">Créateur du niveau *</label>
-                            <input type="text" id="creatorName" name="creatorName" placeholder="Créateur" required>
+                            <select id="creatorName" name="creatorName" required>
+                                <option value="">Sélectionner un compte...</option>
+                            </select>
                         </div>
                     </div>
 
@@ -207,6 +209,21 @@
             if (typeof maintenanceManager !== 'undefined') {
                 await maintenanceManager.checkAndRedirect();
             }
+        })();
+    </script>
+    <script src="user-list.js"></script>
+    <script>
+        // Remplit la liste des comptes créés pour le créateur du niveau
+        (async function () {
+            const select = document.getElementById('creatorName');
+            if (!select) return;
+            const usernames = await fetchUsernames();
+            usernames.forEach(username => {
+                const opt = document.createElement('option');
+                opt.value = username;
+                opt.textContent = username;
+                select.appendChild(opt);
+            });
         })();
     </script>
 
