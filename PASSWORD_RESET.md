@@ -2,7 +2,15 @@
 
 ## 📋 Vue d'ensemble
 
-Un système complet de réinitialisation de mot de passe a été intégré au panneau admin. Les administrateurs peuvent réinitialiser leur mot de passe s'ils l'ont oublié.
+Un système complet de réinitialisation de mot de passe a été intégré pour **les administrateurs ET les utilisateurs normaux**.
+
+### Pour les Administrateurs
+- Réinitialisation par email (`admin.html` → "Mot de passe oublié")
+- Changement depuis le panneau admin (quand connecté)
+
+### Pour les Utilisateurs
+- Réinitialisation par email (`auth.html` → "Mot de passe oublié")
+- Changement depuis la page compte (`auth.html`, section "Changer mon mot de passe")
 
 ## 🔧 Configuration requise
 
@@ -17,7 +25,10 @@ Vous **DEVEZ** configurer l'URL de redirection dans Supabase pour que les emails
    ```
    http://localhost:3000/reset-password.html
    http://localhost:5500/reset-password.html
+   http://localhost:3000/user-reset-password.html
+   http://localhost:5500/user-reset-password.html
    https://votre-domaine.com/reset-password.html
+   https://votre-domaine.com/user-reset-password.html
    ```
    *(Adaptez selon votre environnement)*
 
@@ -31,8 +42,9 @@ Par défaut, Supabase utilise son service d'email. Vous pouvez aussi configurer 
 
 ## 🔐 Utilisation
 
-### Pour l'utilisateur (administrateur)
+### Pour les administrateurs
 
+**Mot de passe oublié :**
 1. Allez sur `admin.html`
 2. Cliquez sur **"Mot de passe oublié ?"**
 3. Entrez votre adresse email admin
@@ -42,6 +54,36 @@ Par défaut, Supabase utilise son service d'email. Vous pouvez aussi configurer 
 7. Entrez votre nouveau mot de passe
 8. Cliquez sur **"Réinitialiser le mot de passe"**
 9. Vous êtes redirigé et pouvez vous reconnecter
+
+**Changer le mot de passe (une fois connecté) :**
+1. Connectez-vous au panneau admin
+2. Cliquez sur **"🔑 Changer mon mot de passe"** (ou allez dans "Gérer les comptes")
+3. Entrez votre mot de passe actuel
+4. Entrez le nouveau mot de passe
+5. Confirmez
+6. Votre mot de passe est mis à jour immédiatement
+
+### Pour les utilisateurs normaux
+
+**Mot de passe oublié :**
+1. Allez sur `auth.html`
+2. Cliquez sur **"Mot de passe oublié ?"**
+3. Entrez votre adresse email
+4. Cliquez sur **"Envoyer le lien de réinitialisation"**
+5. Consultez votre email (y compris les spams !)
+6. Cliquez le lien dans l'email
+7. Entrez votre nouveau mot de passe
+8. Confirmez
+9. Vous êtes redirigé et pouvez vous connecter
+
+**Changer le mot de passe (une fois connecté) :**
+1. Allez sur `auth.html`
+2. Connectez-vous
+3. Dans la section **"🔑 Changer mon mot de passe"**
+4. Entrez votre mot de passe actuel
+5. Entrez le nouveau mot de passe
+6. Confirmez
+7. Votre mot de passe est mis à jour immédiatement
 
 ## 📧 Emails de réinitialisation
 
@@ -172,9 +214,19 @@ Sans cette configuration :
 
 ## 📝 Fichiers impliqués
 
-- `admin.html` - Formulaire de connexion + lien "Mot de passe oublié"
-- `password-reset.js` - Logique d'envoi de l'email
-- `reset-password.html` - Page de réinitialisation du mot de passe
+### Pour les administrateurs
+- `admin.html` - Formulaire de connexion + lien "Mot de passe oublié" + changement de mot de passe
+- `admin-accounts.html` - Changement de mot de passe dans la gestion des comptes
+- `password-reset.js` - Logique d'envoi de l'email (admins)
+- `reset-password.html` - Page de réinitialisation du mot de passe (admins)
+- `admin-password-change.js` - Logique de changement de mot de passe (admins connectés)
+
+### Pour les utilisateurs normaux
+- `auth.html` - Connexion + lien "Mot de passe oublié" + changement de mot de passe
+- `user-reset-password.html` - Page de réinitialisation du mot de passe (utilisateurs)
+- `user-password-change.js` - Logique de changement de mot de passe (utilisateurs connectés)
+
+### Commun
 - `supabase-config.js` - Configuration Supabase
 
 ## 💡 Améliorations futures possibles

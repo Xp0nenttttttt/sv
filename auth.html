@@ -99,6 +99,10 @@
             </div>
             <div id="authStatus" class="muted" style="margin-top:8px;"></div>
             <div id="authError" class="error"></div>
+            <div style="margin-top:12px; text-align: center;">
+                <a href="user-reset-password.html" style="color: #667eea; text-decoration: none; font-size: 0.9em;">Mot
+                    de passe oublié ?</a>
+            </div>
         </div>
 
         <div class="card" style="margin-top:16px;">
@@ -116,8 +120,27 @@
             </div>
             <div id="profileMsg" class="muted" style="margin-top:8px;"></div>
         </div>
+
+        <!-- Section Changement de mot de passe -->
+        <div class="card" style="margin-top:16px;">
+            <h2>🔑 Changer mon mot de passe</h2>
+            <label for="userCurrentPassword">Mot de passe actuel</label>
+            <input type="password" id="userCurrentPassword" placeholder="Mot de passe actuel"
+                autocomplete="current-password">
+            <label for="userNewPassword">Nouveau mot de passe</label>
+            <input type="password" id="userNewPassword" placeholder="Nouveau mot de passe (min. 6 caractères)"
+                autocomplete="new-password" minlength="6">
+            <label for="userConfirmPassword">Confirmer le nouveau mot de passe</label>
+            <input type="password" id="userConfirmPassword" placeholder="Confirmer le nouveau mot de passe"
+                autocomplete="new-password" minlength="6">
+            <div style="margin-top:8px;">
+                <button class="btn" id="changePasswordBtn">Changer le mot de passe</button>
+            </div>
+            <div id="passwordChangeMsg" class="muted" style="margin-top:8px;"></div>
+        </div>
     </main>
     <script src="account.js"></script>
+    <script src="user-password-change.js"></script>
     <div id="page-transition"></div>
     <script src="page-transition.js"></script>
 
