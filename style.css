@@ -1248,12 +1248,19 @@ body.ultra-neon header h1 {
     transform: translateX(4px);
 }
 
-.account-page .particles {
+.particles {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: -1;
+    z-index: 0;
 }
+
+.container,
+.account-page .container {
+    position: relative;
+    z-index: 2;
+}
+
 
 .account-page .particle {
     width: 2px;

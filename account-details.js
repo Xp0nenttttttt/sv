@@ -17,8 +17,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const allLevels =
             await universalStorage.getData('svChallengeSubmissions') || [];
 
-        const data = await fetchAccountData(username, allLevels);
-        renderAccountDetails(data, username);
+        const [data, profile] = await Promise.all([
+            fetchAccountData(username),
+            fetchUserProfile(username)
+        ]);
+
+        renderAccountDetails(data, username, profile);
+
 
     } catch (err) {
         console.error('❌ Erreur chargement compte:', err);
@@ -35,6 +40,19 @@ function getUserFromUrl() {
 // ──────────────────────────────
 // Data
 async function fetchAccountData(username, allLevels) {
+    const title = document.getElementById('account-title');
+
+    title.innerHTML = `
+    <span class="account-name">${username}</span>
+    ${profile?.avatar_url ? `
+        <img
+            src="${profile.avatar_url}"
+            alt="Avatar ${username}"
+            class="account-avatar"
+        />
+    ` : ''}
+`;
+
     const [players, verifiers] = await Promise.all([
         leaderboardManager.getPlayersLeaderboard(),
         leaderboardManager.getVerifiersLeaderboard()
@@ -102,7 +120,7 @@ async function fetchAccountData(username, allLevels) {
 
 // ──────────────────────────────
 // Render
-function renderAccountDetails(data, username) {
+function renderAccountDetails(data, username, profile) {
     const { player, verifier, createdLevels, beatenLevels, verifiedLevels } = data;
 
     document.getElementById('account-title').textContent =
@@ -172,5 +190,21 @@ function renderList(id, items, formatter, emptyText) {
 
         el.appendChild(li);
     });
+}
+async function fetchUserProfile(username) {
+    if (!window.supabase) return null;
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .ilike('username', username)
+        .single();
+
+    if (error) {
+        console.warn('Avatar introuvable:', error.message);
+        return null;
+    }
+
+    return data;
 }
 
