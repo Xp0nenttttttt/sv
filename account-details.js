@@ -26,14 +26,7 @@ function getUserFromUrl() {
     const params = new URLSearchParams(window.location.search);
     return params.get('user');
 }
-const createdLevels = submissions.filter(lvl =>
-    lvl.creator === username &&
-    (
-        lvl.status === 'accepted' ||
-        lvl.status === 'approved' ||
-        lvl.isAccepted === true
-    )
-);
+
 async function fetchAccountData(username) {
     // On suppose que leaderboardManager, dataSyncManager, etc. sont déjà chargés
     // Récupère records, vérifications et niveaux créés pour ce compte
@@ -44,9 +37,16 @@ async function fetchAccountData(username) {
 
     const player = players.find(p => p.name.toLowerCase() === username.toLowerCase());
     const verifier = verifiers.find(v => v.name.toLowerCase() === username.toLowerCase());
-
+    const createdLevels = submissions.filter(lvl =>
+        lvl.creator === username &&
+        (
+            lvl.status === 'accepted' ||
+            lvl.status === 'approved' ||
+            lvl.isAccepted === true
+        )
+    );
     // Niveaux créés (auteur)
-    let createdLevels = [];
+
     let allLevels = [];
     if (typeof dataSyncManager !== 'undefined' && dataSyncManager.loadLevels) {
         allLevels = await dataSyncManager.loadLevels();
