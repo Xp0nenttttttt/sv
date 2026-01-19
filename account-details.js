@@ -20,15 +20,38 @@ async function fetchAccountData(username) {
 
     // Niveaux créés (auteur)
     let createdLevels = [];
+    let allLevels = [];
     if (typeof dataSyncManager !== 'undefined' && dataSyncManager.loadLevels) {
-        const allLevels = await dataSyncManager.loadLevels();
-        createdLevels = allLevels.filter(l => l.authorName && l.authorName.toLowerCase() === username.toLowerCase());
+        allLevels = await dataSyncManager.loadLevels();
     } else if (typeof universalStorage !== 'undefined' && universalStorage.getData) {
-        const allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
-        createdLevels = allLevels.filter(l => l.authorName && l.authorName.toLowerCase() === username.toLowerCase());
+        allLevels = await universalStorage.getData('svChallengeSubmissions') || [];
+    }
+    createdLevels = allLevels.filter(l => l.authorName && l.authorName.toLowerCase() === username.toLowerCase());
+
+    // Niveaux battus (où il a un record)
+    let beatenLevels = [];
+    if (player && player.records) {
+        beatenLevels = player.records.map(r => ({
+            levelName: r.levelName,
+            levelId: r.levelId,
+            rank: r.rank,
+            points: r.points,
+            percentage: r.percentage
+        }));
     }
 
-    return { player, verifier, createdLevels };
+    // Niveaux vérifiés (où il est vérificateur)
+    let verifiedLevels = [];
+    if (verifier && verifier.levels) {
+        verifiedLevels = verifier.levels.map(l => ({
+            levelName: l.levelName,
+            levelId: l.levelId,
+            rank: l.rank,
+            points: l.points
+        }));
+    }
+
+    return { player, verifier, createdLevels, beatenLevels, verifiedLevels };
 }
 
 function renderAccountDetails({ player, verifier, createdLevels }, username) {
@@ -41,41 +64,37 @@ function renderAccountDetails({ player, verifier, createdLevels }, username) {
     if (verifier) {
         infoDiv.innerHTML += `<b>Niveaux vérifiés :</b> ${verifier.levelsVerified} | <b>Points vérif :</b> ${verifier.totalPoints}<br>`;
     }
-    if (createdLevels.length > 0) {
-        infoDiv.innerHTML += `<b>Niveaux créés :</b> ${createdLevels.length}`;
-    }
-
-    // Records
-    const recordsList = document.getElementById('records-list');
-    recordsList.innerHTML = '';
-    if (player && player.records.length > 0) {
-        player.records.forEach(r => {
-            recordsList.innerHTML += `<li>${r.levelName} (Rank ${r.rank}) - ${r.points} pts - ${r.percentage}%</li>`;
-        });
-    } else {
-        recordsList.innerHTML = '<li>Aucun record</li>';
-    }
-
-    // Vérifications
-    const verifList = document.getElementById('verifications-list');
-    verifList.innerHTML = '';
-    if (verifier && verifier.levels.length > 0) {
-        verifier.levels.forEach(l => {
-            verifList.innerHTML += `<li>${l.levelName} (Rank ${l.rank}) - ${l.points} pts</li>`;
-        });
-    } else {
-        verifList.innerHTML = '<li>Aucune vérification</li>';
-    }
-
     // Niveaux créés
     const createdList = document.getElementById('created-levels-list');
     createdList.innerHTML = '';
-    if (createdLevels.length > 0) {
+    if (createdLevels && createdLevels.length > 0) {
         createdLevels.forEach(l => {
             createdList.innerHTML += `<li>${l.levelName} (Rank ${l.approvedRank || '-'})</li>`;
         });
     } else {
         createdList.innerHTML = '<li>Aucun niveau créé</li>';
+    }
+
+    // Niveaux battus
+    const beatenList = document.getElementById('beaten-levels-list');
+    beatenList.innerHTML = '';
+    if (player && player.records && player.records.length > 0) {
+        player.records.forEach(r => {
+            beatenList.innerHTML += `<li>${r.levelName} (Rank ${r.rank}) - ${r.points} pts - ${r.percentage}%</li>`;
+        });
+    } else {
+        beatenList.innerHTML = '<li>Aucun niveau battu</li>';
+    }
+
+    // Niveaux vérifiés
+    const verifList = document.getElementById('verifications-list');
+    verifList.innerHTML = '';
+    if (verifier && verifier.levels && verifier.levels.length > 0) {
+        verifier.levels.forEach(l => {
+            verifList.innerHTML += `<li>${l.levelName} (Rank ${l.rank}) - ${l.points} pts</li>`;
+        });
+    } else {
+        verifList.innerHTML = '<li>Aucun niveau vérifié</li>';
     }
 }
 
