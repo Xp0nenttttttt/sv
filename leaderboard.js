@@ -40,6 +40,10 @@ async function loadLeaderboards() {
     await renderCombinedLeaderboard();
 }
 
+function playerAccountLink(name) {
+    return `<a href="account-details.html?user=${encodeURIComponent(name)}" class="account-link">${escapeHtml(name)}</a>`;
+}
+
 async function renderCombinedLeaderboard() {
     let combined = await leaderboardManager.getCombinedLeaderboard();
 
@@ -95,7 +99,7 @@ async function renderCombinedLeaderboard() {
                         <div style="display:flex; align-items:center; margin-bottom:8px;">
                             ${avatarHtml}
                             <div>
-                                <div class="player-name">🎮 ${escapeHtml(entry.name)}</div>
+                                <div class="player-name">🎮 ${playerAccountLink(entry.name)}</div>
                                 ${entry.country ? `<div class="player-location">📍 ${escapeHtml(entry.country)}${entry.region ? ` - ${escapeHtml(entry.region)}` : ''}</div>` : ''}
                             </div>
                         </div>
@@ -131,7 +135,7 @@ async function renderCombinedLeaderboard() {
                         <div style="display:flex; align-items:center; margin-bottom:8px;">
                             ${avatarHtml}
                             <div>
-                                <div class="verifier-name">👤 ${escapeHtml(entry.name)}</div>
+                                <div class="verifier-name">👤 ${playerAccountLink(entry.name)}</div>
                                 ${entry.country ? `<div class="player-location">📍 ${escapeHtml(entry.country)}${entry.region ? ` - ${escapeHtml(entry.region)}` : ''}</div>` : ''}
                             </div>
                         </div>
@@ -166,7 +170,7 @@ async function renderCombinedLeaderboard() {
                         <div style="display:flex; align-items:center; margin-bottom:8px;">
                             ${avatarHtml}
                             <div>
-                                <div class="both-name">👥 ${escapeHtml(entry.name)} <span class="badge-both">(Joueur & Vérif)</span></div>
+                                <div class="both-name">👥 ${playerAccountLink(entry.name)} <span class="badge-both">(Joueur & Vérif)</span></div>
                                 ${entry.country ? `<div class="player-location">📍 ${escapeHtml(entry.country)}${entry.region ? ` - ${escapeHtml(entry.region)}` : ''}</div>` : ''}
                             </div>
                         </div>

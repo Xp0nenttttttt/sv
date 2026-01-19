@@ -149,7 +149,7 @@ async function loadMembers(clanId) {
         const role = m.role || 'member';
         const country = profile.country ? ` (${profile.country})` : '';
         const username = profile.username || m.user_id;
-        return `<div><strong>${username}</strong>${country} <span class="badge-role">${role}</span></div>`;
+        return `<div><strong>${playerAccountLink(username)}</strong>${country} <span class="badge-role">${role}</span></div>`;
     }));
 
     list.innerHTML = rows.join('');
@@ -338,7 +338,7 @@ async function loadClanLevels(clanId) {
                         </a>
                     </div>
                     <div class="first-clear">
-                        🥇 Premier clear: ${firstClear.player} 
+                        🥇 Premier clear: ${playerAccountLink(firstClear.player)} 
                         ${firstClear.percentage === 100 ? '(100%)' : `(${firstClear.percentage}%)`}
                     </div>
                 </div>
@@ -510,3 +510,7 @@ function showToast(message, type = 'success') {
 }
 
 document.addEventListener('DOMContentLoaded', initClanPage);
+
+function playerAccountLink(name) {
+    return `<a href="account-details.html?user=${encodeURIComponent(name)}" class="account-link">${name}</a>`;
+}

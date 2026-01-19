@@ -375,11 +375,11 @@ class LevelDetailsManager {
                 </div>
                 <div class="info-card">
                     <div class="info-label">👤 Créateur</div>
-                    <div class="info-value">${this.level.creator}</div>
+                    <div class="info-value">${playerAccountLink(this.level.creator)}</div>
                 </div>
                 <div class="info-card">
                     <div class="info-label">🏆 Vérificateur</div>
-                    <div class="info-value">${this.level.author}</div>
+                    <div class="info-value">${playerAccountLink(this.level.author)}</div>
                 </div>
                 <div class="info-card">
                     <div class="info-label">📊 Top proposé</div>
@@ -504,7 +504,7 @@ class LevelDetailsManager {
             <div class="record-card ${record.percentage === 100 ? 'record-complete' : ''}">
                 <div class="record-rank">#${index + 1}</div>
                 <div class="record-info">
-                    <div class="record-player">${record.player}</div>
+                    <div class="record-player">${playerAccountLink(record.player)}</div>
                     <div class="record-meta">
                         <span class="record-percentage">${record.percentage}%</span>
                         <span class="record-device">${record.device}</span>
@@ -657,6 +657,11 @@ class LevelDetailsManager {
             alert('ID: ' + levelId);
         });
     }
+}
+
+// Fonction utilitaire pour générer un lien vers la fiche joueur
+function playerAccountLink(name) {
+    return `<a href="account-details.html?user=${encodeURIComponent(name)}" class="account-link">${name}</a>`;
 }
 
 // Initialiser la page
