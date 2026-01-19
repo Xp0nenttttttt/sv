@@ -58,26 +58,46 @@ async function fetchAccountData(username) {
     const acceptedLevels = allLevels.filter(lvl =>
         lvl.status === 'accepted'
     );
+    const createdLevels = acceptedLevels.filter(lvl =>
+        lvl.creator &&
+        lvl.creator.toLowerCase() === username.toLowerCase()
+    ).map(lvl => ({
+        levelId: lvl.id,
+        levelName: lvl.name || lvl.levelName,
+        rank: lvl.rank
+    }));
 
 
     // ✅ Niveaux battus
     const beatenLevels = player?.records
-        ? player.records.map(r => ({
-            levelName: r.levelName,
-            rank: r.rank,
-            points: r.points,
-            percentage: r.percentage
-        }))
+        ? player.records.map(r => {
+            const level = acceptedLevels.find(l => l.id === r.levelId);
+            return {
+                levelId: r.levelId,
+                levelName: level?.name || r.levelName || 'Niveau inconnu',
+                rank: r.rank,
+                points: r.points,
+                percentage: r.percentage
+            };
+        })
         : [];
+
+
 
     // ✅ Niveaux vérifiés
     const verifiedLevels = verifier?.levels
-        ? verifier.levels.map(l => ({
-            levelName: l.levelName,
-            rank: l.rank,
-            points: l.points
-        }))
+        ? verifier.levels.map(v => {
+            const level = acceptedLevels.find(l => l.id === v.levelId);
+            return {
+                levelId: v.levelId,
+                levelName: level?.name || 'Niveau inconnu',
+                rank: v.rank,
+                points: v.points
+            };
+        })
         : [];
+
+
 
     return { player, verifier, createdLevels, beatenLevels, verifiedLevels };
 }
