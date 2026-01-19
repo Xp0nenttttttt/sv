@@ -128,21 +128,21 @@ function renderAccountDetails(data, username) {
     renderList(
         'created-levels-list',
         createdLevels,
-        l => `${l.levelName} (Rank ${l.rank})`,
+        l => `${l.levelName} (Top ${l.rank})`,
         'Aucun niveau créé'
     );
 
     renderList(
         'beaten-levels-list',
         beatenLevels,
-        r => `${r.levelName} (Rank ${r.rank}) - ${r.points} pts - ${r.percentage}%`,
+        r => `${r.levelName} (Top ${r.rank}) - ${r.points} pts - ${r.percentage}%`,
         'Aucun niveau battu'
     );
 
     renderList(
         'verifications-list',
         verifiedLevels,
-        l => `${l.levelName} (Rank ${l.rank}) - ${l.points} pts`,
+        l => `${l.levelName} (Top ${l.rank}) - ${l.points} pts`,
         'Aucun niveau vérifié'
     );
 }
