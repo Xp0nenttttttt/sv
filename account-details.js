@@ -16,12 +16,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const allLevels =
             await universalStorage.getData('svChallengeSubmissions') || [];
 
-        const [data, profile] = await Promise.all([
+        const [data, profile, clan] = await Promise.all([
             fetchAccountData(username, allLevels),
-            fetchUserProfile(username)
+            fetchUserProfile(username),
+            fetchUserClan(username)
         ]);
 
-        renderAccountDetails(data, username, profile);
+        renderAccountDetails(data, username, profile, clan);
+
 
     } catch (err) {
         console.error('❌ Erreur chargement compte:', err);
@@ -95,7 +97,11 @@ async function fetchAccountData(username, allLevels) {
         })
         : [];
 
-    return { player, verifier, createdLevels, beatenLevels, verifiedLevels };
+    const isTop1 = player?.rank === 1;
+    const isTop2 = player?.rank === 2;
+    const isTop3 = player?.rank === 3;
+
+    return { player, verifier, createdLevels, beatenLevels, verifiedLevels, isTop1, isTop2, isTop3 };
 }
 
 // ──────────────────────────────
@@ -123,6 +129,23 @@ async function fetchUserProfile(username) {
     return data;
 }
 
+async function fetchUserClan(username) {
+    const client = window.supabaseClient || window.supabase;
+    if (!client) return null;
+
+    const { data, error } = await client
+        .from('clans')
+        .select('tag')
+        .ilike('members', `%${username}%`)
+        .single();
+
+    if (error) {
+        console.warn('Clan introuvable:', error.message);
+        return null;
+    }
+
+    return data;
+}
 
 // ──────────────────────────────
 // Render
@@ -130,16 +153,24 @@ function renderAccountDetails(data, username, profile) {
     const { player, verifier, createdLevels, beatenLevels, verifiedLevels } = data;
 
     const title = document.getElementById('account-title');
+
     title.innerHTML = `
-        <span class="account-name">${username}</span>
-        ${profile?.avatar_url ? `
-            <img
-                src="${profile.avatar_url}"
-                alt="Avatar ${username}"
-                class="account-avatar"
-            />
-        ` : ''}
-    `;
+    ${data.isTop1 ? `<span class="top1-badge">TOP 1</span>` : ''}
+
+    <span class="account-name">
+        ${clan?.tag ? `<span class="clan-tag">[${clan.tag}]</span>` : ''}
+        ${username}
+    </span>
+
+    ${profile?.avatar_url ? `
+        <img
+            src="${profile.avatar_url}"
+            alt="Avatar ${username}"
+            class="account-avatar"
+        />
+    ` : ''}
+`;
+
 
     const infoDiv = document.getElementById('account-info');
     infoDiv.innerHTML = '';
