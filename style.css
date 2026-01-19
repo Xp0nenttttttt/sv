@@ -1268,3 +1268,51 @@ body.ultra-neon header h1 {
     background: rgba(42, 250, 223, 0.25);
     animation: float 35s linear infinite;
 }
+
+/* TAG CLAN */
+.clan-tag {
+    margin-right: 6px;
+    color: #2afadf;
+    font-weight: 700;
+}
+
+/* BADGE TOP 1 */
+.top1-badge {
+    background: linear-gradient(135deg, #ffd700, #ff9f1c);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 999px;
+    margin-right: 10px;
+    box-shadow: 0 0 20px rgba(255, 200, 0, 0.5);
+}
+
+.top2-badge {
+    background: linear-gradient(135deg, #c0c0c0, #8c8c8c);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 999px;
+    margin-right: 10px;
+    box-shadow: 0 0 20px rgba(192, 192, 192, 0.5);
+}
+
+.top3-badge {
+    background: linear-gradient(135deg, #cd7f32, #8b4513);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 999px;
+    margin-right: 10px;
+    box-shadow: 0 0 20px rgba(205, 127, 50, 0.5);
+}
+
+/* Avatar + nom alignement */
+#account-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
