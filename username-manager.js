@@ -100,3 +100,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = 'index.html';
     });
 });
+document.addEventListener('DOMContentLoaded', async () => {
+    const client = window.supabaseClient;
+    if (!client) return;
+
+    const input = document.getElementById('usernameInput');
+    const button = document.getElementById('saveUsername');
+    const errorBox = document.getElementById('usernameError');
+
+    button.addEventListener('click', async () => {
+        errorBox.textContent = '';
+
+        const username = input.value.trim();
+
+        // 🔎 validation
+        if (username.length < 3 || username.length > 20) {
+            errorBox.textContent = 'Le pseudo doit contenir entre 3 et 20 caractères';
+            return;
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            errorBox.textContent = 'Caractères autorisés : lettres, chiffres et _';
+            return;
+        }
+
+        const { data: { user } } = await client.auth.getUser();
+        if (!user) {
+            errorBox.textContent = 'Utilisateur non connecté';
+            return;
+        }
+
+        // 🔁 unicité
+        const { data: existing } = await client
+            .from('profiles')
+            .select('id')
+            .ilike('username', username)
+            .maybeSingle();
+
+        if (existing && existing.id !== user.id) {
+            errorBox.textContent = 'Ce pseudo est déjà utilisé';
+            return;
+        }
+
+        // 💾 UPSERT (la clé 🔑)
+        const { error } = await client
+            .from('profiles')
+            .upsert({
+                id: user.id,
+                username
+            });
+
+        if (error) {
+            console.error(error);
+            errorBox.textContent = 'Erreur lors de l’enregistrement';
+            return;
+        }
+
+        console.log('✅ Pseudo enregistré:', username);
+        window.location.replace('index.html');
+    });
+});
