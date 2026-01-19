@@ -1,3 +1,13 @@
+const usernameInput = document.getElementById('usernameInput');
+const avatarUrlInput = document.getElementById('avatarUrlInput');
+const countryInput = document.getElementById('countryInput');
+const regionInput = document.getElementById('regionInput');
+const newPassword = document.getElementById('newPassword');
+
+const errorBox = document.getElementById('errorBox');
+const saveBtn = document.getElementById('saveProfile');
+const changePwdBtn = document.getElementById('changePassword');
+
 document.addEventListener('DOMContentLoaded', async () => {
     await enableSupabaseStorage();
 
