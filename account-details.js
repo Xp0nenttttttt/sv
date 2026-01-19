@@ -159,6 +159,18 @@ function renderList(id, items, formatter, emptyText) {
     }
 
     items.forEach(item => {
-        el.innerHTML += `<li>${formatter(item)}</li>`;
+        const li = document.createElement('li');
+        li.innerHTML = formatter(item);
+        li.classList.add('clickable-level');
+
+        if (item.levelId) {
+            li.addEventListener('click', () => {
+                window.location.href =
+                    `level-details.html?id=${item.levelId}`;
+            });
+        }
+
+        el.appendChild(li);
     });
 }
+
