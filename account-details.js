@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const [data, profile, clan] = await Promise.all([
             fetchAccountData(username, allLevels),
             fetchUserProfile(username),
-            fetchUserClan(username)
+            fetchUserClans(username)
         ]);
 
         renderAccountDetails(data, username, profile, clan);
