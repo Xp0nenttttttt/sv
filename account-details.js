@@ -47,9 +47,9 @@ async function fetchAccountData(username, allLevels) {
     const combined = await leaderboardManager.getCombinedLeaderboard();
 
     const index = combined.findIndex(entry =>
-        entry.name &&
-        entry.name.toLowerCase() === username.toLowerCase()
+        entry?.name?.trim().toLowerCase() === username.trim().toLowerCase()
     );
+
 
     const isTop1 = index === 0;
     const isTop2 = index === 1;
@@ -310,9 +310,5 @@ function renderStats(created, beaten, verified) {
     document.querySelector('.fill.verified').style.width =
         `${(verified / max) * 100}%`;
 }
-console.log(
-    'Classement combiné:',
-    combined.map((e, i) => `${i + 1}. ${e.name} (${e.type})`)
 
-);
 
