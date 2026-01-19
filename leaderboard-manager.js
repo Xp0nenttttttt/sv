@@ -115,12 +115,16 @@ class LeaderboardManager {
         let allSubmissions;
 
         // Supabase via universalStorage si disponible
-        if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
-            allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+        if (typeof universalStorage !== 'undefined' && universalStorage && typeof universalStorage.getData === 'function') {
+            try {
+                allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
+            } catch (e) {
+                allSubmissions = [];
+            }
         }
 
         // Fallback JSON
-        if ((!allSubmissions || allSubmissions.length === 0) && typeof dataSyncManager !== 'undefined') {
+        if ((!allSubmissions || allSubmissions.length === 0) && typeof dataSyncManager !== 'undefined' && typeof dataSyncManager.loadLevels === 'function') {
             allSubmissions = await dataSyncManager.loadLevels();
         }
 
