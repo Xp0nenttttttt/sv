@@ -175,6 +175,8 @@ function renderAccountDetails(data, username, profile, clan) {
 
     title.innerHTML = `
     ${data.isTop1 ? `<span class="top1-badge">TOP 1</span>` : ''}
+    ${data.isTop2 ? `<span class="top2-badge">TOP 2</span>` : ''}
+    ${data.isTop3 ? `<span class="top3-badge">TOP 3</span>` : ''}
 
     <span class="account-name">
         ${clan?.tag ? `<span class="clan-tag">[${clan.tag}]</span>` : ''}
