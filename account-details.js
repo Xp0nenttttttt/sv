@@ -13,17 +13,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('✅ Supabase activé (page compte)');
         }
 
-        // Précharger
         const allLevels =
             await universalStorage.getData('svChallengeSubmissions') || [];
 
         const [data, profile] = await Promise.all([
-            fetchAccountData(username),
+            fetchAccountData(username, allLevels),
             fetchUserProfile(username)
         ]);
 
         renderAccountDetails(data, username, profile);
-
 
     } catch (err) {
         console.error('❌ Erreur chargement compte:', err);
@@ -40,19 +38,6 @@ function getUserFromUrl() {
 // ──────────────────────────────
 // Data
 async function fetchAccountData(username, allLevels) {
-    const title = document.getElementById('account-title');
-
-    title.innerHTML = `
-    <span class="account-name">${username}</span>
-    ${profile?.avatar_url ? `
-        <img
-            src="${profile.avatar_url}"
-            alt="Avatar ${username}"
-            class="account-avatar"
-        />
-    ` : ''}
-`;
-
     const [players, verifiers] = await Promise.all([
         leaderboardManager.getPlayersLeaderboard(),
         leaderboardManager.getVerifiersLeaderboard()
@@ -66,12 +51,10 @@ async function fetchAccountData(username, allLevels) {
         v.name && v.name.toLowerCase() === username.toLowerCase()
     );
 
-    // 🔒 niveaux acceptés uniquement
     const acceptedLevels = allLevels.filter(
         lvl => lvl.status === 'accepted'
     );
 
-    // ✅ NIVEAUX CRÉÉS
     const createdLevels = acceptedLevels
         .filter(lvl =>
             lvl.authorName &&
@@ -80,11 +63,9 @@ async function fetchAccountData(username, allLevels) {
         .map(lvl => ({
             levelId: lvl.id,
             levelName: lvl.levelName,
-            rank: lvl.approvedRank,
-            difficulty: lvl.approvedDifficulty
+            rank: lvl.approvedRank
         }));
 
-    // ✅ NIVEAUX BATTUS
     const beatenLevels = player?.records
         ? player.records.map(r => {
             const level = acceptedLevels.find(
@@ -100,7 +81,6 @@ async function fetchAccountData(username, allLevels) {
         })
         : [];
 
-    // ✅ NIVEAUX VÉRIFIÉS
     const verifiedLevels = verifier?.levels
         ? verifier.levels.map(v => {
             const level = acceptedLevels.find(
@@ -119,12 +99,40 @@ async function fetchAccountData(username, allLevels) {
 }
 
 // ──────────────────────────────
+// Profile
+async function fetchUserProfile(username) {
+    if (!window.supabase) return null;
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .ilike('username', username)
+        .single();
+
+    if (error) {
+        console.warn('Avatar introuvable:', error.message);
+        return null;
+    }
+
+    return data;
+}
+
+// ──────────────────────────────
 // Render
 function renderAccountDetails(data, username, profile) {
     const { player, verifier, createdLevels, beatenLevels, verifiedLevels } = data;
 
-    document.getElementById('account-title').textContent =
-        `Compte : ${username}`;
+    const title = document.getElementById('account-title');
+    title.innerHTML = `
+        <span class="account-name">${username}</span>
+        ${profile?.avatar_url ? `
+            <img
+                src="${profile.avatar_url}"
+                alt="Avatar ${username}"
+                class="account-avatar"
+            />
+        ` : ''}
+    `;
 
     const infoDiv = document.getElementById('account-info');
     infoDiv.innerHTML = '';
@@ -191,20 +199,3 @@ function renderList(id, items, formatter, emptyText) {
         el.appendChild(li);
     });
 }
-async function fetchUserProfile(username) {
-    if (!window.supabase) return null;
-
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('avatar_url')
-        .ilike('username', username)
-        .single();
-
-    if (error) {
-        console.warn('Avatar introuvable:', error.message);
-        return null;
-    }
-
-    return data;
-}
-
