@@ -54,6 +54,15 @@ async function fetchAccountData(username, allLevels) {
     const isTop1 = index === 0;
     const isTop2 = index === 1;
     const isTop3 = index === 2;
+    console.log(
+        '🔎 Recherche rank:',
+        username,
+        combined.map((e, i) => ({
+            rank: i + 1,
+            name: e.name,
+            match: e.name?.toLowerCase() === username.toLowerCase()
+        }))
+    );
 
     // 👇 on garde le reste pour les stats
     const [players, verifiers] = await Promise.all([
