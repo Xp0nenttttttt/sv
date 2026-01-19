@@ -149,7 +149,7 @@ async function fetchUserClan(username) {
 
 // ──────────────────────────────
 // Render
-function renderAccountDetails(data, username, profile) {
+function renderAccountDetails(data, username, profile, clan) {
     const { player, verifier, createdLevels, beatenLevels, verifiedLevels } = data;
 
     const title = document.getElementById('account-title');
