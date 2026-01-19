@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         await universalStorage.getData('svChallengeRecordSubmissions');
 
         // Maintenant seulement tu charges le compte
-        await loadAccountDetails();
+        await fetchAccountData();
+
 
     } catch (err) {
         console.error('❌ Erreur chargement compte:', err);
