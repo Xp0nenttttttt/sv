@@ -90,4 +90,30 @@ document.getElementById('logoutBtn').addEventListener('click', async (e) => {
     console.log('👋 Déconnecté');
     window.location.replace('index.html');
 });
+async function getUsername() {
+    const params = new URLSearchParams(window.location.search);
+    const userFromUrl = params.get('user');
+    if (userFromUrl) return userFromUrl;
+
+    // fallback : utilisateur connecté
+    const client = window.supabaseClient;
+    if (!client) return null;
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) return null;
+
+    const { data: profile } = await client
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single();
+
+    return profile?.username || null;
+}
+const username = await getUsername();
+
+if (!username) {
+    document.body.innerHTML = '<p>Utilisateur non spécifié.</p>';
+    return;
+}
 
