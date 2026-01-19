@@ -28,8 +28,9 @@
             <div id="loginSection" class="login-wrapper">
                 <h2>🔐 Admin Login</h2>
                 <form id="loginForm" class="login-form">
-                    <input type="password" id="adminPassword" placeholder="Mot de passe admin"
-                        autocomplete="current-password">
+                    <input type="email" id="adminEmail" placeholder="Email admin" autocomplete="email" required>
+                    <input type="password" id="adminPassword" placeholder="Mot de passe" autocomplete="current-password"
+                        required>
                     <button type="submit">Se connecter</button>
                 </form>
                 <div id="loginError" class="login-error hidden"></div>

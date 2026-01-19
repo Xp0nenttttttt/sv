@@ -28,14 +28,33 @@ function getDifficultyClass(label) {
 }
 
 // Vérifier si admin est connecté
-function checkAdminLogin() {
-    const token = sessionStorage.getItem('adminToken');
-    if (token && token === 'ADMIN_SESSION_VALID') {
-        adminLoggedIn = true;
-        showAdminPanel();
-    } else {
+async function checkAdminLogin() {
+    // Vérifier la session Supabase
+    if (!window.supabaseClient) {
         showLoginForm();
+        return;
     }
+
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+    if (session?.user) {
+        // Vérifier si l'utilisateur est dans la table admin_users
+        const { data: adminData, error } = await window.supabaseClient
+            .from('admin_users')
+            .select('id')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+        if (adminData && !error) {
+            adminLoggedIn = true;
+            sessionStorage.setItem('adminToken', 'ADMIN_SESSION_VALID');
+            sessionStorage.setItem('adminUserId', session.user.id);
+            await showAdminPanel();
+            return;
+        }
+    }
+
+    showLoginForm();
 }
 
 // Afficher le formulaire de login
@@ -79,33 +98,78 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (loginForm) {
         loginForm.addEventListener('submit', async function (e) {
             e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
+            const errorMsg = document.getElementById('loginError');
 
-            // Vérification du mot de passe
-            if (submissionManager.admins.admin === password) {
+            if (!window.supabaseClient) {
+                errorMsg.textContent = '❌ Supabase non disponible';
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // Se connecter avec Supabase Auth
+                const { data: authData, error: authError } = await window.supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (authError) throw authError;
+
+                // Vérifier si l'utilisateur est admin
+                const { data: adminData, error: adminError } = await window.supabaseClient
+                    .from('admin_users')
+                    .select('id')
+                    .eq('id', authData.user.id)
+                    .maybeSingle();
+
+                if (adminError || !adminData) {
+                    await window.supabaseClient.auth.signOut();
+                    throw new Error('Accès non autorisé - Compte admin requis');
+                }
+
+                // Connexion réussie
                 sessionStorage.setItem('adminToken', 'ADMIN_SESSION_VALID');
+                sessionStorage.setItem('adminUserId', authData.user.id);
                 adminLoggedIn = true;
                 await showAdminPanel();
+
+                document.getElementById('adminEmail').value = '';
                 document.getElementById('adminPassword').value = '';
-            } else {
-                const errorMsg = document.getElementById('loginError');
-                errorMsg.textContent = '❌ Mot de passe incorrect';
+                errorMsg.classList.add('hidden');
+            } catch (err) {
+                console.error('Erreur login:', err);
+                errorMsg.textContent = `❌ ${err.message || 'Email ou mot de passe incorrect'}`;
                 errorMsg.classList.remove('hidden');
                 setTimeout(() => {
                     errorMsg.classList.add('hidden');
-                }, 3000);
+                }, 5000);
             }
         });
     }
 });
 
 // Déconnexion
-function logoutAdmin() {
+async function logoutAdmin() {
+    // Déconnexion de Supabase
+    if (window.supabaseClient) {
+        await window.supabaseClient.auth.signOut();
+    }
+
     sessionStorage.removeItem('adminToken');
+    sessionStorage.removeItem('adminUserId');
     adminLoggedIn = false;
-    document.getElementById('adminPassword').value = '';
+
+    const emailField = document.getElementById('adminEmail');
+    const passwordField = document.getElementById('adminPassword');
+    if (emailField) emailField.value = '';
+    if (passwordField) passwordField.value = '';
+
     showLoginForm();
-    document.getElementById('loginError').classList.add('hidden');
+
+    const errorMsg = document.getElementById('loginError');
+    if (errorMsg) errorMsg.classList.add('hidden');
 }
 
 // Charger les données depuis Supabase (PAS de fallback localStorage)

@@ -109,9 +109,31 @@ const maintenanceManager = {
     },
 
     // Vérifier si l'utilisateur est admin
-    isAdmin() {
+    async isAdmin() {
         const token = sessionStorage.getItem('adminToken');
-        return token && token === 'ADMIN_SESSION_VALID';
+        if (!token || token !== 'ADMIN_SESSION_VALID') {
+            return false;
+        }
+
+        // Vérifier aussi dans Supabase si possible
+        if (window.supabaseClient) {
+            try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                if (session?.user) {
+                    const { data: adminData, error } = await window.supabaseClient
+                        .from('admin_users')
+                        .select('id')
+                        .eq('id', session.user.id)
+                        .maybeSingle();
+                    return !!adminData && !error;
+                }
+            } catch (err) {
+                console.warn('Vérification admin Supabase échouée:', err);
+            }
+        }
+
+        // Fallback sur le token de session
+        return true;
     },
 
     // Afficher la page de maintenance
@@ -208,7 +230,7 @@ const maintenanceManager = {
         }
 
         const isInMaintenance = await this.isMaintenanceMode();
-        const isUserAdmin = this.isAdmin();
+        const isUserAdmin = await this.isAdmin();
 
         if (isInMaintenance && !isUserAdmin) {
             const settings = await this.getMaintenanceSettings();
