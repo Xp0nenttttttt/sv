@@ -51,11 +51,14 @@ async function fetchAccountData(username) {
         await universalStorage.getData('svChallengeSubmissions') || [];
 
     // ✅ Niveaux créés ACCEPTÉS uniquement
-    const createdLevels = submissions.filter(lvl =>
-        lvl.creator &&
-        lvl.status === 'accepted' &&
-        lvl.creator.toLowerCase() === username.toLowerCase()
+    const allLevels =
+        await universalStorage.getData('svChallengeSubmissions') || [];
+
+    // On garde seulement les niveaux acceptés
+    const acceptedLevels = allLevels.filter(lvl =>
+        lvl.status === 'accepted'
     );
+
 
     // ✅ Niveaux battus
     const beatenLevels = player?.records
