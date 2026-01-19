@@ -174,7 +174,7 @@ class LeaderboardManager {
         let allSubmissions;
 
         // Supabase via universalStorage si disponible
-        if (typeof universalStorage !== 'undefined' && typeof universalStorage.getData === 'function') {
+        if (typeof universalStorage !== 'undefined' && universalStorage && typeof universalStorage.getData === 'function') {
             acceptedRecords = await universalStorage.getData('svChallengeRecordSubmissions') || [];
             allSubmissions = await universalStorage.getData('svChallengeSubmissions') || [];
             // Ne garder que les records acceptés
