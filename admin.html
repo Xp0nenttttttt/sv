@@ -66,6 +66,8 @@
                             style="background: #28a745;">📤 Exporter pour GitHub</button>
                         <button class="btn-primary" id="maintenanceToggle" onclick="toggleMaintenanceMode()"
                             style="background: #ffc107; color: #000;">🔧 Mode Maintenance</button>
+                        <button class="btn-primary" onclick="showPasswordChangeModal()" style="background: #667eea;">🔑
+                            Changer mon mot de passe</button>
                         <button class="btn-logout" onclick="logoutAdmin()">Se déconnecter</button>
                     </div>
                 </div>
@@ -118,6 +120,36 @@
         </div>
     </main>
 
+    <!-- Modal de changement de mot de passe -->
+    <div id="passwordChangeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePasswordChangeModal()">&times;</span>
+            <h2>🔑 Changer mon mot de passe</h2>
+            <form id="passwordChangeForm" class="password-change-form">
+                <div class="form-group">
+                    <label for="currentPassword">Mot de passe actuel</label>
+                    <input type="password" id="currentPassword" required autocomplete="current-password">
+                </div>
+                <div class="form-group">
+                    <label for="newPasswordChange">Nouveau mot de passe</label>
+                    <input type="password" id="newPasswordChange" required minlength="6" autocomplete="new-password">
+                    <small>Minimum 6 caractères</small>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPasswordChange">Confirmer le nouveau mot de passe</label>
+                    <input type="password" id="confirmPasswordChange" required minlength="6"
+                        autocomplete="new-password">
+                </div>
+                <div id="passwordChangeError" class="login-error hidden"></div>
+                <div id="passwordChangeSuccess" class="login-success hidden"></div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">✅ Changer le mot de passe</button>
+                    <button type="button" class="btn-secondary" onclick="closePasswordChangeModal()">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <style>
         .login-links {
             text-align: center;
@@ -154,6 +186,97 @@
 
         .login-success:not(.hidden) {
             display: block !important;
+        }
+
+        .modal {
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid #333;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        .modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #fff;
+        }
+
+        .password-change-form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e5e7eb;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: #0f1220;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
         }
     </style>
 
@@ -198,6 +321,7 @@
     <!-- Charger admin.js APRÈS l'initialisation du stockage -->
     <script src="admin.js"></script>
     <script src="password-reset.js"></script>
+    <script src="admin-password-change.js"></script>
     <script src="dark-mode.js"></script>
     <div id="page-transition"></div>
     <script src="page-transition.js"></script>

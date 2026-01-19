@@ -35,6 +35,14 @@
             <div id="accountsSection" class="admin-section hidden">
                 <h1>👤 Gestion des Comptes Utilisateurs</h1>
 
+                <!-- Section Changement de mot de passe -->
+                <div class="password-change-section">
+                    <h3>🔑 Changer mon mot de passe admin</h3>
+                    <button class="btn-secondary" onclick="showPasswordChangeModal()" style="background: #667eea;">
+                        🔒 Modifier mon mot de passe
+                    </button>
+                </div>
+
                 <div class="accounts-stats-grid">
                     <div class="stat-box">
                         <div class="stat-box-title">Total de comptes</div>
@@ -60,6 +68,156 @@
         </div>
     </main>
 
+    <!-- Modal de changement de mot de passe -->
+    <div id="passwordChangeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closePasswordChangeModal()">&times;</span>
+            <h2>🔑 Changer mon mot de passe</h2>
+            <form id="passwordChangeForm" class="password-change-form">
+                <div class="form-group">
+                    <label for="currentPassword">Mot de passe actuel</label>
+                    <input type="password" id="currentPassword" required autocomplete="current-password">
+                </div>
+                <div class="form-group">
+                    <label for="newPasswordChange">Nouveau mot de passe</label>
+                    <input type="password" id="newPasswordChange" required minlength="6" autocomplete="new-password">
+                    <small>Minimum 6 caractères</small>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPasswordChange">Confirmer le nouveau mot de passe</label>
+                    <input type="password" id="confirmPasswordChange" required minlength="6"
+                        autocomplete="new-password">
+                </div>
+                <div id="passwordChangeError" class="error-message hidden"></div>
+                <div id="passwordChangeSuccess" class="success-message hidden"></div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">✅ Changer le mot de passe</button>
+                    <button type="button" class="btn-secondary" onclick="closePasswordChangeModal()">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .password-change-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .password-change-section h3 {
+            margin: 0 0 15px 0;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .modal {
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid #333;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        .modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #fff;
+        }
+
+        .password-change-form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e5e7eb;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: #0f1220;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .success-message.hidden {
+            display: none;
+        }
+    </style>
+
     <footer>
         <p>SV Challenge List - Gestion des Comptes</p>
     </footer>
@@ -83,6 +241,7 @@
     <script src="record-submission.js"></script>
     <script src="leaderboard-manager.js"></script>
     <script src="admin-accounts.js"></script>
+    <script src="admin-password-change.js"></script>
     <div id="page-transition"></div>
     <script src="page-transition.js"></script>
 

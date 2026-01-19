@@ -4,6 +4,12 @@
 
 Le système admin utilise maintenant l'authentification Supabase avec la table `admin_users` au lieu d'un mot de passe simple. Cela offre une meilleure sécurité et permet de gérer plusieurs administrateurs.
 
+**Fonctionnalités disponibles :**
+- ✅ Connexion sécurisée avec email/mot de passe
+- ✅ Réinitialisation de mot de passe oublié (par email)
+- ✅ Changement de mot de passe depuis le panneau admin
+- ✅ Gestion multi-administrateurs
+
 ## 🔧 Prérequis
 
 La table `admin_users` doit exister dans votre base Supabase. Elle est normalement créée via le fichier `profiles-schema.sql`.
@@ -72,6 +78,23 @@ create policy "Users can check own admin status" on public.admin_users
 Seuls les utilisateurs peuvent vérifier leur propre statut admin.
 
 ## 📝 Gestion des administrateurs
+
+### Changer son mot de passe (une fois connecté)
+
+Deux méthodes sont disponibles :
+
+**Méthode 1 : Depuis le panneau admin**
+1. Connectez-vous au panneau admin (`admin.html`)
+2. Cliquez sur **"🔑 Changer mon mot de passe"**
+3. Entrez votre mot de passe actuel
+4. Entrez le nouveau mot de passe (minimum 6 caractères)
+5. Confirmez le nouveau mot de passe
+6. Cliquez sur **"Changer le mot de passe"**
+
+**Méthode 2 : Depuis la gestion des comptes**
+1. Allez dans **"👤 Gérer les comptes"** (`admin-accounts.html`)
+2. En haut de la page, cliquez sur **"🔑 Changer mon mot de passe"**
+3. Suivez les mêmes étapes que ci-dessus
 
 ### Lister tous les admins
 
