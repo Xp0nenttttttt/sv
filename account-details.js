@@ -58,14 +58,17 @@ async function fetchAccountData(username) {
     const acceptedLevels = allLevels.filter(lvl =>
         lvl.status === 'accepted'
     );
-    const createdLevels = acceptedLevels.filter(lvl =>
-        lvl.creator &&
-        lvl.creator.toLowerCase() === username.toLowerCase()
-    ).map(lvl => ({
-        levelId: lvl.id,
-        levelName: lvl.name || lvl.levelName,
-        rank: lvl.rank
-    }));
+    const createdLevels = acceptedLevels
+        .filter(lvl =>
+            lvl.creator &&
+            lvl.creator.toLowerCase() === username.toLowerCase()
+        )
+        .map(lvl => ({
+            levelId: lvl.id,
+            levelName: lvl.levelName || lvl.name || 'Niveau inconnu',
+            approvedRank: lvl.rank ?? '-'
+        }));
+
 
 
     // ✅ Niveaux battus
