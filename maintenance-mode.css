@@ -1,0 +1,143 @@
+/* Styles pour le mode maintenance dans le panneau admin */
+
+.maintenance-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 25px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.maintenance-section h3 {
+    color: white;
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.maintenance-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.maintenance-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.maintenance-status label {
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.status-badge.active {
+    background: #dc3545;
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.status-badge.inactive {
+    background: #28a745;
+    color: white;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.maintenance-message {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.maintenance-message label {
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.maintenance-message textarea {
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.maintenance-message textarea:focus {
+    outline: none;
+    border-color: white;
+    background: white;
+}
+
+.maintenance-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.maintenance-actions button {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.maintenance-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.maintenance-actions button:active {
+    transform: translateY(0);
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+    .maintenance-section {
+        padding: 15px;
+    }
+
+    .maintenance-section h3 {
+        font-size: 20px;
+    }
+
+    .maintenance-actions {
+        flex-direction: column;
+    }
+
+    .maintenance-actions button {
+        width: 100%;
+        min-width: unset;
+    }
+}

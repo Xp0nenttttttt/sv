@@ -401,6 +401,15 @@
     <script src="clans-ranking.js"></script>
     <div id="page-transition"></div>
     <script src="page-transition.js"></script>
+    <script src="maintenance-mode.js"></script>
+    <script>
+        // Vérifier le mode maintenance au chargement
+        (async function () {
+            if (typeof maintenanceManager !== 'undefined') {
+                await maintenanceManager.checkAndRedirect();
+            }
+        })();
+    </script>
 
 </body>
 

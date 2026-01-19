@@ -295,6 +295,15 @@ Podium des 3 meilleurs niveaux -->
             }
         });
     </script>
+    <script src="maintenance-mode.js"></script>
+    <script>
+        // Vérifier le mode maintenance au chargement de la page
+        (async function () {
+            if (typeof maintenanceManager !== 'undefined') {
+                await maintenanceManager.checkAndRedirect();
+            }
+        })();
+    </script>
     <script src="card-glow.js"></script>
     <script src="style.js"></script>
     <script src="filter-feedback.js"></script>

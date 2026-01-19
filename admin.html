@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="submission.css">
     <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="mobile-optimized.css">
+    <link rel="stylesheet" href="maintenance-mode.css">
 </head>
 
 <body>
@@ -38,14 +39,38 @@
             <div id="adminPanel" class="hidden">
                 <div class="admin-header">
                     <h2>👨‍💼 Panneau d'administration</h2>
-                    <div style="display: flex; gap: 10px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <a href="admin-ranking.html" class="btn-primary">🏆 Gérer le classement</a>
                         <a href="admin-records.html" class="btn-primary">🏅 Gérer les records</a>
                         <a href="admin-accounts.html" class="btn-primary">👤 Gérer les comptes</a>
                         <a href="admin-storage.html" class="btn-primary">💾 Gestion du stockage</a>
                         <button class="btn-primary" onclick="dataSyncManager.exportForGitHub()"
                             style="background: #28a745;">📤 Exporter pour GitHub</button>
+                        <button class="btn-primary" id="maintenanceToggle" onclick="toggleMaintenanceMode()"
+                            style="background: #ffc107; color: #000;">🔧 Mode Maintenance</button>
                         <button class="btn-logout" onclick="logoutAdmin()">Se déconnecter</button>
+                    </div>
+                </div>
+
+                <!-- Section Mode Maintenance -->
+                <div id="maintenanceSection" class="maintenance-section" style="display: none;">
+                    <h3>🔧 Mode Maintenance</h3>
+                    <div class="maintenance-controls">
+                        <div class="maintenance-status">
+                            <label>État actuel:</label>
+                            <span id="maintenanceStatus" class="status-badge">Désactivé</span>
+                        </div>
+                        <div class="maintenance-message">
+                            <label for="maintenanceMessage">Message de maintenance:</label>
+                            <textarea id="maintenanceMessage" rows="3"
+                                placeholder="Le site est actuellement en maintenance..."></textarea>
+                        </div>
+                        <div class="maintenance-actions">
+                            <button class="btn-primary" onclick="enableMaintenance()" style="background: #dc3545;">🔒
+                                Activer Maintenance</button>
+                            <button class="btn-primary" onclick="disableMaintenance()" style="background: #28a745;">🔓
+                                Désactiver Maintenance</button>
+                        </div>
                     </div>
                 </div>
 
@@ -82,6 +107,7 @@
     <script src="submission.js"></script>
     <script src="record-submission.js"></script>
     <script src="data-sync.js"></script>
+    <script src="maintenance-mode.js"></script>
 
     <!-- Supabase (optionnel, pour usage futur) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
