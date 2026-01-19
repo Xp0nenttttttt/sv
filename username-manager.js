@@ -1,32 +1,44 @@
-alert('JS chargé');
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🟡 Username manager lancé');
 
-async function ensureUsername() {
-    const client = window.supabaseClient;
-    if (!client) return;
+    const client = window.supabaseClient || window.supabase;
+    if (!client) {
+        console.warn('❌ Supabase non prêt');
+        return;
+    }
 
-    const { data: { user } } = await client.auth.getUser();
-    if (!user) return;
+    // 1️⃣ utilisateur connecté ?
+    const { data: authData } = await client.auth.getUser();
 
-    const { data: profile } = await client
+    if (!authData?.user) {
+        console.log('👤 Aucun utilisateur connecté');
+        return;
+    }
+
+    const userId = authData.user.id;
+    console.log('👤 User ID:', userId);
+
+    // 2️⃣ récupérer le profil
+    const { data: profile, error } = await client
         .from('profiles')
-        .select('id, username')
-        .eq('id', user.id)
+        .select('username')
+        .eq('id', userId)
         .single();
 
-    if (!profile) return;
-
-    if (!profile.username) {
-        const fallback = `Visiteur${Math.floor(1000 + Math.random() * 9000)}`;
-
-        await client
-            .from('profiles')
-            .update({ username: fallback })
-            .eq('id', user.id);
-
-        console.log('Pseudo auto attribué:', fallback);
-    }
-
-    if (profile.username?.startsWith('Visiteur')) {
+    if (error) {
+        console.warn('⚠️ Profil introuvable, redirection');
         window.location.href = 'username-setup.html';
+        return;
     }
-}
+
+    // 3️⃣ vérifier le pseudo
+    const username = profile?.username;
+
+    if (!username || username.trim().length < 3) {
+        console.log('🚨 Username invalide → redirection');
+        window.location.href = 'username-setup.html';
+        return;
+    }
+
+    console.log('✅ Username valide:', username);
+});
