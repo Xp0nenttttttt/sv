@@ -101,9 +101,15 @@ async function fetchAccountData(username, allLevels) {
 // ──────────────────────────────
 // Profile
 async function fetchUserProfile(username) {
-    if (!window.supabase) return null;
+    const client =
+        window.supabaseClient || window.supabase;
 
-    const { data, error } = await supabase
+    if (!client || typeof client.from !== 'function') {
+        console.warn('❌ Supabase client indisponible');
+        return null;
+    }
+
+    const { data, error } = await client
         .from('profiles')
         .select('avatar_url')
         .ilike('username', username)
@@ -116,6 +122,7 @@ async function fetchUserProfile(username) {
 
     return data;
 }
+
 
 // ──────────────────────────────
 // Render
