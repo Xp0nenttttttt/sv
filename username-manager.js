@@ -37,7 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (error) {
         console.warn('⚠️ Profil introuvable, redirection');
-        if (!profile.username && currentPage !== 'choose-username.html') {
+
+
+        if (!profile || !profile.username && currentPage !== 'choose-username.html') {
             console.log('➡️ Redirection vers choix du pseudo');
             window.location.href = 'choose-username.html';
         }
