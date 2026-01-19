@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 // account-details.js
 // Affiche les infos, records, vérifications et niveaux créés d'un compte
+
+// Récupère le nom d'utilisateur depuis l'URL (?user=...)
+function getUserFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('user');
+}
 const createdLevels = submissions.filter(lvl =>
     lvl.creator === username &&
     (
@@ -28,12 +34,6 @@ const createdLevels = submissions.filter(lvl =>
         lvl.isAccepted === true
     )
 );
-// Récupère le nom d'utilisateur depuis l'URL (?user=...)
-function getUserFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('user');
-}
-
 async function fetchAccountData(username) {
     // On suppose que leaderboardManager, dataSyncManager, etc. sont déjà chargés
     // Récupère records, vérifications et niveaux créés pour ce compte
