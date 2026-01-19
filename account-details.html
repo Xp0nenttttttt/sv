@@ -105,6 +105,55 @@
         border: 1px solid #2afadf;
         box-shadow: 0 0 18px rgba(42, 250, 223, 0.25);
     }
+
+    .stats-card {
+        margin-top: 32px;
+        padding: 20px;
+        background: linear-gradient(180deg, #0f1324, #0b0f1e);
+        border: 1px solid #1f2436;
+        border-radius: 14px;
+    }
+
+    .stat-bar {
+        display: grid;
+        grid-template-columns: 80px 1fr 40px;
+        align-items: center;
+        gap: 12px;
+        margin-top: 14px;
+        font-size: 0.85rem;
+    }
+
+    .bar {
+        height: 8px;
+        background: #14192e;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .fill {
+        height: 100%;
+        width: 0;
+        border-radius: 999px;
+        transition: width 1s ease;
+    }
+
+    /* couleurs */
+    .fill.created {
+        background: linear-gradient(90deg, #7c6cff, #9f8cff);
+    }
+
+    .fill.beaten {
+        background: linear-gradient(90deg, #2afadf, #00c6ff);
+    }
+
+    .fill.verified {
+        background: linear-gradient(90deg, #4ade80, #22c55e);
+    }
+
+    .value {
+        text-align: right;
+        color: #c7ccef;
+    }
 </style>
 
 <body class="account-page">
@@ -124,6 +173,33 @@
         <span class="particle" style="left:10%;animation-delay:0s"></span>
         <span class="particle" style="left:30%;animation-delay:5s"></span>
         <span class="particle" style="left:70%;animation-delay:12s"></span>
+    </div>
+    <div class="stats-card">
+        <h2 class="section-title">Activité</h2>
+
+        <div class="stat-bar">
+            <span>Créés</span>
+            <div class="bar">
+                <div class="fill created"></div>
+            </div>
+            <span class="value" id="stat-created">0</span>
+        </div>
+
+        <div class="stat-bar">
+            <span>Battus</span>
+            <div class="bar">
+                <div class="fill beaten"></div>
+            </div>
+            <span class="value" id="stat-beaten">0</span>
+        </div>
+
+        <div class="stat-bar">
+            <span>Vérifiés</span>
+            <div class="bar">
+                <div class="fill verified"></div>
+            </div>
+            <span class="value" id="stat-verified">0</span>
+        </div>
     </div>
 
     <script src="storage-adapter.js"></script>

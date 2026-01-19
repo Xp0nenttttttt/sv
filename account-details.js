@@ -209,6 +209,8 @@ function renderAccountDetails(data, username, profile, clan) {
         l => `${l.levelName} (Top ${l.rank}) - ${l.points} pts`,
         'Aucun niveau vérifié'
     );
+    renderStats(createdLevels.length, beatenLevels.length, verifiedLevels.length);
+
 }
 
 // ──────────────────────────────
@@ -236,4 +238,20 @@ function renderList(id, items, formatter, emptyText) {
 
         el.appendChild(li);
     });
+}
+function renderStats(created, beaten, verified) {
+    const max = Math.max(created, beaten, verified, 1);
+
+    document.getElementById('stat-created').textContent = created;
+    document.getElementById('stat-beaten').textContent = beaten;
+    document.getElementById('stat-verified').textContent = verified;
+
+    document.querySelector('.fill.created').style.width =
+        `${(created / max) * 100}%`;
+
+    document.querySelector('.fill.beaten').style.width =
+        `${(beaten / max) * 100}%`;
+
+    document.querySelector('.fill.verified').style.width =
+        `${(verified / max) * 100}%`;
 }
