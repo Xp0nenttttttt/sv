@@ -51,9 +51,31 @@ class LeaderboardManager {
             if (combined[key]) {
                 // La personne est déjà dans la liste (joueur + vérificateur)
                 combined[key].type = 'both';
-                combined[key].totalPoints += verifier.totalPoints;
+
+                // Calculer les points à ajouter en évitant les doublons
+                let verifierPointsToAdd = verifier.totalPoints;
+                let recordsToRemove = [];
+
+                // Vérifier si le vérificateur a vérifié des niveaux qu'il a aussi complété
+                verifier.levels.forEach(verifiedLevel => {
+                    combined[key].records.forEach(record => {
+                        if (String(verifiedLevel.levelId) === String(record.levelId)) {
+                            // Même niveau en record ET vérification
+                            // On retire les points du record et on garde ceux de la vérification
+                            verifierPointsToAdd -= (record.points - verifiedLevel.points);
+                            recordsToRemove.push(record.levelId);
+                        }
+                    });
+                });
+
+                // Retirer les records qui sont aussi vérifiés
+                combined[key].records = combined[key].records.filter(r => !recordsToRemove.includes(r.levelId));
+                combined[key].recordsCount -= recordsToRemove.length;
+
+                combined[key].totalPoints += verifierPointsToAdd;
                 combined[key].levelsVerified = verifier.levelsVerified;
                 combined[key].levels = verifier.levels;
+
                 // Prendre le pays/région du vérificateur si le joueur n'en a pas
                 if (!combined[key].country && verifier.country) {
                     combined[key].country = verifier.country;
