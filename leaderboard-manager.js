@@ -201,10 +201,24 @@ class LeaderboardManager {
             allSubmissions = [];
         }
 
+
+        // Construire une map des niveaux vérifiés par chaque joueur
+        const levelsVerifiedByPlayer = {};
+        allSubmissions.forEach(sub => {
+            if (!levelsVerifiedByPlayer[sub.authorName]) {
+                levelsVerifiedByPlayer[sub.authorName] = new Set();
+            }
+            levelsVerifiedByPlayer[sub.authorName].add(String(sub.id));
+        });
+
         const players = {};
 
         acceptedRecords.forEach(record => {
             const player = record.player;
+            // Si le joueur a vérifié ce niveau, on ignore ce record
+            if (levelsVerifiedByPlayer[player] && levelsVerifiedByPlayer[player].has(String(record.levelId))) {
+                return;
+            }
             if (!players[player]) {
                 players[player] = {
                     name: player,
