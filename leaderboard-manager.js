@@ -302,3 +302,4 @@ class LeaderboardManager {
 
 // Rendre disponible globalement
 const leaderboardManager = new LeaderboardManager();
+window.leaderboardManager = leaderboardManager;

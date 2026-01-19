@@ -204,27 +204,31 @@ class AccountManager {
             await universalStorage.setData(this.recordManager.storageKey, allRecords);
             await universalStorage.setData(this.submissionManager.storageKey, allSubmissions);
         }
-        await this.loadAccounts();
-    }
 
-    searchAccounts(term) {
-        if (!term) return this.accounts;
-        return this.accounts.filter(account =>
-            account.name.toLowerCase().includes(term.toLowerCase()) ||
-            account.country.toLowerCase().includes(term.toLowerCase()) ||
-            account.region.toLowerCase().includes(term.toLowerCase())
-        );
-    }
+        // Invalider le cache du classement pour forcer la recalculation
+        // À la fois l'instance locale et la globale
+        if (this.leaderboardManager) {
+            this.leaderboardManager.clearCache();
+        }
 
-    getStats() {
-        return {
-            total: this.accounts.length,
-            players: this.accounts.filter(a => a.isPlayer).length,
-            verifiers: this.accounts.filter(a => a.isVerifier).length,
-            both: this.accounts.filter(a => a.isPlayer && a.isVerifier).length
-        };
+        searchAccounts(term) {
+            if (!term) return this.accounts;
+            return this.accounts.filter(account =>
+                account.name.toLowerCase().includes(term.toLowerCase()) ||
+                account.country.toLowerCase().includes(term.toLowerCase()) ||
+                account.region.toLowerCase().includes(term.toLowerCase())
+            );
+        }
+
+        getStats() {
+            return {
+                total: this.accounts.length,
+                players: this.accounts.filter(a => a.isPlayer).length,
+                verifiers: this.accounts.filter(a => a.isVerifier).length,
+                both: this.accounts.filter(a => a.isPlayer && a.isVerifier).length
+            };
+        }
     }
-}
 
 let accountManager;
 
