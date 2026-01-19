@@ -11,6 +11,81 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="level-details.css">
 </head>
+<style>
+    :root {
+        --accent: #7c6cff;
+    }
+
+    body {
+        background: #0b0d14;
+        color: #e5e7eb;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .account-card,
+    .level-card {
+        background: linear-gradient(180deg, #141826, #101422);
+        border: 1px solid #1f2436;
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    .account-card:hover,
+    .level-card:hover {
+        background: #181c2e;
+    }
+
+    .section-title {
+        font-size: 14px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #9ca3af;
+        margin-bottom: 8px;
+    }
+
+    .particles {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .particle {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: rgba(180, 160, 255, 0.25);
+        border-radius: 50%;
+        animation: float 30s linear infinite;
+    }
+
+    @keyframes float {
+        from {
+            transform: translateY(100vh);
+            opacity: 0;
+        }
+
+        10% {
+            opacity: 1;
+        }
+
+        to {
+            transform: translateY(-20vh);
+            opacity: 0;
+        }
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background:
+            radial-gradient(circle at 20% 20%, rgba(120, 90, 255, 0.05), transparent 40%),
+            radial-gradient(circle at 80% 80%, rgba(0, 200, 255, 0.04), transparent 45%);
+        pointer-events: none;
+        z-index: -1;
+    }
+</style>
 
 <body>
     <div class="container">
@@ -24,6 +99,12 @@
         <ul id="verifications-list"></ul>
         <a href="admin-accounts.html">← Retour à la gestion des comptes</a>
     </div>
+    <div class="particles">
+        <span class="particle" style="left:10%;animation-delay:0s"></span>
+        <span class="particle" style="left:30%;animation-delay:5s"></span>
+        <span class="particle" style="left:70%;animation-delay:12s"></span>
+    </div>
+
     <script src="storage-adapter.js"></script>
     <script src="submission.js"></script>
     <script src="record-submission.js"></script>
