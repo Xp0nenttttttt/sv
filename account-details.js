@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
         console.error('❌ Erreur chargement compte:', err);
     }
+
+
+
 });
 
 // ──────────────────────────────
@@ -102,6 +105,8 @@ async function fetchAccountData(username, allLevels) {
     const isTop3 = player?.rank === 3;
 
     return { player, verifier, createdLevels, beatenLevels, verifiedLevels, isTop1, isTop2, isTop3 };
+    console.log(clan);
+    console.log('Clan résultat:', clan);
 }
 
 // ──────────────────────────────
@@ -136,7 +141,7 @@ async function fetchUserClan(username) {
     const { data, error } = await client
         .from('clans')
         .select('tag')
-        .ilike('members', `%${username}%`)
+        .contains('members', [username])
         .single();
 
     if (error) {
@@ -146,6 +151,7 @@ async function fetchUserClan(username) {
 
     return data;
 }
+
 
 // ──────────────────────────────
 // Render
