@@ -299,13 +299,18 @@ class LeaderboardManager {
                 .filter(s => s.status === 'accepted');
         }
 
+        // Ne compter que les niveaux non supprimés
+        const validLevels = Array.isArray(allSubmissions)
+            ? allSubmissions.filter(l => l.status !== 'deleted' && l.status !== 'removed')
+            : [];
+
         // Compter joueurs et vérificateurs ensemble
         const playersSet = new Set(acceptedRecords.map(r => r.player));
-        const verifiersSet = new Set(allSubmissions.map(s => s.authorName));
+        const verifiersSet = new Set(validLevels.map(s => s.authorName));
         const allParticipants = new Set([...playersSet, ...verifiersSet]);
 
         return {
-            totalLevels: allSubmissions.length,
+            totalLevels: validLevels.length,
             totalRecords: acceptedRecords.length,
             totalPlayers: allParticipants.size,
             pendingLevels: 0,
