@@ -214,19 +214,8 @@
 
     <main>
         <div class="storage-container">
-            <div id="loginSection" class="login-wrapper">
-                <h2>🔐 Admin Login</h2>
-                <form id="storageLoginForm" class="login-form">
-                    <input type="password" id="storagePassword" placeholder="Mot de passe admin"
-                        autocomplete="current-password">
-                    <button type="submit">Se connecter</button>
-                </form>
-                <div id="loginError" class="error-message hidden"></div>
-            </div>
-
             <div id="storageSection" class="hidden">
                 <h1>💾 Gestion du Stockage LocalStorage</h1>
-
                 <!-- Storage Usage -->
                 <div class="storage-usage">
                     <h2>Utilisation Actuelle</h2>
@@ -235,7 +224,6 @@
                             <span id="usagePercentage">0%</span>
                         </div>
                     </div>
-
                     <div class="storage-stats">
                         <div class="stat-card">
                             <div class="stat-card-label">Utilisé</div>
@@ -250,34 +238,27 @@
                             <div class="stat-card-value" id="storageStatus">✅ OK</div>
                         </div>
                     </div>
-
                     <div id="statusMessage" style="margin-top: 20px; padding: 15px; border-radius: 5px; display: none;">
                     </div>
                 </div>
-
                 <!-- Cleanup Actions -->
                 <div class="cleanup-actions">
                     <h3>🧹 Actions de Nettoyage</h3>
                     <p style="color: #666; margin-bottom: 20px;">Sélectionnez l'action appropriée pour libérer de
                         l'espace.</p>
-
                     <button class="action-button" onclick="cleanupImages()">
                         🖼️ Supprimer les Images Base64 Volumineuses
                     </button>
-
                     <button class="action-button warning" onclick="removeRejected()">
                         ❌ Supprimer les Soumissions Rejetées
                     </button>
-
                     <button class="action-button warning" onclick="optimizeData()">
                         🔧 Optimiser les Données
                     </button>
-
                     <button class="action-button critical" onclick="fullCleanup()">
                         🔴 Nettoyage Complet
                     </button>
                 </div>
-
                 <!-- Data Breakdown -->
                 <div class="breakdown-section">
                     <h2>📊 Détails du Stockage</h2>
@@ -296,12 +277,36 @@
                         </tbody>
                     </table>
                 </div>
-
                 <!-- Results Section -->
                 <div id="resultSection" class="result-section" style="display: none;"></div>
             </div>
         </div>
     </main>
+    <script>
+        // Vérification Supabase Auth (admin)
+        document.addEventListener('DOMContentLoaded', async () => {
+            let client = window.supabaseClient;
+            if (!client && window.supabase && window.SUPABASE_CONFIG) {
+                client = window.supabase.createClient(window.SUPABASE_CONFIG.URL, window.SUPABASE_CONFIG.KEY);
+            }
+            if (!client) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            const { data } = await client.auth.getUser();
+            const user = data && data.user;
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            const isAdmin = user.user_metadata && (user.user_metadata.is_admin || user.email.endsWith('@sv-admin.com'));
+            if (!isAdmin) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            document.getElementById('storageSection').classList.remove('hidden');
+        });
+    </script>
 
     <footer>
         <p>SV Challenge List - Storage Manager</p>

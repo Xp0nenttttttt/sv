@@ -1,5 +1,7 @@
 // Admin Users Manager (Joueurs + Vérificateurs)
-const ADMIN_PASSWORD = 'SV2026';
+
+// La vérification admin est désormais faite côté HTML via Supabase Auth
+// (voir admin-users.html)
 
 class UserManager {
     constructor() {

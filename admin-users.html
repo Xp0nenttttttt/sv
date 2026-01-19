@@ -22,19 +22,8 @@
 
     <main>
         <div class="container">
-            <div id="loginSection" class="login-wrapper">
-                <h2>🔐 Admin Login</h2>
-                <form id="usersLoginForm" class="login-form">
-                    <input type="password" id="usersPassword" placeholder="Mot de passe admin"
-                        autocomplete="current-password">
-                    <button type="submit">Se connecter</button>
-                </form>
-                <div id="loginError" class="error-message hidden"></div>
-            </div>
-
             <div id="usersSection" class="admin-section hidden">
                 <h2>👥 Gestion des Utilisateurs</h2>
-
                 <!-- Onglets -->
                 <div class="users-tabs">
                     <button class="tab-button active" onclick="switchTab('players')">
@@ -44,7 +33,6 @@
                         ✔️ Vérificateurs
                     </button>
                 </div>
-
                 <!-- Section Joueurs -->
                 <div id="playersTab" class="tab-content active">
                     <div class="players-stats">
@@ -57,15 +45,12 @@
                             <div class="stat-value" id="totalRecords">0</div>
                         </div>
                     </div>
-
                     <div class="players-search">
                         <input type="text" id="searchPlayer" placeholder="🔍 Chercher un joueur par nom..."
                             class="search-input">
                     </div>
-
                     <div id="playersList" class="players-grid"></div>
                 </div>
-
                 <!-- Section Vérificateurs -->
                 <div id="verifiersTab" class="tab-content hidden">
                     <div class="players-stats">
@@ -78,17 +63,40 @@
                             <div class="stat-value" id="totalVerified">0</div>
                         </div>
                     </div>
-
                     <div class="players-search">
                         <input type="text" id="searchVerifier" placeholder="🔍 Chercher un vérificateur par nom..."
                             class="search-input">
                     </div>
-
                     <div id="verifiersList" class="players-grid"></div>
                 </div>
             </div>
         </div>
     </main>
+    <script>
+        // Vérification Supabase Auth (admin)
+        document.addEventListener('DOMContentLoaded', async () => {
+            let client = window.supabaseClient;
+            if (!client && window.supabase && window.SUPABASE_CONFIG) {
+                client = window.supabase.createClient(window.SUPABASE_CONFIG.URL, window.SUPABASE_CONFIG.KEY);
+            }
+            if (!client) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            const { data } = await client.auth.getUser();
+            const user = data && data.user;
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            const isAdmin = user.user_metadata && (user.user_metadata.is_admin || user.email.endsWith('@sv-admin.com'));
+            if (!isAdmin) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            document.getElementById('usersSection').classList.remove('hidden');
+        });
+    </script>
 
     <footer>
         <p>SV Challenge List - Gestion des Utilisateurs</p>

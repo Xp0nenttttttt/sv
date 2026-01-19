@@ -1,5 +1,7 @@
 // Admin Accounts Manager - Système de compte unifié
-const ADMIN_PASSWORD = 'SV2026';
+
+// La vérification admin est désormais faite côté HTML via Supabase Auth
+// (voir admin-accounts.html)
 
 class Account {
     constructor(data) {
@@ -234,43 +236,25 @@ let accountManager;
 
 // === INITIALIZATION ===
 document.addEventListener('DOMContentLoaded', async () => {
-    // Attendre que Supabase soit prêt
+    // Attendre que Supabase Storage soit prêt
     let attempts = 0;
     while (!universalStorage && attempts < 100) {
         await new Promise(resolve => setTimeout(resolve, 100));
         attempts++;
     }
-
     if (!universalStorage) {
         console.error('❌ universalStorage pas disponible');
         return;
     }
-
     console.log('✅ Création AccountManager...');
     accountManager = new AccountManager();
-    const loginForm = document.getElementById('accountsLoginForm');
-    loginForm.addEventListener('submit', handleAccountsLogin);
-
     const searchAccount = document.getElementById('searchAccount');
     if (searchAccount) {
         searchAccount.addEventListener('input', (e) => renderAccountsList(e.target.value));
     }
+    // Afficher la liste au chargement
+    renderAccountsList();
 });
-
-function handleAccountsLogin(event) {
-    event.preventDefault();
-    const password = document.getElementById('accountsPassword').value;
-    const loginError = document.getElementById('loginError');
-
-    if (password === ADMIN_PASSWORD) {
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('accountsSection').classList.remove('hidden');
-        renderAccountsList();
-    } else {
-        loginError.textContent = '❌ Mot de passe incorrect';
-        loginError.classList.remove('hidden');
-    }
-}
 
 // === AFFICHAGE DES COMPTES ===
 function renderAccountsList(searchTerm = '') {

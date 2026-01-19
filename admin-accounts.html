@@ -22,19 +22,8 @@
 
     <main>
         <div class="container">
-            <div id="loginSection" class="login-wrapper">
-                <h2>🔐 Admin Login</h2>
-                <form id="accountsLoginForm" class="login-form">
-                    <input type="password" id="accountsPassword" placeholder="Mot de passe admin"
-                        autocomplete="current-password">
-                    <button type="submit">Se connecter</button>
-                </form>
-                <div id="loginError" class="error-message hidden"></div>
-            </div>
-
             <div id="accountsSection" class="admin-section hidden">
                 <h1>👤 Gestion des Comptes Utilisateurs</h1>
-
                 <!-- Section Changement de mot de passe -->
                 <div class="password-change-section">
                     <h3>🔑 Changer mon mot de passe admin</h3>
@@ -42,7 +31,6 @@
                         🔒 Modifier mon mot de passe
                     </button>
                 </div>
-
                 <div class="accounts-stats-grid">
                     <div class="stat-box">
                         <div class="stat-box-title">Total de comptes</div>
@@ -57,16 +45,41 @@
                         <div class="stat-box-value" id="activeVerifiers">0</div>
                     </div>
                 </div>
-
                 <div class="accounts-search">
                     <input type="text" id="searchAccount" placeholder="🔍 Chercher un compte par nom, pays..."
                         class="search-input">
                 </div>
-
                 <div id="accountsList" class="accounts-list"></div>
             </div>
         </div>
     </main>
+    <script>
+        // Vérification Supabase Auth (admin)
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Attendre que Supabase soit prêt
+            let client = window.supabaseClient;
+            if (!client && window.supabase && window.SUPABASE_CONFIG) {
+                client = window.supabase.createClient(window.SUPABASE_CONFIG.URL, window.SUPABASE_CONFIG.KEY);
+            }
+            if (!client) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            const { data } = await client.auth.getUser();
+            const user = data && data.user;
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            // Vérifier le rôle admin (champ user_metadata.is_admin ou email)
+            const isAdmin = user.user_metadata && (user.user_metadata.is_admin || user.email.endsWith('@sv-admin.com'));
+            if (!isAdmin) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            document.getElementById('accountsSection').classList.remove('hidden');
+        });
+    </script>
 
     <!-- Modal de changement de mot de passe -->
     <div id="passwordChangeModal" class="modal" style="display: none;">
