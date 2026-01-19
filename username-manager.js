@@ -1,63 +1,39 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    let attempts = 0;
+    const currentPage = window.location.pathname.split('/').pop();
 
-    // ⏳ attendre supabaseClient
-    while (!window.supabaseClient && attempts < 100) {
-        await new Promise(r => setTimeout(r, 50));
-        attempts++;
-    }
+    await enableSupabaseStorage();
 
     const client = window.supabaseClient;
-
     if (!client) {
-        console.error('❌ Supabase toujours indisponible');
+        console.error('❌ Supabase non disponible');
         return;
     }
 
-    console.log('✅ Supabase prêt (username setup)');
+    const {
+        data: { user }
+    } = await client.auth.getUser();
 
+    if (!user) return; // pas connecté → pas concerné
 
-    // 1️⃣ utilisateur connecté ?
-    const { data: authData } = await client.auth.getUser();
-
-    if (!authData?.user) {
-        console.log('👤 Aucun utilisateur connecté');
-        return;
-    }
-
-    const userId = authData.user.id;
-    console.log('👤 User ID:', userId);
-
-    // 2️⃣ récupérer le profil
     const { data: profile, error } = await client
         .from('profiles')
         .select('username')
-        .eq('id', userId)
-        .single();
+        .eq('id', user.id)
+        .maybeSingle();
 
     if (error) {
-        console.warn('⚠️ Profil introuvable, redirection');
-
-
-        if (!profile || !profile.username && currentPage !== 'username-setup.html') {
-            console.log('➡️ Redirection vers choix du pseudo');
-            window.location.href = 'username-setup.html';
-        }
-
+        console.error('❌ Erreur profil:', error);
         return;
     }
 
-    // 3️⃣ vérifier le pseudo
-    const username = profile?.username;
+    console.log('👤 Profil:', profile);
 
-    if (!username || username.trim().length < 3) {
-        console.log('🚨 Username invalide → redirection');
-        window.location.href = 'username-setup.html';
-        return;
+    if ((!profile || !profile.username) && currentPage !== 'username-setup.html') {
+        console.log('➡️ Redirection vers choix du pseudo');
+        window.location.replace('username-setup.html');
     }
-
-    console.log('✅ Username valide:', username);
 });
+
 document.addEventListener('DOMContentLoaded', async () => {
     const client = window.supabaseClient || window.supabase;
 
