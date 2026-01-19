@@ -136,19 +136,34 @@ async function fetchUserClan(username) {
     const client = window.supabaseClient || window.supabase;
     if (!client) return null;
 
-    const { data, error } = await client
-        .from('clans')
-        .select('tag')
-        .contains('user_id', [username])
+    // 1️⃣ récupérer l'id utilisateur
+    const { data: profile, error: profileError } = await client
+        .from('profiles')
+        .select('id')
+        .ilike('username', username)
         .single();
 
-    if (error) {
-        console.warn('Clan introuvable:', error.message);
+    if (profileError || !profile) return null;
+
+    // 2️⃣ récupérer le clan via la table de liaison
+    const { data, error } = await client
+        .from('clan_members')
+        .select(`
+            clans (
+                tag
+            )
+        `)
+        .eq('user_id', profile.id)
+        .single();
+
+    if (error || !data?.clans) {
+        console.warn('Clan introuvable');
         return null;
     }
 
-    return data;
+    return data.clans;
 }
+
 
 
 // ──────────────────────────────
