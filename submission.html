@@ -66,6 +66,10 @@
 
                     <div class="form-row">
                         <div class="form-group">
+                            <label for="creatorSearch">Recherche créateur</label>
+                            <input type="text" id="creatorSearch" placeholder="Rechercher un compte...">
+                        </div>
+                        <div class="form-group">
                             <label for="creatorName">Créateur du niveau *</label>
                             <select id="creatorName" name="creatorName" required>
                                 <option value="">Sélectionner un compte...</option>
@@ -213,16 +217,26 @@
     </script>
     <script src="user-list.js"></script>
     <script>
-        // Remplit la liste des comptes créés pour le créateur du niveau
+        // Remplit la liste des comptes créés pour le créateur du niveau avec recherche
         (async function () {
             const select = document.getElementById('creatorName');
-            if (!select) return;
-            const usernames = await fetchUsernames();
-            usernames.forEach(username => {
-                const opt = document.createElement('option');
-                opt.value = username;
-                opt.textContent = username;
-                select.appendChild(opt);
+            const search = document.getElementById('creatorSearch');
+            if (!select || !search) return;
+            let usernames = await fetchUsernames();
+            let lastFilter = '';
+            function renderOptions(filter = '') {
+                select.innerHTML = '<option value="">Sélectionner un compte...</option>';
+                usernames.filter(u => u.toLowerCase().includes(filter.toLowerCase())).forEach(username => {
+                    const opt = document.createElement('option');
+                    opt.value = username;
+                    opt.textContent = username;
+                    select.appendChild(opt);
+                });
+            }
+            renderOptions();
+            search.addEventListener('input', e => {
+                lastFilter = e.target.value;
+                renderOptions(lastFilter);
             });
         })();
     </script>
