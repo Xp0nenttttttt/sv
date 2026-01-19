@@ -175,6 +175,8 @@ async function fetchUserClan(username) {
 // Render
 function renderAccountDetails(data, username, profile, clan) {
     const { player, verifier, createdLevels, beatenLevels, verifiedLevels } = data;
+    console.log('🟢 renderAccountDetails appelé', data);
+    console.log('Top flags:', data.isTop1, data.isTop2, data.isTop3);
 
     // 🎖️ BADGE
     const badgeContainer = document.getElementById('rank-badges');
