@@ -1,3 +1,12 @@
+const createdLevels = submissions.filter(lvl =>
+    lvl.creator === username &&
+    (
+        lvl.status === 'accepted' ||
+        lvl.status === 'approved' ||
+        lvl.isAccepted === true
+    )
+);
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         if (typeof enableSupabaseStorage === 'function') {
