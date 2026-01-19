@@ -1316,3 +1316,61 @@ body.ultra-neon header h1 {
     align-items: center;
     gap: 12px;
 }
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top, #1f2430, #0d1117);
+}
+
+.auth-card {
+    background: #1f2430;
+    border: 1px solid #2b3240;
+    border-radius: 10px;
+    padding: 32px;
+    width: 100%;
+    max-width: 420px;
+    color: #f2f4fb;
+}
+
+.auth-card h2 {
+    margin-top: 0;
+    color: #667eea;
+}
+
+.auth-card input {
+    width: 100%;
+    margin: 8px 0;
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    background: #2b3240;
+    color: white;
+}
+
+.auth-card button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #667eea;
+    color: white;
+    cursor: pointer;
+}
+
+.auth-card button:hover {
+    background: #5568d3;
+}
+
+.muted {
+    color: #9aa2b5;
+    font-size: 0.9em;
+}
+
+.error {
+    color: #ff8c8c;
+    margin-top: 8px;
+}
