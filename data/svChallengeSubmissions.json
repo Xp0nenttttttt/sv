@@ -25,4 +25,30 @@
         "imageUrl": "image/svkawai.png",
         "acceptedAt": "2026-01-19T10:00:00.000Z"
     }
+    {
+        "id": 1768816693897,
+        "levelName": "stp frero",
+        "creatorName": "Spleen",
+        "authorName": "Spleen",
+        "playerCountry": "France",
+        "playerRegion": "France",
+        "length": "Tiny",
+        "proposedTop": 1,
+        "description": "",
+        "tags": [
+            "wave"
+        ],
+        "imageBase64": "data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAf...",
+        "status": "accepted",
+        "submittedAt": "2026-01-19T09:58:13.897Z",
+        "submittedBy": "27bc2f3a-6d6b-4f35-b4e7-911698cbbf05",
+        "youtubeLink": "https://www.youtube.com/watch?v=zwY3udMjju8",
+        "approvedRank": 1,
+        "playerRegion": "France",
+        "playerCountry": "France",
+        "submitterEmail": "vikings2278@gmail.com",
+        "approvedDifficulty": "Hard Demon",
+        "imageUrl": "image/svkawai.png",
+        "acceptedAt": "2026-01-19T09:58:31.221Z"
+    }
 ]
