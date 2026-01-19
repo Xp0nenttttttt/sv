@@ -245,6 +245,25 @@
     <div id="page-transition"></div>
     <script src="page-transition.js"></script>
 
+    <script>
+        // Ajoute un lien vers la page de détails du compte pour chaque utilisateur
+        document.addEventListener('DOMContentLoaded', function () {
+            const table = document.querySelector('table');
+            if (!table) return;
+            for (const row of table.querySelectorAll('tbody tr')) {
+                const nameCell = row.querySelector('td');
+                if (nameCell) {
+                    const username = nameCell.textContent.trim();
+                    const link = document.createElement('a');
+                    link.href = `account-details.html?user=${encodeURIComponent(username)}`;
+                    link.textContent = username;
+                    nameCell.textContent = '';
+                    nameCell.appendChild(link);
+                }
+            }
+        });
+    </script>
+
 </body>
 
 </html>
