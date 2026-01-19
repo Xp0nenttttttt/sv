@@ -73,8 +73,21 @@ document.getElementById('changePassword').addEventListener('click', async () => 
 
     alert('🔐 Mot de passe changé');
 });
-document.getElementById('logoutBtn').addEventListener('click', async () => {
+document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+
     const client = window.supabaseClient;
-    await client.auth.signOut();
+    if (!client) return;
+
+    const { error } = await client.auth.signOut();
+
+    if (error) {
+        console.error(error);
+        alert('Erreur lors de la déconnexion');
+        return;
+    }
+
+    console.log('👋 Déconnecté');
     window.location.replace('index.html');
 });
+
