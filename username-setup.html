@@ -68,8 +68,14 @@
         <p class="muted">Vous pouvez changer ce nom plus tard dans les paramètres.</p>
         <p class="error" id="errorMessage" style="display:none;"></p>
     </div>
-    <script src="script.js"></script>
+
     <script src="supabase-config.js"></script>
+    <script>
+        (async () => {
+            await enableSupabaseStorage();
+            console.log('✅ Supabase prêt pour la page username');
+        })();
+    </script>
     <script src="username-manager.js"></script>
 </body>
 
