@@ -42,3 +42,69 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     console.log('✅ Username valide:', username);
 });
+document.addEventListener('DOMContentLoaded', async () => {
+    const client = window.supabaseClient || window.supabase;
+
+    const input = document.getElementById('usernameInput');
+    const button = document.getElementById('saveUsername');
+    const errorBox = document.getElementById('usernameError');
+
+    if (!client) {
+        errorBox.textContent = 'Erreur: Supabase non chargé';
+        return;
+    }
+
+    button.addEventListener('click', async () => {
+        errorBox.textContent = '';
+
+        const username = input.value.trim();
+
+        // 1️⃣ validation basique
+        if (username.length < 3 || username.length > 20) {
+            errorBox.textContent = 'Le pseudo doit contenir entre 3 et 20 caractères';
+            return;
+        }
+
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            errorBox.textContent = 'Caractères autorisés : lettres, chiffres et _';
+            return;
+        }
+
+        // 2️⃣ utilisateur connecté
+        const { data: authData } = await client.auth.getUser();
+        if (!authData?.user) {
+            errorBox.textContent = 'Utilisateur non connecté';
+            return;
+        }
+
+        const userId = authData.user.id;
+
+        // 3️⃣ unicité du pseudo
+        const { data: existing } = await client
+            .from('profiles')
+            .select('id')
+            .ilike('username', username)
+            .maybeSingle();
+
+        if (existing) {
+            errorBox.textContent = 'Ce pseudo est déjà utilisé';
+            return;
+        }
+
+        // 4️⃣ sauvegarde
+        const { error } = await client
+            .from('profiles')
+            .update({ username })
+            .eq('id', userId);
+
+        if (error) {
+            console.error(error);
+            errorBox.textContent = 'Erreur lors de l’enregistrement';
+            return;
+        }
+
+        // 5️⃣ succès
+        console.log('✅ Username enregistré:', username);
+        window.location.href = 'index.html';
+    });
+});

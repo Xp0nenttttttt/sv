@@ -58,10 +58,13 @@
 
 <body class="setup-page">
     <div class="card">
+
+
         <h2>Configuration du nom d'utilisateur</h2>
         <p>Veuillez choisir un nom d'utilisateur unique pour votre profil.</p>
-        <input type="text" id="username" placeholder="Nom d'utilisateur" />
-        <button class="btn" id="saveUsername">Enregistrer</button>
+        <input id="usernameInput" type="text" placeholder="Ton pseudo" />
+        <button id="saveUsername">Valider</button>
+        <p id="usernameError"></p>
         <p class="muted">Vous pouvez changer ce nom plus tard dans les paramètres.</p>
         <p class="error" id="errorMessage" style="display:none;"></p>
     </div>
