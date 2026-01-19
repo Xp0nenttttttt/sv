@@ -100,9 +100,14 @@ async function fetchAccountData(username, allLevels) {
         })
         : [];
 
-    const isTop1 = player?.rank === 1;
-    const isTop2 = player?.rank === 2;
-    const isTop3 = player?.rank === 3;
+    const playerIndex = players.findIndex(p =>
+        p.name?.toLowerCase() === username.toLowerCase()
+    );
+
+    const isTop1 = playerIndex === 0;
+    const isTop2 = playerIndex === 1;
+    const isTop3 = playerIndex === 2;
+
 
     return { player, verifier, createdLevels, beatenLevels, verifiedLevels, isTop1, isTop2, isTop3 };
 }
