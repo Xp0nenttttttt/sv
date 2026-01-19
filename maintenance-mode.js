@@ -66,6 +66,8 @@ const maintenanceManager = {
                     setting_value: { enabled: true, message: message },
                     updated_at: new Date().toISOString(),
                     updated_by: 'admin'
+                }, {
+                    onConflict: 'setting_key'
                 });
 
             if (error) throw error;
@@ -92,6 +94,8 @@ const maintenanceManager = {
                     setting_value: { enabled: false, message: '' },
                     updated_at: new Date().toISOString(),
                     updated_by: 'admin'
+                }, {
+                    onConflict: 'setting_key'
                 });
 
             if (error) throw error;
