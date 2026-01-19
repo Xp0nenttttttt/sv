@@ -1,11 +1,4 @@
-const createdLevels = submissions.filter(lvl =>
-    lvl.creator === username &&
-    (
-        lvl.status === 'accepted' ||
-        lvl.status === 'approved' ||
-        lvl.isAccepted === true
-    )
-);
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -27,7 +20,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 // account-details.js
 // Affiche les infos, records, vérifications et niveaux créés d'un compte
-
+const createdLevels = submissions.filter(lvl =>
+    lvl.creator === username &&
+    (
+        lvl.status === 'accepted' ||
+        lvl.status === 'approved' ||
+        lvl.isAccepted === true
+    )
+);
 // Récupère le nom d'utilisateur depuis l'URL (?user=...)
 function getUserFromUrl() {
     const params = new URLSearchParams(window.location.search);
