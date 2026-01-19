@@ -37,8 +37,8 @@ async function fetchAccountData(username) {
     ]);
 
     const player = players.find(p => p.name.toLowerCase() === username.toLowerCase());
-    const verifier = verifier &&
-        verifier.toLowerCase() === username.toLowerCase()
+    const verifier = verifiers.find(v => v.name.toLowerCase() === username.toLowerCase());
+    verifier.toLowerCase() === username.toLowerCase()
 
     const createdLevels = submissions.filter(lvl =>
         lvl.creator === username &&
