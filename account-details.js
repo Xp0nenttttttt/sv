@@ -103,10 +103,17 @@ async function fetchAccountData(username, allLevels) {
     const playerIndex = players.findIndex(p =>
         p.name?.toLowerCase() === username.toLowerCase()
     );
+    const combined = await leaderboardManager.getCombinedLeaderboard();
 
-    const isTop1 = playerIndex === 0;
-    const isTop2 = playerIndex === 1;
-    const isTop3 = playerIndex === 2;
+    const index = combined.findIndex(entry =>
+        entry.type !== 'verifier' && // on exclut les verify-only si besoin
+        entry.name?.toLowerCase() === username.toLowerCase()
+    );
+
+    const isTop1 = index === 0;
+    const isTop2 = index === 1;
+    const isTop3 = index === 2;
+
 
 
     return { player, verifier, createdLevels, beatenLevels, verifiedLevels, isTop1, isTop2, isTop3 };
@@ -285,3 +292,9 @@ function renderStats(created, beaten, verified) {
     document.querySelector('.fill.verified').style.width =
         `${(verified / max) * 100}%`;
 }
+console.log(
+    'Classement combiné:',
+    combined.map((e, i) => `${i + 1}. ${e.name} (${e.type})`)
+);
+console.log('Utilisateur page compte:', username);
+console.log('Index trouvé:', index);
