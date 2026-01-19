@@ -157,3 +157,4 @@ function renderList(id, items, formatter, emptyText) {
         el.innerHTML += `<li>${formatter(item)}</li>`;
     });
 }
+console.log(acceptedLevels[0]);
