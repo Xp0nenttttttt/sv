@@ -315,4 +315,4 @@ async function fetchAccountData(username, allLevels) {
         combined.map((e, i) => `${i + 1}. ${e.name} (${e.type})`)
 
     );
-
+}
