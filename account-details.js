@@ -170,6 +170,16 @@ async function fetchUserClan(username) {
 // Render
 function renderAccountDetails(data, username, profile, clan) {
     const { player, verifier, createdLevels, beatenLevels, verifiedLevels } = data;
+    const badgeContainer = document.getElementById('rank-badges');
+    badgeContainer.innerHTML = '';
+
+    if (data.isTop1) {
+        badgeContainer.innerHTML = `<span class="top1-badge">TOP 1</span>`;
+    } else if (data.isTop2) {
+        badgeContainer.innerHTML = `<span class="top2-badge">TOP 2</span>`;
+    } else if (data.isTop3) {
+        badgeContainer.innerHTML = `<span class="top3-badge">TOP 3</span>`;
+    }
 
     const title = document.getElementById('account-title');
 
