@@ -2,36 +2,26 @@
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
     <title>Connexion - SV Challenge</title>
-
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="dark-mode.css" />
+    <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="auth-page">
+<body>
 
-    <div class="auth-card">
-        <h2>Connexion</h2>
-        <p class="muted">Content de te revoir 👋</p>
+    <main style="max-width:400px;margin:80px auto;">
+        <h2>🔐 Connexion</h2>
 
-        <form id="loginForm">
-            <input type="email" id="email" placeholder="Email" required />
-            <input type="password" id="password" placeholder="Mot de passe" required />
+        <input id="email" type="email" placeholder="Email" />
+        <input id="password" type="password" placeholder="Mot de passe" />
 
-            <button type="submit">Se connecter</button>
-            <p id="error" class="error"></p>
-        </form>
+        <button id="loginBtn">Se connecter</button>
 
-        <p class="muted">
-            Pas encore de compte ?
-            <a href="register.html">Créer un compte</a>
-        </p>
-    </div>
+        <p id="loginError" style="color:red;"></p>
+    </main>
 
     <script src="supabase-config.js"></script>
-    <script src="auth.js"></script>
+    <script src="login.js"></script>
 </body>
 
 </html>
