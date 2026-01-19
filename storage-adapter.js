@@ -349,16 +349,19 @@ async function initializeSupabaseStorage() {
             universalStorage = new UniversalStorageManager(hybridAdapter);
             console.log('✅ Stockage Supabase initialisé (SANS fallback localStorage)');
         } catch (supabaseError) {
-            console.error('❌ Erreur Supabase - PAS de fallback:', supabaseError.message);
-            // NE PAS FALLBACK - lever l'erreur
-            throw supabaseError;
+            console.error('❌ Erreur Supabase - fallback localStorage:', supabaseError.message);
+            // FALLBACK localStorage
+            universalStorage = new UniversalStorageManager(new LocalStorageAdapter());
+            console.log('✅ Fallback sur localStorage');
         }
 
         return true;
     } catch (error) {
         console.error('❌ Erreur initialisation stockage Supabase:', error);
-        // NE PAS FALLBACK SUR LOCALSTORAGE
-        throw error;
+        // FALLBACK localStorage
+        universalStorage = new UniversalStorageManager(new LocalStorageAdapter());
+        console.log('✅ Fallback sur localStorage');
+        return false;
     }
 }
 
