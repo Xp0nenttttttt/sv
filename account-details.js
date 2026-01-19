@@ -1,3 +1,21 @@
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        if (typeof enableSupabaseStorage === 'function') {
+            await enableSupabaseStorage();
+            console.log('✅ Supabase activé (page compte)');
+        }
+
+        // Précharger les données nécessaires
+        await universalStorage.getData('svChallengeSubmissions');
+        await universalStorage.getData('svChallengeRecordSubmissions');
+
+        // Maintenant seulement tu charges le compte
+        await loadAccountDetails();
+
+    } catch (err) {
+        console.error('❌ Erreur chargement compte:', err);
+    }
+});
 // account-details.js
 // Affiche les infos, records, vérifications et niveaux créés d'un compte
 
