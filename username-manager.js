@@ -1,11 +1,21 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🟡 Username manager lancé');
+    let attempts = 0;
 
-    const client = window.supabaseClient || window.supabase;
+    // ⏳ attendre supabaseClient
+    while (!window.supabaseClient && attempts < 100) {
+        await new Promise(r => setTimeout(r, 50));
+        attempts++;
+    }
+
+    const client = window.supabaseClient;
+
     if (!client) {
-        console.warn('❌ Supabase non prêt');
+        console.error('❌ Supabase toujours indisponible');
         return;
     }
+
+    console.log('✅ Supabase prêt (username setup)');
+
 
     // 1️⃣ utilisateur connecté ?
     const { data: authData } = await client.auth.getUser();
