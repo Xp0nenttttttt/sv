@@ -105,8 +105,6 @@ async function fetchAccountData(username, allLevels) {
     const isTop3 = player?.rank === 3;
 
     return { player, verifier, createdLevels, beatenLevels, verifiedLevels, isTop1, isTop2, isTop3 };
-    console.log(clan);
-    console.log('Clan résultat:', clan);
 }
 
 // ──────────────────────────────
@@ -141,7 +139,7 @@ async function fetchUserClan(username) {
     const { data, error } = await client
         .from('clans')
         .select('tag')
-        .contains('members', [username])
+        .contains('user_id', [username])
         .single();
 
     if (error) {
