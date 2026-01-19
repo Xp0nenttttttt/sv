@@ -89,8 +89,8 @@ function renderAccountDetails({ player, verifier, createdLevels }, username) {
     // Niveaux vérifiés
     const verifList = document.getElementById('verifications-list');
     verifList.innerHTML = '';
-    if (verifier && verifier.levels && verifier.levels.length > 0) {
-        verifier.levels.forEach(l => {
+    if (Array.isArray(arguments[0].verifiedLevels) && arguments[0].verifiedLevels.length > 0) {
+        arguments[0].verifiedLevels.forEach(l => {
             verifList.innerHTML += `<li>${l.levelName} (Rank ${l.rank}) - ${l.points} pts</li>`;
         });
     } else {
