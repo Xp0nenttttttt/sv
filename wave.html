@@ -3,21 +3,589 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wave Precision</title>
-    <link rel="stylesheet" href="wave.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
+            letter-spacing: 3px;
+        }
+
+        .instructions {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        #gameCanvas {
+            border: 3px solid rgba(138, 43, 226, 0.5);
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            background: #1a1a2e;
+        }
+
+        .score-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .score {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .best-score {
+            font-size: 1.2em;
+            margin-top: 5px;
+            color: #ffd700;
+            opacity: 0.8;
+        }
+
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5em;
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        .start-message {
+            color: #00d4ff;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .game-over-message {
+            color: #ff4757;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%);
+            }
+
+            25% {
+                transform: translate(-48%, -50%);
+            }
+
+            75% {
+                transform: translate(-52%, -50%);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
+    <h1>⚡ WAVE PRECISION ⚡</h1>
+    <p class="instructions">Maintiens ESPACE ou CLIC pour monter • Relâche pour descendre</p>
 
-    <h1>🌊 Wave Precision</h1>
-    <p>Clique ou maintiens ESPACE pour monter</p>
+    <div style="position: relative;">
+        <canvas id="gameCanvas" width="800" height="500"></canvas>
+        <div id="message" class="message start-message">
+            CLIQUE POUR COMMENCER
+        </div>
+    </div>
 
-    <canvas id="game" width="900" height="400"></canvas>
+    <div class="score-container">
+        <div class="score">Score: <span id="score">0</span></div>
+        <div class="best-score">Meilleur: <span id="bestScore">0</span></div>
+    </div>
 
-    <p id="score">Score : 0</p>
-    <p id="hint">Clique pour commencer</p>
+    <script>
+        // === CONFIGURATION ===
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const bestScoreElement = document.getElementById('bestScore');
+        const messageElement = document.getElementById('message');
 
-    <script src="wave.js"></script>
+        // === ÉTAT DU JEU ===
+        let gameState = 'waiting'; // waiting, playing, gameOver
+        let score = 0;
+        let bestScore = parseInt(localStorage.getItem('waveBestScore')) || 0;
+        bestScoreElement.textContent = bestScore;
+
+        // === JOUEUR (WAVE) ===
+        const player = {
+            x: 150, // Position fixe
+            y: canvas.height / 2,
+            width: 20,
+            height: 20,
+            diagonalSpeed: 4, // Vitesse de montée/descente constante
+        };
+
+        // === TRAÎNÉE ===
+        let trail = [];
+        const scrollSpeed = 4; // Vitesse de défilement de la traînée
+
+        // === OBSTACLES COULOIR ===
+        let topPath = [];
+        let bottomPath = [];
+        const obstacleThickness = 8;
+        const segmentWidth = 200; // Largeur d'un segment diagonal
+        const corridorGap = 120; // Espace entre les deux murs
+        let obstacleSpeed = 4;
+        let difficultyTimer = 0;
+        let direction = 1; // 1 = monte, -1 = descend
+
+        // === PARTICULES ===
+        let particles = [];
+
+        // === CONTRÔLES ===
+        let isPressingUp = false;
+
+        // Souris
+        canvas.addEventListener('mousedown', handleInput);
+        canvas.addEventListener('mouseup', () => isPressingUp = false);
+
+        // Clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                handleInput();
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'Space') {
+                isPressingUp = false;
+            }
+        });
+
+        // Touch (mobile)
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleInput();
+        });
+        canvas.addEventListener('touchend', () => isPressingUp = false);
+
+        function handleInput() {
+            if (gameState === 'waiting') {
+                startGame();
+            } else if (gameState === 'playing') {
+                isPressingUp = true;
+            } else if (gameState === 'gameOver') {
+                resetGame();
+            }
+        }
+
+        // === DÉMARRAGE ===
+        function startGame() {
+            gameState = 'playing';
+            messageElement.classList.add('hidden');
+            score = 0;
+            player.y = canvas.height / 2;
+            particles = [];
+            trail = [];
+            obstacleSpeed = 4;
+            difficultyTimer = 0;
+            direction = 1;
+
+            // Initialiser les chemins du couloir
+            topPath = [];
+            bottomPath = [];
+            let centerY = canvas.height / 2;
+
+            for (let x = canvas.width; x >= -segmentWidth; x -= segmentWidth) {
+                topPath.push({ x: x, y: centerY - corridorGap / 2 });
+                bottomPath.push({ x: x, y: centerY + corridorGap / 2 });
+
+                centerY += direction * segmentWidth; // Même ratio que la wave (45°)
+
+                // Inverser la direction si on atteint les limites
+                if (centerY - corridorGap / 2 < 60 || centerY + corridorGap / 2 > canvas.height - 60) {
+                    direction *= -1;
+                    centerY = Math.max(60 + corridorGap / 2, Math.min(canvas.height - 60 - corridorGap / 2, centerY));
+                }
+            }
+        }
+
+        // === RÉINITIALISATION ===
+        function resetGame() {
+            gameState = 'waiting';
+            messageElement.textContent = 'CLIQUE POUR COMMENCER';
+            messageElement.className = 'message start-message';
+            messageElement.classList.remove('hidden');
+        }
+
+        // === MISE À JOUR ===
+        function update() {
+            if (gameState !== 'playing') return;
+
+            // Mouvement diagonal strict de la wave
+            if (isPressingUp) {
+                player.y -= player.diagonalSpeed; // Montée constante
+            } else {
+                player.y += player.diagonalSpeed; // Descente constante
+            }
+
+            // Ajout de la position actuelle à la traînée
+            trail.push({ x: player.x + player.width / 2, y: player.y + player.height / 2 });
+
+            // Déplacement de tous les points de la traînée vers la gauche
+            for (let i = 0; i < trail.length; i++) {
+                trail[i].x -= scrollSpeed;
+            }
+
+            // Suppression des points sortis de l'écran
+            trail = trail.filter(point => point.x > 0);
+
+            // Collision avec les bords
+            if (player.y < 0 || player.y + player.height > canvas.height) {
+                endGame();
+                return;
+            }
+
+            // Mise à jour des chemins du couloir
+            for (let i = 0; i < topPath.length; i++) {
+                topPath[i].x -= obstacleSpeed;
+                bottomPath[i].x -= obstacleSpeed;
+            }
+
+            // Ajouter de nouveaux points à droite si nécessaire
+            while (topPath.length > 0 && topPath[topPath.length - 1].x < canvas.width + segmentWidth) {
+                const lastTop = topPath[topPath.length - 1];
+                const lastBottom = bottomPath[bottomPath.length - 1];
+                const centerY = (lastTop.y + lastBottom.y) / 2;
+                const newCenterY = centerY + direction * segmentWidth;
+
+                // Inverser si on atteint les limites
+                if (newCenterY - corridorGap / 2 < 60 || newCenterY + corridorGap / 2 > canvas.height - 60) {
+                    direction *= -1;
+                }
+
+                const clampedCenterY = Math.max(60 + corridorGap / 2, Math.min(canvas.height - 60 - corridorGap / 2, newCenterY));
+                topPath.push({ x: lastTop.x + segmentWidth, y: clampedCenterY - corridorGap / 2 });
+                bottomPath.push({ x: lastBottom.x + segmentWidth, y: clampedCenterY + corridorGap / 2 });
+            }
+
+            // Supprimer les points sortis de l'écran à gauche
+            topPath = topPath.filter(point => point.x > -segmentWidth);
+            bottomPath = bottomPath.filter(point => point.x > -segmentWidth);
+
+            // Collision avec l'obstacle
+            if (checkObstacleCollision()) {
+                endGame();
+                return;
+            }
+
+            // Mise à jour des particules
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            // Score et difficulté
+            score++;
+            scoreElement.textContent = Math.floor(score / 10);
+
+            difficultyTimer++;
+            if (difficultyTimer > 600 && obstacleSpeed < 8) {
+                obstacleSpeed += 0.5;
+                player.diagonalSpeed += 0.25;
+                difficultyTimer = 0;
+            }
+        }
+
+        // === COLLISION AVEC OBSTACLES ===
+        function checkObstacleCollision() {
+            const playerCenterX = player.x + player.width / 2;
+            const playerCenterY = player.y + player.height / 2;
+
+            // Vérifier collision avec le mur du haut
+            for (let i = 0; i < topPath.length - 1; i++) {
+                const p1 = topPath[i];
+                const p2 = topPath[i + 1];
+
+                if (playerCenterX >= Math.min(p1.x, p2.x) - player.width / 2 &&
+                    playerCenterX <= Math.max(p1.x, p2.x) + player.width / 2) {
+
+                    const t = (playerCenterX - p1.x) / (p2.x - p1.x);
+                    const obstacleY = p1.y + t * (p2.y - p1.y);
+                    const distance = Math.abs(playerCenterY - obstacleY);
+
+                    if (distance < obstacleThickness + player.height / 2) {
+                        return true;
+                    }
+                }
+            }
+
+            // Vérifier collision avec le mur du bas
+            for (let i = 0; i < bottomPath.length - 1; i++) {
+                const p1 = bottomPath[i];
+                const p2 = bottomPath[i + 1];
+
+                if (playerCenterX >= Math.min(p1.x, p2.x) - player.width / 2 &&
+                    playerCenterX <= Math.max(p1.x, p2.x) + player.width / 2) {
+
+                    const t = (playerCenterX - p1.x) / (p2.x - p1.x);
+                    const obstacleY = p1.y + t * (p2.y - p1.y);
+                    const distance = Math.abs(playerCenterY - obstacleY);
+
+                    if (distance < obstacleThickness + player.height / 2) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        // === FIN DE JEU ===
+        function endGame() {
+            gameState = 'gameOver';
+
+            const finalScore = Math.floor(score / 10);
+            if (finalScore > bestScore) {
+                bestScore = finalScore;
+                localStorage.setItem('waveBestScore', bestScore);
+                bestScoreElement.textContent = bestScore;
+            }
+
+            // Explosion de particules
+            for (let i = 0; i < 30; i++) {
+                createDeathParticle();
+            }
+
+            messageElement.textContent = `GAME OVER\n${finalScore} points`;
+            messageElement.className = 'message game-over-message';
+            messageElement.classList.remove('hidden');
+        }
+
+        // === PARTICULES ===
+        class Particle {
+            constructor(x, y, vx, vy, color, size) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.color = color;
+                this.size = size;
+                this.life = 60;
+                this.maxLife = 60;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.2;
+                this.life--;
+            }
+
+            draw() {
+                const alpha = this.life / this.maxLife;
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function createDeathParticle() {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 5 + 2;
+            particles.push(new Particle(
+                player.x + player.width / 2,
+                player.y + player.height / 2,
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                '#ff4757',
+                Math.random() * 4 + 2
+            ));
+        }
+
+        function createTrailParticle() {
+            particles.push(new Particle(
+                player.x,
+                player.y + player.height / 2,
+                0,
+                0,
+                '#00d4ff',
+                3
+            ));
+        }
+
+        // === RENDU ===
+        function draw() {
+            // Background
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grille subtile
+            ctx.strokeStyle = 'rgba(138, 43, 226, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+            // Traînée solide
+            if (trail.length > 1) {
+                ctx.strokeStyle = '#00d4ff';
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#00d4ff';
+
+                ctx.beginPath();
+                ctx.moveTo(trail[0].x, trail[0].y);
+                for (let i = 1; i < trail.length; i++) {
+                    ctx.lineTo(trail[i].x, trail[i].y);
+                }
+                ctx.stroke();
+
+                ctx.shadowBlur = 0;
+            }
+
+            // Mur du haut
+            if (topPath.length > 1) {
+                ctx.strokeStyle = '#ff4757';
+                ctx.lineWidth = obstacleThickness;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ff4757';
+
+                ctx.beginPath();
+                ctx.moveTo(topPath[0].x, topPath[0].y);
+                for (let i = 1; i < topPath.length; i++) {
+                    ctx.lineTo(topPath[i].x, topPath[i].y);
+                }
+                ctx.stroke();
+
+                // Bordure brillante
+                ctx.strokeStyle = '#ff6b81';
+                ctx.lineWidth = obstacleThickness + 4;
+                ctx.globalAlpha = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(topPath[0].x, topPath[0].y);
+                for (let i = 1; i < topPath.length; i++) {
+                    ctx.lineTo(topPath[i].x, topPath[i].y);
+                }
+                ctx.stroke();
+
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+            }
+
+            // Mur du bas
+            if (bottomPath.length > 1) {
+                ctx.strokeStyle = '#ff4757';
+                ctx.lineWidth = obstacleThickness;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ff4757';
+
+                ctx.beginPath();
+                ctx.moveTo(bottomPath[0].x, bottomPath[0].y);
+                for (let i = 1; i < bottomPath.length; i++) {
+                    ctx.lineTo(bottomPath[i].x, bottomPath[i].y);
+                }
+                ctx.stroke();
+
+                // Bordure brillante
+                ctx.strokeStyle = '#ff6b81';
+                ctx.lineWidth = obstacleThickness + 4;
+                ctx.globalAlpha = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(bottomPath[0].x, bottomPath[0].y);
+                for (let i = 1; i < bottomPath.length; i++) {
+                    ctx.lineTo(bottomPath[i].x, bottomPath[i].y);
+                }
+                ctx.stroke();
+
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+            }
+
+            // Particules
+            particles.forEach(p => p.draw());
+
+            // Joueur (wave triangle)
+            ctx.fillStyle = '#00d4ff';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#00d4ff';
+
+            ctx.beginPath();
+            ctx.moveTo(player.x, player.y + player.height / 2);
+            ctx.lineTo(player.x + player.width, player.y);
+            ctx.lineTo(player.x + player.width, player.y + player.height);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+        }
+
+        // === BOUCLE PRINCIPALE ===
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Démarrage
+        gameLoop();
+    </script>
 </body>
 
 </html>
