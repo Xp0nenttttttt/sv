@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Wave Precision</title>
+
     <style>
         body {
             margin: 0;
-            background: #0b0f1a;
+            background: #05070f;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,15 +19,16 @@
         }
 
         canvas {
-            background: #0f1424;
-            border: 2px solid #2a335a;
+            background: #0b1020;
+            border: 2px solid #202b55;
         }
 
         .ui {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 12px;
+            left: 12px;
             font-size: 18px;
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -45,33 +47,41 @@
         const scoreEl = document.getElementById('score');
 
         // ─────────────────────────────
-        // PLAYER (WAVE)
+        // IMAGE
+        // ─────────────────────────────
+        const waveImage = new Image();
+        waveImage.src = 'wave.png';
+
+        // ─────────────────────────────
+        // PLAYER
         // ─────────────────────────────
         const player = {
-            x: 150,
+            x: 180,
             y: canvas.height / 2,
-            size: 6,
-            diagonalSpeed: 4,
-            direction: 1 // 1 = up, -1 = down
+            size: 28,
+            speed: 4,
+            direction: 1, // 1 = up, -1 = down
+            trail: []
         };
 
         // ─────────────────────────────
         // COULOIR
         // ─────────────────────────────
-        let corridorGap = 90;
-        let corridorCenterY = canvas.height / 2;
-        let corridorDirection = 1;
+        let gap = 90;
+        let centerY = canvas.height / 2;
+        let corridorDir = 1;
 
         let topPath = [];
         let bottomPath = [];
 
-        const obstacleSpeed = 3;
+        const scrollSpeed = 3;
 
         // ─────────────────────────────
         // GAME STATE
         // ─────────────────────────────
         let running = false;
         let score = 0;
+        let deathTimeout = null;
 
         // ─────────────────────────────
         // INPUT
@@ -82,28 +92,30 @@
         window.addEventListener('keydown', e => {
             if (e.code === 'Space') player.direction = -1;
         });
-
         window.addEventListener('keyup', e => {
             if (e.code === 'Space') player.direction = 1;
         });
 
         // ─────────────────────────────
-        // INIT
+        // START / RESET
         // ─────────────────────────────
         function startGame() {
             running = true;
             score = 0;
-            player.y = canvas.height / 2;
+            scoreEl.textContent = 0;
 
-            corridorCenterY = canvas.height / 2;
-            corridorDirection = 1;
+            player.y = canvas.height / 2;
+            player.trail = [];
+
+            centerY = canvas.height / 2;
+            corridorDir = 1;
 
             topPath = [];
             bottomPath = [];
 
             for (let x = canvas.width; x >= -50; x -= 10) {
-                topPath.push({ x, y: corridorCenterY - corridorGap / 2 });
-                bottomPath.push({ x, y: corridorCenterY + corridorGap / 2 });
+                topPath.push({ x, y: centerY - gap / 2 });
+                bottomPath.push({ x, y: centerY + gap / 2 });
             }
 
             requestAnimationFrame(loop);
@@ -115,38 +127,43 @@
         function update() {
             if (!running) return;
 
-            // player movement
-            player.y += player.direction * player.diagonalSpeed;
+            // wave movement
+            player.y += player.direction * player.speed;
 
-            // corridor vertical movement (same angle as wave)
-            corridorCenterY += corridorDirection * player.diagonalSpeed;
+            // trail
+            player.trail.push({ x: player.x, y: player.y });
+            if (player.trail.length > 20) player.trail.shift();
 
-            if (corridorCenterY - corridorGap / 2 < 50) corridorDirection = 1;
-            if (corridorCenterY + corridorGap / 2 > canvas.height - 50) corridorDirection = -1;
+            // corridor vertical movement (same slope)
+            centerY += corridorDir * player.speed;
 
-            // move corridor horizontally
-            topPath.forEach(p => p.x -= obstacleSpeed);
-            bottomPath.forEach(p => p.x -= obstacleSpeed);
+            if (centerY - gap / 2 < 50) corridorDir = 1;
+            if (centerY + gap / 2 > canvas.height - 50) corridorDir = -1;
 
-            // extend corridor to the right
+            // move corridor
+            topPath.forEach(p => p.x -= scrollSpeed);
+            bottomPath.forEach(p => p.x -= scrollSpeed);
+
+            // extend corridor
             while (topPath[topPath.length - 1].x < canvas.width) {
-                const lastX = topPath[topPath.length - 1].x + 10;
-                topPath.push({ x: lastX, y: corridorCenterY - corridorGap / 2 });
-                bottomPath.push({ x: lastX, y: corridorCenterY + corridorGap / 2 });
+                const nextX = topPath[topPath.length - 1].x + 10;
+                topPath.push({ x: nextX, y: centerY - gap / 2 });
+                bottomPath.push({ x: nextX, y: centerY + gap / 2 });
             }
 
             // cleanup
-            topPath = topPath.filter(p => p.x > -20);
-            bottomPath = bottomPath.filter(p => p.x > -20);
+            topPath = topPath.filter(p => p.x > -30);
+            bottomPath = bottomPath.filter(p => p.x > -30);
 
             // collision
             for (let i = 0; i < topPath.length; i++) {
-                if (Math.abs(topPath[i].x - player.x) < 5) {
+                if (Math.abs(topPath[i].x - player.x) < 6) {
                     if (
-                        player.y - player.size < topPath[i].y ||
-                        player.y + player.size > bottomPath[i].y
+                        player.y < topPath[i].y ||
+                        player.y > bottomPath[i].y
                     ) {
-                        running = false;
+                        die();
+                        return;
                     }
                 }
             }
@@ -162,31 +179,48 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // corridor
-            ctx.strokeStyle = '#ff4d4d';
+            ctx.strokeStyle = '#ff3b3b';
             ctx.lineWidth = 2;
 
             ctx.beginPath();
-            topPath.forEach((p, i) => {
-                if (i === 0) ctx.moveTo(p.x, p.y);
-                else ctx.lineTo(p.x, p.y);
-            });
+            topPath.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
             ctx.stroke();
 
             ctx.beginPath();
-            bottomPath.forEach((p, i) => {
-                if (i === 0) ctx.moveTo(p.x, p.y);
-                else ctx.lineTo(p.x, p.y);
-            });
+            bottomPath.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
             ctx.stroke();
 
-            // player
-            ctx.fillStyle = '#00eaff';
+            // trail
+            ctx.strokeStyle = 'rgba(0, 234, 255, 0.5)';
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(player.x, player.y);
-            ctx.lineTo(player.x - player.size, player.y - player.size);
-            ctx.lineTo(player.x - player.size, player.y + player.size);
-            ctx.closePath();
-            ctx.fill();
+            player.trail.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+            ctx.stroke();
+
+            // wave image with rotation
+            const angle = player.direction === -1 ? -Math.PI / 4 : Math.PI / 4;
+
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(angle);
+            ctx.drawImage(
+                waveImage,
+                -player.size / 2,
+                -player.size / 2,
+                player.size,
+                player.size
+            );
+            ctx.restore();
+        }
+
+        // ─────────────────────────────
+        // DEATH
+        // ─────────────────────────────
+        function die() {
+            running = false;
+
+            if (deathTimeout) clearTimeout(deathTimeout);
+            deathTimeout = setTimeout(startGame, 500);
         }
 
         // ─────────────────────────────
@@ -198,17 +232,13 @@
 
             if (running) {
                 requestAnimationFrame(loop);
-            } else {
-                ctx.fillStyle = 'white';
-                ctx.font = '30px Arial';
-                ctx.fillText('Game Over', canvas.width / 2 - 80, canvas.height / 2);
             }
         }
 
         // ─────────────────────────────
-        // START
+        // INIT
         // ─────────────────────────────
-        startGame();
+        waveImage.onload = startGame;
     </script>
 
 </body>
