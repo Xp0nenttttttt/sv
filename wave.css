@@ -1,0 +1,21 @@
+body {
+    background: #0e1016;
+    color: #f2f4fb;
+    text-align: center;
+    font-family: sans-serif;
+}
+
+canvas {
+    background: #141824;
+    border: 2px solid #2b3240;
+    margin-top: 16px;
+}
+
+#score {
+    margin-top: 8px;
+    font-size: 18px;
+}
+
+#hint {
+    color: #9aa2b5;
+}
